@@ -1,0 +1,43 @@
+[common]
+enable_register = true
+
+[log]
+log_path = "/var/log/web-history.log"
+log_level = "debug"
+
+[web]
+port = 8080
+addr = "0.0.0.0"
+
+[jwt]
+jwt_key = "he-jwt-key"
+jwt_secret = "123456abcdef"
+
+[singlefile]
+path = "/data/history-engine/html" # 为空默认在当前目录下创建html文件夹
+max_version = 5
+version_check_interval = 3600 # 检查版本间隔时间
+version_check_limit = 100 # 检查版本数量限制
+
+[readability]
+parser = "mozilla" # 解析器，目前只支持mozilla
+path = "/usr/lib/readability.js"
+
+[zincsearch]
+host = "http://zincsearch.example.com"
+shared_num = 3
+index = "web_history"
+index_prefix = "he"
+user = "admin"
+password = "admin"
+
+[database]
+drive = "mysql"
+host = "127.0.0.1"
+port = 3306
+user = "root"
+password = "123456"
+name = "history"
+ssl = "false"
+charset = "utf8mb4"
+timeout = 10
