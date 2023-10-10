@@ -1,13 +1,18 @@
 package main
 
 import (
+	"fmt"
 	"github.com/urfave/cli"
 	"history-engine/engine/jobs"
 	"history-engine/engine/setting"
 	"history-engine/engine/web"
 	"log"
 	"os"
+	"runtime"
+	"time"
 )
+
+var buildVersion = "dev-master"
 
 func main() {
 	app := cli.NewApp()
@@ -16,7 +21,7 @@ func main() {
 	app.Description = "history engine"
 	app.Before = loadSetting
 	app.Commands = []cli.Command{web.Web, jobs.Jobs}
-	app.EnableBashCompletion = true
+	app.Version = fmt.Sprintf("%s, build with: %s, time: %s", buildVersion, runtime.Version(), time.Now().Format(time.RFC3339))
 
 	app.Flags = append(app.Flags, []cli.Flag{
 		cli.StringFlag{
