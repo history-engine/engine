@@ -1,8 +1,8 @@
 package jobs
 
-import "github.com/urfave/cli"
+import "github.com/urfave/cli/v2"
 
-var Jobs = cli.Command{
+var Jobs = &cli.Command{
 	Name:        "jobs",
 	Usage:       "start engine jobs server",
 	Description: "run engine jobs server and listen for requests",

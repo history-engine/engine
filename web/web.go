@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
-	"github.com/urfave/cli"
+	"github.com/urfave/cli/v2"
 	"history-engine/engine/library/db"
 	"history-engine/engine/setting"
 	"history-engine/engine/web/routes"
@@ -14,7 +14,7 @@ import (
 	"strings"
 )
 
-var Web = cli.Command{
+var Web = &cli.Command{
 	Name:        "web",
 	Usage:       "start engine web server",
 	Description: "run engine web server and listen for requests",

@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"github.com/urfave/cli"
+	"github.com/urfave/cli/v2"
 	"history-engine/engine/jobs"
 	"history-engine/engine/setting"
 	"history-engine/engine/web"
@@ -20,11 +20,11 @@ func main() {
 	app.Usage = "history engine"
 	app.Description = "history engine"
 	app.Before = loadSetting
-	app.Commands = []cli.Command{web.Web, jobs.Jobs}
+	app.Commands = []*cli.Command{web.Web, jobs.Jobs}
 	app.Version = fmt.Sprintf("%s, build with: %s, time: %s", buildVersion, runtime.Version(), time.Now().Format(time.RFC3339))
 
 	app.Flags = append(app.Flags, []cli.Flag{
-		cli.StringFlag{
+		&cli.StringFlag{
 			Name:  "config, c",
 			Value: setting.CustomFile,
 			Usage: "Custom configuration file path",
