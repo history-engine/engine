@@ -3,7 +3,9 @@ package page
 import (
 	"context"
 	"fmt"
+	"go.uber.org/zap"
 	"history-engine/engine/library/db"
+	"history-engine/engine/library/logger"
 	"history-engine/engine/setting"
 	"log"
 	"os"
@@ -13,8 +15,10 @@ import (
 func NextVersion(ctx context.Context, uniqueId string) int {
 	var version int
 	x := db.GetEngine()
-	err := x.GetContext(ctx, &version, "select max(version) from page where unique_id=?", uniqueId)
+	sql := "select max(version) from page where unique_id=?"
+	err := x.GetContext(ctx, &version, sql, uniqueId)
 	if err != nil {
+		logger.Zap().Error("get max version error", zap.String("sql", sql), zap.String("unique_id", uniqueId), zap.Error(err))
 		return 1
 	}
 
@@ -34,9 +38,11 @@ func CleanHistory(ctx context.Context, uniqueId string) error {
 		Min: 0,
 		Max: 0,
 	}
-	err := x.GetContext(ctx, &v, "select min(version) as min, max(version) as max from page where unique_id=?", uniqueId)
+
+	sql := "select min(version) as min, max(version) as max from page where unique_id=?"
+	err := x.GetContext(ctx, &v, sql, uniqueId)
 	if err != nil {
-		// todo
+		logger.Zap().Error("check min and max version error", zap.String("sql", sql), zap.String("unique_id", uniqueId), zap.Error(err))
 		return err
 	}
 
@@ -45,9 +51,10 @@ func CleanHistory(ctx context.Context, uniqueId string) error {
 	}
 
 	// todo 改成全部查出来再删除比较好因为还要删除文件和索引
-	res, err := x.ExecContext(ctx, "delete from page where unique_id=? and version < ?", uniqueId, v.Max-setting.SingleFile.MaxVersion+1)
+	sql = "delete from page where unique_id=? and version < ?"
+	res, err := x.ExecContext(ctx, sql, uniqueId, v.Max-setting.SingleFile.MaxVersion+1)
 	if err != nil {
-		// todo
+		logger.Zap().Error("clean history version error", zap.Error(err), zap.String("sql", sql))
 		return err
 	}
 

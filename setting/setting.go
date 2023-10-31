@@ -19,6 +19,7 @@ func Load(file string) error {
 	loadJwt()
 	loadDatabase()
 	loadZincSearch()
+	loadLogger()
 
 	return nil
 }

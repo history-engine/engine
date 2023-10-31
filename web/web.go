@@ -7,6 +7,7 @@ import (
 	"github.com/labstack/echo/v4/middleware"
 	"github.com/urfave/cli/v2"
 	"history-engine/engine/library/db"
+	"history-engine/engine/library/logger"
 	"history-engine/engine/setting"
 	"history-engine/engine/web/routes"
 	"history-engine/engine/web/task"
@@ -27,6 +28,7 @@ var Web = &cli.Command{
 func before(c *cli.Context) error {
 	log.Printf("web server start at %s:%d\n", setting.Web.Addr, setting.Web.Port)
 	_ = db.InitEngine(context.TODO())
+	_ = logger.InitZap(context.TODO())
 	return nil
 }
 

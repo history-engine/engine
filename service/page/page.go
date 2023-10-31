@@ -2,7 +2,9 @@ package page
 
 import (
 	"context"
+	"go.uber.org/zap"
 	"history-engine/engine/library/db"
+	"history-engine/engine/library/logger"
 	"history-engine/engine/model"
 	"history-engine/engine/service/readability"
 	"time"
@@ -26,12 +28,14 @@ func SavePage(ctx context.Context, page *model.Page) (int64, error) {
 		"lite_size=:lite_size, indexed_at=:indexed_at, updated_at=:updated_at"
 	res, err := x.NamedExecContext(ctx, sql, page)
 	if err != nil {
-		panic(err)
+		logger.Zap().Error("save page error", zap.Error(err), zap.String("sql", sql), zap.Any("page", page))
+		return 0, err
 	}
 
 	page.Id, err = res.LastInsertId()
 	if err != nil {
-		panic(err)
+		logger.Zap().Error("get last insert id error", zap.Error(err), zap.String("sql", sql), zap.Any("page", page))
+		return 0, err
 	}
 
 	// 清除历史版本

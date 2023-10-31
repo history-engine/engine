@@ -4,6 +4,8 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"go.uber.org/zap"
+	"history-engine/engine/library/logger"
 	"history-engine/engine/model"
 	"history-engine/engine/setting"
 	"io"
@@ -22,12 +24,12 @@ func AddIndex(unique_id string, doc *model.ZincDocument) error {
 
 	res, err := http.DefaultClient.Do(req)
 	if err != nil || res == nil {
-		fmt.Printf("put zinc index err: %v\n", err)
+		logger.Zap().Error("put zinc index err", zap.Error(err))
 		return err
 	}
 	defer res.Body.Close()
 
 	body, _ = io.ReadAll(res.Body)
-	fmt.Printf("put zinc index: %s\n", res.Status)
+	logger.Zap().Debug("put zinc index", zap.String("status", res.Status), zap.String("body", string(body)))
 	return nil
 }

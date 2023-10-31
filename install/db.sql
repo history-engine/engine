@@ -25,8 +25,8 @@ CREATE TABLE `user` (
 
 ALTER TABLE `page`
     ADD PRIMARY KEY (`id`),
-    ADD UNIQUE KEY `user` (`user_id`),
-    ADD UNIQUE KEY `page_version` (`unique_id`,`version`);
+    ADD UNIQUE KEY `user_page_version` (`user_id`,`unique_id`,`version`) USING BTREE,
+    ADD UNIQUE KEY `page_version` (`unique_id`,`version`) USING BTREE;
 
 ALTER TABLE `user`
     ADD PRIMARY KEY (`id`),

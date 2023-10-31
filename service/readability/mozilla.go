@@ -2,6 +2,8 @@ package readability
 
 import (
 	"encoding/json"
+	"go.uber.org/zap"
+	"history-engine/engine/library/logger"
 	"log"
 	"os"
 	"os/exec"
@@ -24,7 +26,7 @@ func NewMozilla() Readability {
 	if err != nil {
 		log.Fatalf("readability-parse not exist")
 	}
-	log.Printf("readability-parse path:%s\n", path)
+	logger.Zap().Debug("readability-parse path", zap.String("path", path))
 
 	regex, _ = regexp.Compile(`(?s)<!--.*?(htt.+://\S+).*?saved\sdate.*?-->`)
 
