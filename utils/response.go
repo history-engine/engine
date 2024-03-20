@@ -1,8 +1,9 @@
 package utils
 
 import (
-	"github.com/labstack/echo/v4"
 	"history-engine/engine/model"
+
+	"github.com/labstack/echo/v4"
 )
 
 func ApiSuccess(ctx echo.Context, data any) error {
