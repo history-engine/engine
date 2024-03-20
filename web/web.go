@@ -3,15 +3,17 @@ package web
 import (
 	"context"
 	"fmt"
-	"github.com/labstack/echo/v4"
-	"github.com/labstack/echo/v4/middleware"
-	"github.com/urfave/cli/v2"
 	"history-engine/engine/library/db"
+	"history-engine/engine/service"
 	"history-engine/engine/setting"
-	"history-engine/engine/web/routes"
+	"history-engine/engine/web/handlers"
 	"history-engine/engine/web/task"
 	"log"
 	"strings"
+
+	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v4/middleware"
+	"github.com/urfave/cli/v2"
 )
 
 var Web = &cli.Command{
@@ -45,9 +47,11 @@ func runWeb(c *cli.Context) error {
 	e.Use(middleware.Recover())
 	e.OnAddRouteHandler = onAddRouteHandler
 
-	//home.RouteRegister(e)
-	routes.UserRouteRegister(e.Group("/user"))
-	routes.SingleFileRouteRegister(e.Group("/singlefile"))
+	// 初始化依赖
+	svr := service.NewServiceImpl(context.Background(), db.GetEngine())
+	handler := handlers.NewHandlerImpl(svr)
+	// 初始化路由
+	InitRoutes(e.Group("/api"), handler)
 
 	listen := fmt.Sprintf("%s:%d", setting.Web.Addr, setting.Web.Port)
 	return e.Start(listen)
