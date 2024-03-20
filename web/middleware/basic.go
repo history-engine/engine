@@ -1,10 +1,11 @@
 package middleware
 
 import (
-	"github.com/labstack/echo/v4"
-	"github.com/labstack/echo/v4/middleware"
 	"history-engine/engine/model"
 	"history-engine/engine/service/auth"
+
+	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v4/middleware"
 )
 
 func BasicAuth() echo.MiddlewareFunc {
@@ -20,7 +21,7 @@ func BasicAuth() echo.MiddlewareFunc {
 			c.Set("email", u.Email)
 			return true, nil
 		}
-
+		c.Redirect(302, "/login")
 		return false, err
 	})
 }

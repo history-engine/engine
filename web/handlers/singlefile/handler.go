@@ -16,6 +16,12 @@ import (
 	"golang.org/x/net/webdav"
 )
 
+type SingleFile interface {
+}
+
+type SingleFileImpl struct {
+}
+
 type Endpoint struct {
 	dir      string
 	prefix   string
