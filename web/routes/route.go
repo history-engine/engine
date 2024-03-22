@@ -13,8 +13,8 @@ func RegisterRoute(e *echo.Echo) {
 	e.Use(middleware.Recover())
 	e.OnAddRouteHandler = onAddRouteHandler
 
-	UserRouteRegister(e.Group("/user"))
-	SingleFileRouteRegister(e.Group("/singlefile"))
+	userRouteRegister(e.Group("/user"))
+	singleFileRouteRegister(e.Group("/singlefile"))
 }
 
 func onAddRouteHandler(host string, route echo.Route, handler echo.HandlerFunc, middleware []echo.MiddlewareFunc) {
