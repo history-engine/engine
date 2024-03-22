@@ -1,14 +1,14 @@
 package logger
 
 import (
-	"context"
-	"go.uber.org/zap"
 	"history-engine/engine/setting"
+
+	"go.uber.org/zap"
 )
 
 var _zap *zap.Logger
 
-func InitZap(ctx context.Context) error {
+func initZap() error {
 	var err error
 	var config zap.Config
 
@@ -35,10 +35,9 @@ func InitZap(ctx context.Context) error {
 }
 
 func Zap() *zap.Logger {
-	if _zap == nil {
-		if err := InitZap(context.TODO()); err != nil {
-			panic(err)
-		}
+	if !enable {
+		panic("logger not enable")
 	}
+
 	return _zap
 }

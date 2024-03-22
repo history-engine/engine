@@ -2,15 +2,16 @@ package db
 
 import (
 	"context"
+	"history-engine/engine/setting"
+
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/jmoiron/sqlx"
-	"history-engine/engine/setting"
 )
 
 var x *sqlx.DB // todo 或许可以public直接调用
 
-func InitEngine(ctx context.Context) error {
-	db, err := sqlx.ConnectContext(ctx, setting.Database.Drive, setting.GetDSN())
+func initEngine() error {
+	db, err := sqlx.ConnectContext(context.TODO(), setting.Database.Drive, setting.GetDSN())
 	if err != nil {
 		panic(err)
 	}
@@ -22,5 +23,8 @@ func InitEngine(ctx context.Context) error {
 }
 
 func GetEngine() *sqlx.DB {
+	if !enable {
+		panic("db not enable")
+	}
 	return x
 }
