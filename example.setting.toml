@@ -1,4 +1,5 @@
 [common]
+env = "prod" # 可选值：dev、prod
 enable_register = true
 
 [log]
@@ -41,3 +42,8 @@ name = "history"
 ssl = "false"
 charset = "utf8mb4"
 timeout = 10
+
+[redis]
+addr = "127.0.0.1:6379"
+password = ""
+db = 0

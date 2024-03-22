@@ -1,8 +1,9 @@
 package setting
 
 import (
-	"github.com/spf13/viper"
 	"os"
+
+	"github.com/spf13/viper"
 )
 
 var Log = struct {
@@ -17,6 +18,7 @@ func loadLogger() {
 	v := viper.Sub("log")
 	Log.Level = v.GetString("log_level")
 	Log.Path = v.GetString("log_path")
+	checkFileExist()
 }
 
 func checkFileExist() {

@@ -2,6 +2,7 @@ package setting
 
 import (
 	"fmt"
+
 	"github.com/spf13/viper"
 )
 
@@ -17,15 +18,22 @@ var (
 		Charset  string
 		Timeout  int
 	}{
-		Port:    3306,
-		Ssl:     false,
-		Charset: "utf8mb4",
-		Timeout: 500,
+		Host:     "127.0.0.1",
+		Port:     3306,
+		User:     "root",
+		Password: "",
+		Ssl:      false,
+		Charset:  "utf8mb4",
+		Timeout:  500,
 	}
 )
 
 func loadDatabase() {
 	v := viper.Sub("database")
+	if v == nil {
+		panic("database setting not found")
+	}
+
 	Database.Drive = v.GetString("drive")
 	Database.Host = v.GetString("host")
 	Database.Port = v.GetInt("port")

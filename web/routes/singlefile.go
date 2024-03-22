@@ -1,16 +1,15 @@
 package routes
 
 import (
-	"github.com/labstack/echo/v4"
-	"history-engine/engine/model"
-	"history-engine/engine/service/auth"
 	"history-engine/engine/setting"
 	"history-engine/engine/web/handler/singlefile"
 	"history-engine/engine/web/middleware"
+
+	"github.com/labstack/echo/v4"
 )
 
-// SingleFileRouteRegister 注册页面相关路由
-func SingleFileRouteRegister(r *echo.Group) {
+// 注册页面相关路由
+func singleFileRouteRegister(r *echo.Group) {
 	e := singlefile.NewEndpoint("/", setting.SingleFile.Path)
 
 	//r.Use(middleware.BasicAuth(basicAuth))
@@ -21,7 +20,7 @@ func SingleFileRouteRegister(r *echo.Group) {
 	r.Add("PROPFIND", "/html/:file", e.Cover)
 }
 
-func basicAuth(username, password string, c echo.Context) (bool, error) {
+/* func basicAuth(username, password string, c echo.Context) (bool, error) {
 	req := &model.PasswordLoginReq{
 		Username: username,
 		Password: password,
@@ -35,4 +34,4 @@ func basicAuth(username, password string, c echo.Context) (bool, error) {
 	}
 
 	return false, err
-}
+} */
