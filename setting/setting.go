@@ -19,6 +19,7 @@ func Load(file string) error {
 	loadLogger()
 	loadJwt()
 	loadWeb()
+	loadRedis()
 	loadDatabase()
 	loadZincSearch()
 	loadSingleFile()

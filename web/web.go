@@ -19,8 +19,8 @@ var Web = &cli.Command{
 }
 
 func before(c *cli.Context) error {
-	db.EnableDb()
 	logger.EnableLogger()
+	db.EnableDb()
 	return nil
 }
 
