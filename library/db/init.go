@@ -1,5 +1,7 @@
 package db
 
+import "history-engine/engine/library/wait"
+
 var enable = false
 
 func EnableDb() {
@@ -7,9 +9,8 @@ func EnableDb() {
 		return
 	}
 
-	if err := initEngine(); err != nil {
-		return
-	}
-
+	wait.AddWait(1)
 	enable = true
+	initEngine()
+	initSignal()
 }

@@ -2,6 +2,7 @@ package db
 
 import (
 	"context"
+	"history-engine/engine/library/wait"
 	"history-engine/engine/setting"
 
 	_ "github.com/go-sql-driver/mysql"
@@ -19,6 +20,7 @@ func initEngine() error {
 	// todo 自定义mapper, 可以不用写db tag
 	x = db.Unsafe()
 
+	wait.Done()
 	return nil
 }
 

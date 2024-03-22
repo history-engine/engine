@@ -1,6 +1,7 @@
 package logger
 
 import (
+	"history-engine/engine/library/wait"
 	"history-engine/engine/setting"
 
 	"go.uber.org/zap"
@@ -31,6 +32,7 @@ func initZap() error {
 	_zap, err = config.Build()
 	_zap.Info("zap logger init success")
 
+	wait.Done()
 	return err
 }
 

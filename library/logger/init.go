@@ -1,5 +1,7 @@
 package logger
 
+import "history-engine/engine/library/wait"
+
 var enable = false
 
 func EnableLogger() {
@@ -7,9 +9,8 @@ func EnableLogger() {
 		return
 	}
 
-	if err := initZap(); err != nil {
-		return
-	}
-
+	wait.AddWait(1)
 	enable = true
+	initZap()
+	initSignal()
 }

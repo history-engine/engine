@@ -1,8 +1,9 @@
 package setting
 
 import (
-	"github.com/spf13/viper"
 	"os"
+
+	"github.com/spf13/viper"
 )
 
 var (
@@ -14,12 +15,13 @@ func Load(file string) error {
 		return err
 	}
 
-	loadWeb()
-	loadSingleFile()
+	loadCommon()
+	loadLogger()
 	loadJwt()
+	loadWeb()
 	loadDatabase()
 	loadZincSearch()
-	loadLogger()
+	loadSingleFile()
 
 	return nil
 }
