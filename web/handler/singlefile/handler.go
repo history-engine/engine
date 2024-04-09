@@ -84,6 +84,7 @@ func (e *Endpoint) Put(c echo.Context) error {
 		UserId:   c.Get("uid").(int64),
 		UniqueId: uniqueId,
 		Version:  version,
+		Title:    article.Title,
 		Url:      url,
 		FullSize: len(body),
 		FullPath: file,
