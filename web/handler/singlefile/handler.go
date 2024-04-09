@@ -2,6 +2,8 @@ package singlefile
 
 import (
 	"fmt"
+	"go.uber.org/zap"
+	"history-engine/engine/library/logger"
 	"history-engine/engine/model"
 	"history-engine/engine/service/page"
 	"history-engine/engine/service/readability"
@@ -90,7 +92,8 @@ func (e *Endpoint) Put(c echo.Context) error {
 		FullPath: file,
 	})
 	if err != nil {
-		panic(err)
+		logger.Zap().Fatal("save page error", zap.Error(err), zap.String("url", article.Url))
+		return c.String(http.StatusInternalServerError, "save page error")
 	}
 
 	err = page.AddIndex(uniqueId, &model.ZincDocument{
@@ -101,10 +104,11 @@ func (e *Endpoint) Put(c echo.Context) error {
 		Size:     len(body),
 	})
 	if err != nil {
-		panic(err)
+		logger.Zap().Fatal("add index error", zap.Error(err), zap.String("uniqueId", uniqueId))
+		return c.String(http.StatusInternalServerError, "add index error")
 	}
 
-	return c.String(http.StatusCreated, "")
+	return c.String(http.StatusCreated, "ok")
 }
 
 // Cover PUT 以外的操作的兜底, 理论上不应该有逻辑走到这里
