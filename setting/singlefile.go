@@ -9,7 +9,7 @@ import (
 var (
 	SingleFile = struct {
 		Path                 string
-		MaxVersion           int
+		MaxVersion           int // todo 可以按天周月年保留
 		VersionCheckInterval int
 		VersionCheckLimit    int
 	}{
