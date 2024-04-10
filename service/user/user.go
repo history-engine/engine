@@ -24,9 +24,9 @@ func Register(ctx context.Context, req *model.UserRegisterReq) (*model.User, mod
 	user.Username = req.Username
 	user.Email = req.Email
 	user.Password = utils.Md5str(req.Password)
-	sql := "insert into user set " +
+	query := "insert into user set " +
 		"username=:username, email=:email, password=:password"
-	res, err := x.NamedExecContext(ctx, sql, user)
+	res, err := x.NamedExecContext(ctx, query, user)
 	if err != nil {
 		panic(err)
 	}
