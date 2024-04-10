@@ -17,3 +17,10 @@ type Page struct {
 	CreatedAt time.Time `json:"created_at" db:"created_at"`
 	UpdatedAt time.Time `json:"updated_at" db:"updated_at"`
 }
+
+type SearchPage struct {
+	Query     string    `json:"query" query:"q"`
+	Limit     int       `json:"limit" query:"limit"`
+	StartTime time.Time `json:"start_time" query:"start_time"`
+	EndTime   time.Time `json:"end_time" query:"end_time"`
+}

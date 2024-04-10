@@ -7,6 +7,7 @@ import (
 	"history-engine/engine/model"
 	"history-engine/engine/service/page"
 	"history-engine/engine/service/readability"
+	"history-engine/engine/service/zincsearch"
 	"history-engine/engine/setting"
 	"history-engine/engine/utils"
 	"io"
@@ -96,7 +97,7 @@ func (e *Endpoint) Put(c echo.Context) error {
 		return c.String(http.StatusInternalServerError, "save page error")
 	}
 
-	err = page.AddIndex(uniqueId, &model.ZincDocument{
+	err = zincsearch.AddIndex(uniqueId, &model.ZincDocument{
 		FilePath: file,
 		Url:      url,
 		Title:    article.Title,

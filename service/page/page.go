@@ -2,6 +2,7 @@ package page
 
 import (
 	"context"
+	"github.com/jmoiron/sqlx"
 	"go.uber.org/zap"
 	"history-engine/engine/library/db"
 	"history-engine/engine/library/logger"
@@ -47,4 +48,20 @@ func SavePage(ctx context.Context, page *model.Page) (int64, error) {
 	}()
 
 	return page.Id, nil
+}
+
+func BatchGetPage(ctx context.Context, uniqueId []string) ([]model.Page, error) {
+	x := db.GetEngine()
+	var pages []model.Page
+	query, args, err := sqlx.In("select * from page where unique_id in (?) order by created_at desc", uniqueId)
+	if err != nil {
+		panic(err)
+	}
+
+	err = x.SelectContext(ctx, &pages, query, args...)
+	if err != nil {
+		panic(err)
+	}
+
+	return pages, nil
 }

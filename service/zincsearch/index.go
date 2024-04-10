@@ -13,16 +13,17 @@ import (
 )
 
 // AddIndex 添加到ZincSearch索引
+// TODO 请求ZincSearch逻辑封装
 func AddIndex(uniqueId string, doc *model.ZincDocument) error {
 	body, _ := json.Marshal(doc)
 
-	api := fmt.Sprintf("%s/api/%s/_doc/%s", setting.ZincSearch.Host, setting.ZincSearch.Index, uniqueId)
-	req, _ := http.NewRequest("PUT", api, bytes.NewReader(body))
+	api := fmt.Sprintf(ApiIndex, setting.ZincSearch.Index, uniqueId)
+	req, _ := http.NewRequest("PUT", setting.ZincSearch.Host+api, bytes.NewReader(body))
 
 	req.Header.Set("Content-Type", "application/json")
 	req.SetBasicAuth("admin", "123456")
 
-	res, err := http.DefaultClient.Do(req)
+	res, err := client.Do(req)
 	if err != nil || res == nil {
 		logger.Zap().Error("put zinc index err", zap.Error(err))
 		return err
