@@ -3,6 +3,7 @@ package user
 import (
 	"context"
 	"database/sql"
+	"errors"
 	"history-engine/engine/library/db"
 	"history-engine/engine/model"
 	"history-engine/engine/utils"
@@ -12,7 +13,7 @@ func Register(ctx context.Context, req *model.UserRegisterReq) (*model.User, mod
 	x := db.GetEngine()
 	user := &model.User{}
 	err := x.GetContext(ctx, user, "select * from user where username=? or email=? limit 1", req.Username, req.Username)
-	if err != nil && err != sql.ErrNoRows {
+	if err != nil && !errors.Is(err, sql.ErrNoRows) {
 		panic(err)
 	}
 
@@ -37,4 +38,23 @@ func Register(ctx context.Context, req *model.UserRegisterReq) (*model.User, mod
 	}
 
 	return user, model.Ok
+}
+
+func List(ctx context.Context, req *model.UserListReq) ([]model.User, model.MsgCode) {
+	if req.Page <= 0 {
+		req.Page = 1
+	}
+
+	if req.Rows <= 0 {
+		req.Rows = 20
+	}
+
+	x := db.GetEngine()
+	users := make([]model.User, 0)
+	err := x.SelectContext(ctx, &users, "select * from user limit ?,?", (req.Page-1)*20, 20)
+	if err != nil {
+		panic(err)
+	}
+
+	return users, model.Ok
 }
