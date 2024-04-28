@@ -1,6 +1,7 @@
 [common]
 env = "prod" # 可选值：dev、prod
 enable_register = true
+lang="zh-CN"
 
 [log]
 log_path = "/var/log/web-history.log"
