@@ -19,7 +19,7 @@ func Register(ctx context.Context, req *model.UserRegisterReq) (*model.User, mod
 
 	if user.Id != 0 {
 		// todo 用户已存在
-		return nil, model.UserMailExist
+		return nil, model.ErrorUserExist
 	}
 
 	user.Username = req.Username
@@ -57,4 +57,34 @@ func List(ctx context.Context, req *model.UserListReq) ([]model.User, model.MsgC
 	}
 
 	return users, model.Ok
+}
+
+func Create(ctx context.Context, req *model.UserCreateReq) model.MsgCode {
+	x := db.GetEngine()
+
+	// 重复检查
+	query := "select * from user where username=? or email=? limit 1"
+	user := &model.User{}
+	err := x.GetContext(ctx, user, query, req.Username, req.Email)
+	if err != nil && !errors.Is(err, sql.ErrNoRows) {
+		panic(err)
+	}
+
+	if user.Id != 0 {
+		return model.ErrorUserExist
+	}
+
+	user = &model.User{
+		Username: req.Username,
+		Email:    req.Email,
+		Password: utils.Md5str(req.Password),
+	}
+	query = "insert into user set " +
+		"username=:username, email=:email, password=:password"
+	_, err = x.NamedExecContext(ctx, query, user)
+	if err != nil {
+		panic(err)
+	}
+
+	return model.Ok
 }

@@ -21,3 +21,18 @@ func UserList(c echo.Context) error {
 
 	return utils.ApiSuccess(c, list)
 }
+
+func UserCreate(c echo.Context) error {
+	req := &model.UserCreateReq{}
+	err := c.Bind(req)
+	if err != nil {
+		return utils.ApiError(c, model.ErrorParamParse)
+	}
+
+	code := user.Create(c.Request().Context(), req)
+	if code != model.Ok {
+		return utils.ApiError(c, code)
+	}
+
+	return utils.ApiSuccess(c, nil)
+}

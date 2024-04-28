@@ -12,15 +12,14 @@ const (
 	ErrorParamParse
 	ErrorUsernameExist
 	ErrorMailExist
+	ErrorUserExist
 	ErrorLoginFailed
 	ErrorLoginExpire
 	ErrorRowsNotExist
 	ErrorExpired
 	ErrorForeverNotSupport
 	ErrorInternal
-
-	UserMailExist
-	UserJWTExpired
+	ErrorJWTExpired
 )
 
 var ( // todo 使用配置文件
@@ -34,14 +33,13 @@ var ( // todo 使用配置文件
 		ErrorParamParse:        "参数解析出错",
 		ErrorUsernameExist:     "用户名已存在",
 		ErrorMailExist:         "邮箱已存在",
+		ErrorUserExist:         "用户已存在",
 		ErrorLoginFailed:       "登录失败",
 		ErrorLoginExpire:       "登录态失效",
 		ErrorRowsNotExist:      "记录不存在",
 		ErrorExpired:           "已过期",
 		ErrorForeverNotSupport: "暂不支持永久有效",
 		ErrorInternal:          "服务器内部错误",
-
-		UserMailExist:  "用户已存在",
-		UserJWTExpired: "登录态失效",
+		ErrorJWTExpired:        "登录态失效",
 	}
 )

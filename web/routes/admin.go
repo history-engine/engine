@@ -11,4 +11,7 @@ func adminRouteRegister(r *echo.Group) {
 
 func adminUserRouteRegister(r *echo.Group) {
 	r.GET("/list", admin.UserList)
+	r.POST("/create", admin.UserCreate)
+	//r.PUT("/update", admin.UserUpdate)
+	//r.DELETE("/delete", admin.UserDelete)
 }

@@ -27,3 +27,9 @@ type UserListReq struct {
 	Page int `json:"page" query:"page"`
 	Rows int `json:"rows" query:"rows"`
 }
+
+type UserCreateReq struct {
+	Username string `json:"username"`
+	Email    string `json:"email"`
+	Password string `json:"password"`
+}
