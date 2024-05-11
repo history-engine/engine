@@ -2,6 +2,7 @@ package setting
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/spf13/viper"
 )
@@ -16,7 +17,7 @@ var (
 		Password string
 		Ssl      bool
 		Charset  string
-		Timeout  int
+		Timeout  time.Duration
 	}{
 		Host:     "127.0.0.1",
 		Port:     3306,
@@ -24,7 +25,7 @@ var (
 		Password: "",
 		Ssl:      false,
 		Charset:  "utf8mb4",
-		Timeout:  500,
+		Timeout:  500 * time.Millisecond,
 	}
 )
 
@@ -42,12 +43,12 @@ func loadDatabase() {
 	Database.Password = v.GetString("password")
 	Database.Ssl = v.GetBool("ssl")
 	Database.Charset = v.GetString("charset")
-	Database.Timeout = v.GetInt("timeout")
+	Database.Timeout = v.GetDuration("timeout")
 }
 
 func GetDSN() string {
 	return fmt.Sprintf(
-		"%s:%s@tcp(%s:%d)/%s?charset=%s&timeout=%dms&parseTime=true",
+		"%s:%s@tcp(%s:%d)/%s?charset=%s&timeout=%s&parseTime=true",
 		Database.User,
 		Database.Password,
 		Database.Host,

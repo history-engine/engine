@@ -42,7 +42,7 @@ password = "123456"
 name = "history"
 ssl = "false"
 charset = "utf8mb4"
-timeout = 10
+timeout = "5s"
 
 [redis]
 addr = "127.0.0.1:6379"
