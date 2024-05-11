@@ -17,6 +17,7 @@ func RegisterRoute(e *echo.Echo) {
 	singleFileRouteRegister(e.Group("/singlefile"))
 	pageRouteRegister(e.Group("/page"))
 	adminRouteRegister(e.Group("/admin"))
+	miscRegister(e.Group("/misc"))
 }
 
 func onAddRouteHandler(host string, route echo.Route, handler echo.HandlerFunc, middleware []echo.MiddlewareFunc) {
