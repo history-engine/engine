@@ -45,3 +45,8 @@ func loadSetting(c *cli.Context) error {
 
 	return setting.Load(file)
 }
+
+func checkReadability(c *cli.Context) error {
+	// todo
+	return nil
+}
