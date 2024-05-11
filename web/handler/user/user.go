@@ -11,6 +11,10 @@ import (
 
 // Register 注册
 func Register(c echo.Context) error {
+	if !setting.Common.EnableRegister {
+		return utils.ApiError(c, model.ErrorRegisterDisabled)
+	}
+
 	req := &model.UserRegisterReq{}
 	err := c.Bind(req)
 	if err != nil {

@@ -20,6 +20,7 @@ const (
 	ErrorForeverNotSupport
 	ErrorInternal
 	ErrorJWTExpired
+	ErrorRegisterDisabled
 )
 
 var ( // todo 使用配置文件
@@ -41,5 +42,6 @@ var ( // todo 使用配置文件
 		ErrorForeverNotSupport: "暂不支持永久有效",
 		ErrorInternal:          "服务器内部错误",
 		ErrorJWTExpired:        "登录态失效",
+		ErrorRegisterDisabled:  "注册已关闭",
 	}
 )
