@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/zincsearch/zincsearch/pkg/meta"
 	"history-engine/engine/model"
 	"history-engine/engine/setting"
 	"io"
@@ -15,23 +14,23 @@ import (
 
 // EsSearch Search V2 ES语法兼容
 func EsSearch(search model.SearchPage) ([]string, error) {
-	query := meta.ZincQueryForSDK{
+	query := model.ZincQueryForSDK{
 		Size: search.Limit,
 		From: 0,
 		Sort: []string{"-@timestamp"},
-		Aggregations: map[string]meta.Aggregations{
+		Aggregations: map[string]model.Aggregations{
 			"histogram": {
-				DateHistogram: &meta.AggregationDateHistogram{
+				DateHistogram: &model.AggregationDateHistogram{
 					Field:    "@timestamp",
 					Interval: "1d",
 				},
 			},
 		},
-		Query: meta.QueryForSDK{
-			Bool: &meta.BoolQueryForSDK{
-				Must: []*meta.QueryForSDK{
+		Query: model.QueryForSDK{
+			Bool: &model.BoolQueryForSDK{
+				Must: []*model.QueryForSDK{
 					{
-						Range: map[string]*meta.RangeQueryForSDK{
+						Range: map[string]*model.RangeQueryForSDK{
 							"@timestamp": {
 								GTE:    search.StartTime.Format(time.RFC3339),
 								LT:     search.EndTime.Format(time.RFC3339),
@@ -40,7 +39,7 @@ func EsSearch(search model.SearchPage) ([]string, error) {
 						},
 					},
 					{
-						QueryString: &meta.QueryStringQuery{
+						QueryString: &model.QueryStringQuery{
 							Query: search.Query,
 						},
 					},
@@ -70,7 +69,7 @@ func EsSearch(search model.SearchPage) ([]string, error) {
 	defer res.Body.Close()
 
 	body, _ = io.ReadAll(res.Body)
-	resp := &meta.SearchResponse{}
+	resp := &model.SearchResponse{}
 	err = json.Unmarshal(body, resp)
 	if err != nil {
 		panic(err)
