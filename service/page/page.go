@@ -65,3 +65,14 @@ func BatchGetPage(ctx context.Context, uniqueId []string) ([]model.Page, error) 
 
 	return pages, nil
 }
+
+func Page(ctx context.Context, start, rows int) ([]model.Page, error) {
+	x := db.GetEngine()
+	var list []model.Page
+	err := x.SelectContext(ctx, &list, "select * from page order by created_at desc limit ?, ?", start, rows)
+	if err != nil {
+		panic(err)
+	}
+
+	return list, err
+}
