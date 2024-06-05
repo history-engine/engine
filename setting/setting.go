@@ -22,6 +22,7 @@ func Load(file string) error {
 	loadRedis()
 	loadDatabase()
 	loadZincSearch()
+	loadReadability()
 	loadSingleFile()
 
 	return nil

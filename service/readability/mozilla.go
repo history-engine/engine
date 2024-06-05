@@ -4,8 +4,6 @@ import (
 	"encoding/json"
 	"go.uber.org/zap"
 	"history-engine/engine/library/logger"
-	"log"
-	"os"
 	"os/exec"
 	"regexp"
 	"strings"
@@ -19,12 +17,9 @@ var (
 type Mozilla struct{}
 
 func NewMozilla() Readability {
-	home, _ := os.UserHomeDir()
-	_ = os.Setenv("PATH", home+"/.local/bin:"+os.Getenv("PATH"))
-
 	path, err := exec.LookPath("readability-parse")
 	if err != nil {
-		log.Fatalf("readability-parse not exist")
+		panic("readability-parse not exist")
 	}
 	logger.Zap().Debug("readability-parse path", zap.String("path", path))
 
@@ -37,7 +32,7 @@ func (m Mozilla) Parse(path string) *Article {
 	cmd := exec.Command("readability-parse", path)
 	data, err := cmd.Output()
 	if err != nil {
-		panic(err)
+		logger.Zap().Error("exec readability-parse err", zap.Error(err))
 	}
 
 	article := &Article{}

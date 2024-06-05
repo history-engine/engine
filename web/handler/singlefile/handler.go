@@ -7,6 +7,7 @@ import (
 	"history-engine/engine/model"
 	"history-engine/engine/service/page"
 	"history-engine/engine/service/readability"
+	"history-engine/engine/service/singlefile"
 	"history-engine/engine/service/zincsearch"
 	"history-engine/engine/setting"
 	"history-engine/engine/utils"
@@ -51,6 +52,10 @@ func (e *Endpoint) Put(c echo.Context) error {
 	}
 
 	url := readability.Parser().ExtractSingleFileUrl(body[:2048])
+	if singlefile.CheckIgnore(url) {
+		return c.String(http.StatusOK, "")
+	}
+
 	uniqueId := utils.Md5str(url) // todo 自定义
 
 	// 检查并创建目录

@@ -1,6 +1,7 @@
 package setting
 
 import (
+	"errors"
 	"github.com/spf13/viper"
 	"log"
 	"os"
@@ -12,11 +13,13 @@ var (
 		MaxVersion           int // todo 可以按天周月年保留
 		VersionCheckInterval int
 		VersionCheckLimit    int
+		IgnoreHost           []string
 	}{
 		Path:                 "",
 		MaxVersion:           5,
 		VersionCheckInterval: 300,
 		VersionCheckLimit:    100,
+		IgnoreHost:           []string{},
 	}
 )
 
@@ -33,12 +36,13 @@ func loadSingleFile() {
 	SingleFile.MaxVersion = v.GetInt("max_version")
 	SingleFile.VersionCheckInterval = v.GetInt("version_check_interval")
 	SingleFile.VersionCheckLimit = v.GetInt("version_check_limit")
+	SingleFile.IgnoreHost = v.GetStringSlice("ignore_host")
 	checkStoragePath()
 }
 
 func checkStoragePath() {
 	log.Printf("singlefile storage path:%s\n", SingleFile.Path)
-	if _, err := os.Stat(SingleFile.Path); err == os.ErrNotExist {
+	if _, err := os.Stat(SingleFile.Path); errors.Is(err, os.ErrNotExist) {
 		err = os.MkdirAll(SingleFile.Path, 0755)
 		if err != nil {
 			log.Fatalf("initialize storage path err:%v", err)

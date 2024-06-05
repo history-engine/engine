@@ -20,6 +20,7 @@ path = "/data/history-engine/html" # 为空默认在当前目录下创建html文
 max_version = 5
 version_check_interval = 3600 # 检查版本间隔时间
 version_check_limit = 100 # 检查版本数量限制
+ignore_host = ["*.youtube.com", "*.google.com", "regexp:.*(\\.|)(chatgpt|openai)\\.com"]
 
 [readability]
 parser = "mozilla" # 解析器，目前只支持mozilla
