@@ -13,13 +13,12 @@ import (
 
 // NextVersion 获取下一个版本号
 func NextVersion(ctx context.Context, uniqueId string) int {
-	var version int
+	var version = 0
 	x := db.GetEngine()
-	sql := "select max(version) from page where unique_id=?"
+	sql := "select coalesce(max(version), 0) from page where unique_id=?"
 	err := x.GetContext(ctx, &version, sql, uniqueId)
 	if err != nil {
-		logger.Zap().Error("get max version error", zap.String("sql", sql), zap.String("unique_id", uniqueId), zap.Error(err))
-		return 1
+		logger.Zap().Warn("get max version error", zap.String("sql", sql), zap.String("unique_id", uniqueId), zap.Error(err))
 	}
 
 	return version + 1
