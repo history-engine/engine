@@ -4,7 +4,7 @@ enable_register = true
 lang="zh-CN"
 
 [log]
-log_path = "/var/log/web-history.log"
+log_path = "/tmp/web-history.log"
 log_level = "debug"
 
 [web]
