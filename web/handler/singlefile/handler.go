@@ -53,6 +53,7 @@ func (e *Endpoint) Put(c echo.Context) error {
 
 	url := readability.Parser().ExtractSingleFileUrl(body[:2048])
 	if singlefile.CheckIgnore(url) {
+		logger.Zap().Info("ignore url")
 		return c.String(http.StatusOK, "")
 	}
 
