@@ -41,7 +41,6 @@ func loadSingleFile() {
 }
 
 func checkStoragePath() {
-	log.Printf("singlefile storage path:%s\n", SingleFile.Path)
 	if _, err := os.Stat(SingleFile.Path); errors.Is(err, os.ErrNotExist) {
 		err = os.MkdirAll(SingleFile.Path, 0755)
 		if err != nil {
