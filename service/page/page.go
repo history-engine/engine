@@ -7,7 +7,6 @@ import (
 	"history-engine/engine/library/db"
 	"history-engine/engine/library/logger"
 	"history-engine/engine/model"
-	"history-engine/engine/service/readability"
 	"time"
 )
 
@@ -21,7 +20,6 @@ func SavePage(ctx context.Context, page *model.Page) (int64, error) {
 		page.UpdatedAt = time.Now()
 	}
 
-	readability.Parser()
 	x := db.GetEngine()
 	sql := "insert into page set " +
 		"user_id=:user_id, unique_id=:unique_id, version=:version, title=:title, " +
