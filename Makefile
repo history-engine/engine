@@ -1,5 +1,5 @@
 NAME=history-engine
-VERSION=$(shell git describe --tags || echo "dev-master")
+VERSION=$(shell git describe --tags || git rev-parse --short HEAD)
 RELEASE_DIR=release
 GOBUILD=CGO_ENABLED=0 go build -trimpath -ldflags '-w -s -X "main.buildVersion=$(VERSION)"'
 
