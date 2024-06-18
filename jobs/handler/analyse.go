@@ -5,6 +5,7 @@ import (
 	"history-engine/engine/service/page"
 	"log"
 	"net/url"
+	"sort"
 	"time"
 )
 
@@ -49,8 +50,22 @@ func runAnalyse(ctx *cli.Context) error {
 		}
 	}
 
-	for item, count := range host {
-		log.Println(count, "\t", item)
+	type count struct {
+		host  string
+		count int
+	}
+	countList := make([]count, 0)
+
+	for item, number := range host {
+		countList = append(countList, count{item, number})
+	}
+
+	sort.Slice(countList, func(i, j int) bool {
+		return countList[i].count > countList[j].count
+	})
+
+	for _, v := range countList {
+		log.Println(v.count, "\t", v.host)
 	}
 
 	return nil
