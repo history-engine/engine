@@ -27,7 +27,8 @@ func SavePage(ctx context.Context, page *model.Page) (int64, error) {
 		"lite_size=:lite_size, indexed_at=:indexed_at, updated_at=:updated_at"
 	res, err := x.NamedExecContext(ctx, sql, page)
 	if err != nil {
-		logger.Zap().Error("save page error", zap.Error(err), zap.String("sql", sql), zap.Any("page", page))
+		version := NextVersion(ctx, page.UniqueId)
+		logger.Zap().Error("save page error", zap.Error(err), zap.String("sql", sql), zap.Any("page", page), zap.Int("version", version))
 		return 0, err
 	}
 
