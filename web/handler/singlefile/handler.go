@@ -58,6 +58,7 @@ func (e *Endpoint) Put(c echo.Context) error {
 	}
 
 	uniqueId := utils.Md5str(url) // todo 自定义
+	logger.Zap().Debug("receive singleFile", zap.String("url", url), zap.String("uniqueId", uniqueId))
 
 	// 检查并创建目录
 	storagePath := fmt.Sprintf("/%s/%s", uniqueId[:2], uniqueId[2:4])

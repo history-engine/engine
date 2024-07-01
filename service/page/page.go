@@ -7,8 +7,11 @@ import (
 	"history-engine/engine/library/db"
 	"history-engine/engine/library/logger"
 	"history-engine/engine/model"
+	"sync"
 	"time"
 )
+
+var pageLock = sync.Mutex{}
 
 // SavePage 保存页面
 func SavePage(ctx context.Context, page *model.Page) (int64, error) {
@@ -20,6 +23,8 @@ func SavePage(ctx context.Context, page *model.Page) (int64, error) {
 		page.UpdatedAt = time.Now()
 	}
 
+	pageLock.Lock()
+	defer pageLock.Unlock()
 	x := db.GetEngine()
 	sql := "insert into page set " +
 		"user_id=:user_id, unique_id=:unique_id, version=:version, title=:title, " +
