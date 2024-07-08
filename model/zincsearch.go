@@ -3,6 +3,7 @@ package model
 import "time"
 
 type ZincDocument struct {
+	Id       string `json:"id"`
 	FilePath string `json:"file_path"` // todo 不需要
 	Url      string `json:"url"`
 	Title    string `json:"title"`
