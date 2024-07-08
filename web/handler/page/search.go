@@ -28,7 +28,7 @@ func Search(c echo.Context) error {
 		req.EndTime = time.Now()
 	}
 
-	resp, err := zincsearch.EsSearch(req)
+	docs, resp, err := zincsearch.EsSearch(req)
 	if err != nil {
 		return c.String(500, err.Error())
 	}
@@ -38,13 +38,20 @@ func Search(c echo.Context) error {
 		panic(err)
 	}
 
-	versions := map[string][]model.Page{}
+	versions := map[string][]model.PageSearchResponse{}
 	for _, v := range pages {
 		v.FullPath = setting.Web.Domain + "/page/preview" + v.FullPath
 		if _, ok := versions[v.UniqueId]; !ok {
-			versions[v.UniqueId] = []model.Page{}
+			versions[v.UniqueId] = []model.PageSearchResponse{}
 		}
-		versions[v.UniqueId] = append(versions[v.UniqueId], v)
+		versions[v.UniqueId] = append(versions[v.UniqueId], model.PageSearchResponse{
+			Avatar:  "https://avatars.akamai.steamstatic.com/6a9ae9c069cd4fff8bf954938727730cdb0fe27b.jpg",
+			Title:   docs[v.UniqueId].Title,
+			Content: docs[v.UniqueId].Content,
+			Url:     docs[v.UniqueId].Url,
+			Size:    docs[v.UniqueId].Size,
+			Preview: v.FullPath,
+		})
 	}
 
 	return utils.ApiSuccess(c, versions)

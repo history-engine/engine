@@ -4,8 +4,8 @@ import "time"
 
 // https://github.com/zincsearch/zincsearch/blob/main/pkg/meta/query_response.go
 
-// SearchResponse for a query
-type SearchResponse struct {
+// ZincSearchResponse for a query
+type ZincSearchResponse struct {
 	Took         int                            `json:"took"` // Time it took to generate the response
 	TimedOut     bool                           `json:"timed_out"`
 	Shards       Shards                         `json:"_shards"`
