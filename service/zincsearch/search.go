@@ -15,6 +15,7 @@ import (
 )
 
 // EsSearch Search V2 ES语法兼容
+// todo 返回条数，用于分页
 func EsSearch(search model.SearchPage) (map[string]model.ZincDocument, []string, error) {
 	query := model.ZincQueryForSDK{
 		Size: search.Limit,
@@ -76,6 +77,8 @@ func EsSearch(search model.SearchPage) (map[string]model.ZincDocument, []string,
 	err = json.Unmarshal(body, resp)
 	if err != nil {
 		panic(err)
+		logger.Zap().Error("search zinc err", zap.ByteString("resp", body))
+		return nil, nil, err
 	}
 
 	if resp.Error != "" {
