@@ -76,7 +76,6 @@ func EsSearch(search model.SearchPage) (map[string]model.ZincDocument, []string,
 	resp := &model.ZincSearchResponse{}
 	err = json.Unmarshal(body, resp)
 	if err != nil {
-		panic(err)
 		logger.Zap().Error("search zinc err", zap.ByteString("resp", body))
 		return nil, nil, err
 	}
