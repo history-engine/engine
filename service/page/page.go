@@ -7,6 +7,8 @@ import (
 	"history-engine/engine/library/db"
 	"history-engine/engine/library/logger"
 	"history-engine/engine/model"
+	"history-engine/engine/service/zincsearch"
+	"history-engine/engine/setting"
 	"sync"
 	"time"
 )
@@ -83,4 +85,49 @@ func Page(ctx context.Context, start, rows int) ([]model.Page, error) {
 	}
 
 	return list, err
+}
+
+func Search(ctx context.Context, search model.SearchPage) (maps map[string][]model.PageSearch, total int, err error) {
+	zincSearch, err := zincsearch.EsSearch(search)
+	if err != nil {
+		panic(err)
+	}
+
+	if zincSearch.Hits.Total.Value == 0 {
+		return
+	}
+
+	docs := make(map[string]model.ZincDocument, 0)
+	ids := make([]string, zincSearch.Hits.Total.Value)
+	for k, v := range zincSearch.Hits.Hits {
+		ids[k] = v.ID
+		if source, ok := v.Source.(map[string]interface{}); ok {
+			docs[v.ID] = model.ZincDocument{
+				Id:      v.ID,
+				Title:   source["title"].(string),
+				Content: source["content"].(string),
+				Url:     source["url"].(string),
+				Size:    int(source["size"].(float64)),
+			}
+		}
+	}
+
+	pages, err := BatchGetPage(ctx, ids)
+	maps = map[string][]model.PageSearch{}
+	for _, v := range pages {
+		v.FullPath = setting.Web.Domain + "/page/preview" + v.FullPath
+		if _, ok := maps[v.UniqueId]; !ok {
+			maps[v.UniqueId] = []model.PageSearch{}
+		}
+		maps[v.UniqueId] = append(maps[v.UniqueId], model.PageSearch{
+			Avatar:  "https://avatars.akamai.steamstatic.com/6a9ae9c069cd4fff8bf954938727730cdb0fe27b.jpg",
+			Title:   docs[v.UniqueId].Title,
+			Content: docs[v.UniqueId].Content,
+			Url:     docs[v.UniqueId].Url,
+			Size:    docs[v.UniqueId].Size,
+			Preview: v.FullPath,
+		})
+	}
+
+	return maps, zincSearch.Hits.Total.Value, nil
 }
