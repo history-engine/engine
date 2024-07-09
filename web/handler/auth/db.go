@@ -20,7 +20,7 @@ func Password(c echo.Context) error {
 
 	u, err := auth.PasswordLogin(c.Request().Context(), req)
 	if err != nil {
-		panic(err)
+		return utils.ApiError(c, model.ErrorLoginFailed)
 	}
 
 	if u == nil {

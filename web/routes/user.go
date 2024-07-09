@@ -1,10 +1,9 @@
 package routes
 
 import (
+	"github.com/labstack/echo/v4"
 	"history-engine/engine/web/handler/auth"
 	"history-engine/engine/web/handler/user"
-
-	"github.com/labstack/echo/v4"
 )
 
 // 注册用户相关路由
