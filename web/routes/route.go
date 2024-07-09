@@ -4,19 +4,20 @@ import (
 	"log"
 	"strings"
 
-	"github.com/labstack/echo/v4/middleware"
+	em "github.com/labstack/echo/v4/middleware"
 
 	"github.com/labstack/echo/v4"
 )
 
 func RegisterRoute(e *echo.Echo) {
-	e.Use(middleware.Recover())
+	e.Use(em.Recover())
 	e.OnAddRouteHandler = onAddRouteHandler
 
-	userRouteRegister(e.Group("/user"))
-	singleFileRouteRegister(e.Group("/singlefile"))
-	pageRouteRegister(e.Group("/page"))
-	adminRouteRegister(e.Group("/admin"))
+	uiRouteRegister(e.Group(""))
+	userRouteRegister(e.Group("/api/user"))
+	singleFileRouteRegister(e.Group("/api/singlefile"))
+	pageRouteRegister(e.Group("/api/page"))
+	adminRouteRegister(e.Group("/api/admin"))
 	miscRegister(e.Group("/misc"))
 }
 
