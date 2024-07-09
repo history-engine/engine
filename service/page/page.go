@@ -55,6 +55,10 @@ func SavePage(ctx context.Context, page *model.Page) (int64, error) {
 }
 
 func BatchGetPage(ctx context.Context, uniqueId []string) ([]model.Page, error) {
+	if len(uniqueId) == 0 {
+		return nil, nil
+	}
+
 	x := db.GetEngine()
 	var pages []model.Page
 	query, args, err := sqlx.In("select * from page where unique_id in (?) order by created_at desc", uniqueId)

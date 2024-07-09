@@ -40,8 +40,6 @@ func (m Mozilla) Parse(path string) *Article {
 		panic(err) // todo 使用等级日志
 	}
 
-	//article.Url = ExtractSingleFileUrl()
-
 	article.TextContent = strings.ReplaceAll(article.TextContent, "\n", "")
 
 	return article

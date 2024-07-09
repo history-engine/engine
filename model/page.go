@@ -19,8 +19,17 @@ type Page struct {
 }
 
 type SearchPage struct {
-	Query     string    `json:"query" query:"q"`
+	Query     string    `json:"query" query:"query"`
 	Limit     int       `json:"limit" query:"limit"`
 	StartTime time.Time `json:"start_time" query:"start_time"`
 	EndTime   time.Time `json:"end_time" query:"end_time"`
+}
+
+type PageSearchResponse struct {
+	Avatar  string `json:"avatar"`
+	Title   string `json:"title"`
+	Content string `json:"content"`
+	Size    int    `json:"size"`
+	Url     string `json:"url"`
+	Preview string `json:"preview"`
 }
