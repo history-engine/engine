@@ -19,11 +19,10 @@ func JwtAuth(next echo.HandlerFunc) echo.HandlerFunc {
 			}
 		}
 
-		if jwtToken == "" || len(jwtToken) < 8 || jwtToken[0:6] != "Bearer" {
+		if jwtToken == "" {
 			return utils.ApiError(c, model.ErrorLoginFailed)
 		}
 
-		jwtToken = jwtToken[7:]
 		token, err := jwt.Parse(jwtToken, func(token *jwt.Token) (interface{}, error) {
 			return setting.JwtSecret, nil
 		})

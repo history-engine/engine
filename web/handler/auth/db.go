@@ -7,6 +7,8 @@ import (
 	"history-engine/engine/service/auth"
 	"history-engine/engine/setting"
 	"history-engine/engine/utils"
+	"net/http"
+	"time"
 )
 
 // Password 密码登录
@@ -36,6 +38,14 @@ func Password(c echo.Context) error {
 	if err != nil {
 		panic(err)
 	}
+
+	c.SetCookie(&http.Cookie{
+		Name:     setting.JwtKey,
+		Value:    tokenString,
+		Expires:  time.Now().Add(86400 * 24 * time.Second),
+		Path:     "/",
+		HttpOnly: true,
+	})
 
 	return utils.ApiSuccess(c, map[string]any{"jwt_token": tokenString})
 }
