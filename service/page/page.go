@@ -115,7 +115,7 @@ func Search(ctx context.Context, search model.SearchPage) (maps map[string][]mod
 	pages, err := BatchGetPage(ctx, ids)
 	maps = map[string][]model.PageSearch{}
 	for _, v := range pages {
-		v.FullPath = setting.Web.Domain + "/page/preview" + v.FullPath
+		v.FullPath = setting.Web.Domain + "/page/view" + v.FullPath
 		if _, ok := maps[v.UniqueId]; !ok {
 			maps[v.UniqueId] = []model.PageSearch{}
 		}

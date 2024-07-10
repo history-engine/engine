@@ -10,5 +10,5 @@ func pageRouteRegister(r *echo.Group) {
 	r.Use(middleware.JwtAuth)
 
 	r.GET("/search", page.Search)
-	r.GET("/preview/:path", page.View)
+	r.GET("/view/:path", page.View)
 }
