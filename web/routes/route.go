@@ -14,10 +14,10 @@ func RegisterRoute(e *echo.Echo) {
 	e.OnAddRouteHandler = onAddRouteHandler
 
 	uiRouteRegister(e.Group(""))
-	userRouteRegister(e.Group("/api/user"))
-	singleFileRouteRegister(e.Group("/api/singlefile"))
-	pageRouteRegister(e.Group("/api/page"))
-	adminRouteRegister(e.Group("/api/admin"))
+	userRouteRegister(e.Group("/user"))
+	singleFileRouteRegister(e.Group("/singlefile"))
+	pageRouteRegister(e.Group("/page"))
+	adminRouteRegister(e.Group("/admin"))
 	miscRegister(e.Group("/misc"))
 }
 
