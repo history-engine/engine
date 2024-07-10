@@ -1,11 +1,10 @@
 package routes
 
 import (
+	"github.com/labstack/echo/v4"
 	"history-engine/engine/setting"
 	"history-engine/engine/web/handler/singlefile"
 	"history-engine/engine/web/middleware"
-
-	"github.com/labstack/echo/v4"
 )
 
 // 注册页面相关路由
@@ -17,6 +16,7 @@ func singleFileRouteRegister(r *echo.Group) {
 	r.Add("OPTIONS", "/html/:file", e.Cover)
 	r.Add("MKCOL", "/html/:file", e.Cover)
 	r.Add("PROPFIND", "/html/:file", e.Cover)
+	r.Add("HEAD", "/html/:file", e.Head)
 }
 
 /* func basicAuth(username, password string, c echo.Context) (bool, error) {

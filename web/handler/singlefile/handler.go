@@ -119,6 +119,11 @@ func (e *Endpoint) Put(c echo.Context) error {
 	return c.String(http.StatusCreated, "ok")
 }
 
+func (e *Endpoint) Head(c echo.Context) error {
+	http.NotFound(c.Response(), c.Request())
+	return nil
+}
+
 // Cover PUT 以外的操作的兜底, 理论上不应该有逻辑走到这里
 func (e *Endpoint) Cover(c echo.Context) error {
 	log.Printf("webdav cover: %s", c.Request().URL.Path)
