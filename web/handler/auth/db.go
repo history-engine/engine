@@ -47,5 +47,5 @@ func Password(c echo.Context) error {
 		HttpOnly: true,
 	})
 
-	return utils.ApiSuccess(c, map[string]any{"jwt_token": tokenString})
+	return utils.ApiSuccess(c, map[string]any{"jwt_token": tokenString, "user": u})
 }
