@@ -9,6 +9,17 @@ import (
 	"history-engine/engine/utils"
 )
 
+func Info(ctx context.Context, uid int64) *model.User {
+	x := db.GetEngine()
+	user := &model.User{}
+	err := x.GetContext(ctx, user, "select * from user where id=?", uid)
+	if err != nil {
+		panic(err)
+	}
+
+	return user
+}
+
 func Register(ctx context.Context, req *model.UserRegisterReq) (*model.User, model.MsgCode) {
 	x := db.GetEngine()
 	user := &model.User{}
