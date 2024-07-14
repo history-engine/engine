@@ -9,8 +9,9 @@ import (
 
 // 注册页面相关路由
 func singleFileRouteRegister(r *echo.Group) {
-	r.Use(middleware.BasicAuth())
+	r.Add("POST", "/rest", singlefile.RestSave, middleware.Token)
 
+	r.Use(middleware.BasicAuth())
 	e := singlefile.NewEndpoint("/", setting.SingleFile.Path)
 	r.Add("PUT", "/html/:file", e.Put)
 	r.Add("OPTIONS", "/html/:file", e.Cover)

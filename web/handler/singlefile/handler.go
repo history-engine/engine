@@ -105,11 +105,9 @@ func (e *Endpoint) Put(c echo.Context) error {
 	}
 
 	err = zincsearch.AddIndex(uniqueId, &model.ZincDocument{
-		FilePath: file,
-		Url:      url,
-		Title:    article.Title,
-		Content:  article.TextContent,
-		Size:     len(body),
+		Url:     url,
+		Title:   article.Title,
+		Content: article.TextContent,
 	})
 	if err != nil {
 		logger.Zap().Fatal("add index error", zap.Error(err), zap.String("uniqueId", uniqueId))
