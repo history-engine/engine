@@ -55,7 +55,7 @@ func RestSave(c echo.Context) error {
 		if !os.IsNotExist(err) { // TODO 未知错误,记录日志
 			return c.JSON(http.StatusInternalServerError, nil)
 		}
-		if err := os.MkdirAll(storagePath, 0775); err != nil {
+		if err := os.MkdirAll(setting.SingleFile.Path+storagePath, 0775); err != nil {
 			// todo 这里可能有多种情况
 			return c.JSON(http.StatusInternalServerError, nil)
 		}
