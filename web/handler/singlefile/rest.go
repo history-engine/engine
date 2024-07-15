@@ -74,7 +74,7 @@ func RestSave(c echo.Context) error {
 	}
 
 	// 内容分析
-	article := readability.Parser().Parse(setting.SingleFile.Path + file)
+	article := readability.Parser().Parse(file)
 
 	// 入库
 	_, err = page.SavePage(ctx, &model.Page{
