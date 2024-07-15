@@ -56,6 +56,7 @@ func SavePage(ctx context.Context, page *model.Page) (int64, error) {
 	return page.Id, nil
 }
 
+// TODO 少获取几个字段
 func BatchGetPage(ctx context.Context, uniqueId []string) ([]model.Page, error) {
 	if len(uniqueId) == 0 {
 		return nil, nil
@@ -87,8 +88,8 @@ func Page(ctx context.Context, start, rows int) ([]model.Page, error) {
 	return list, err
 }
 
-func Search(ctx context.Context, search model.SearchPage) (maps map[string][]model.PageSearch, total int, err error) {
-	zincSearch, err := zincsearch.EsSearch(search)
+func Search(ctx context.Context, userId int64, search model.SearchPage) (maps map[string][]model.PageSearch, total int, err error) {
+	zincSearch, err := zincsearch.EsSearch(userId, search)
 	if err != nil {
 		panic(err)
 	}
@@ -102,20 +103,27 @@ func Search(ctx context.Context, search model.SearchPage) (maps map[string][]mod
 	for k, v := range zincSearch.Hits.Hits {
 		ids[k] = v.ID
 		if source, ok := v.Source.(map[string]interface{}); ok {
-			docs[v.ID] = model.ZincDocument{
-				Id:      v.ID,
-				Title:   source["title"].(string),
-				Content: source["content"].(string),
-				Url:     source["url"].(string),
-				Size:    int(source["size"].(float64)),
+			document := model.ZincDocument{}
+			if val, ok := source["title"].(string); ok {
+				document.Title = val
 			}
+			if val, ok := source["excerpt"].(string); ok {
+				document.Excerpt = val
+			}
+			if val, ok := source["content"].(string); ok {
+				document.Content = val
+			}
+			if val, ok := source["url"].(string); ok {
+				document.Url = val
+			}
+
+			docs[v.ID] = document
 		}
 	}
 
 	pages, err := BatchGetPage(ctx, ids)
 	maps = map[string][]model.PageSearch{}
 	for _, v := range pages {
-		v.FullPath = setting.Web.Domain + "/page/view" + v.FullPath
 		if _, ok := maps[v.UniqueId]; !ok {
 			maps[v.UniqueId] = []model.PageSearch{}
 		}
@@ -123,9 +131,9 @@ func Search(ctx context.Context, search model.SearchPage) (maps map[string][]mod
 			Avatar:  "https://avatars.akamai.steamstatic.com/6a9ae9c069cd4fff8bf954938727730cdb0fe27b.jpg",
 			Title:   docs[v.UniqueId].Title,
 			Content: docs[v.UniqueId].Content,
-			Url:     docs[v.UniqueId].Url,
-			Size:    docs[v.UniqueId].Size,
-			Preview: v.FullPath,
+			Url:     v.Url,
+			Size:    v.FullSize,
+			Preview: setting.Web.Domain + "/page/view" + v.FullPath,
 		})
 	}
 

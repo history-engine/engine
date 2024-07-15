@@ -30,7 +30,8 @@ func Search(c echo.Context) error {
 		req.EndTime = time.Now()
 	}
 
-	list, total, err := page.Search(c.Request().Context(), req)
+	userId := c.Get("uid").(int64)
+	list, total, err := page.Search(c.Request().Context(), userId, req)
 	if err != nil {
 		panic(err)
 	}

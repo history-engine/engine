@@ -19,6 +19,7 @@ import (
 
 func RestSave(c echo.Context) error {
 	ctx := c.Request().Context()
+	userId := c.Get("uid").(int64)
 
 	err := c.Request().ParseMultipartForm(10 << 20)
 	if err != nil {
@@ -49,8 +50,8 @@ func RestSave(c echo.Context) error {
 	logger.Zap().Debug("rest receive singleFile", zap.String("url", url), zap.String("uniqueId", uniqueId))
 
 	// 检查并创建目录
-	storagePath := fmt.Sprintf("%s/%s/%s", setting.SingleFile.Path, uniqueId[:2], uniqueId[2:4])
-	if _, err = os.Stat(storagePath); err != nil {
+	storagePath := fmt.Sprintf("/%s/%s", uniqueId[:2], uniqueId[2:4])
+	if _, err = os.Stat(setting.SingleFile.Path + storagePath); err != nil {
 		if !os.IsNotExist(err) { // TODO 未知错误,记录日志
 			return c.JSON(http.StatusInternalServerError, nil)
 		}
@@ -62,8 +63,8 @@ func RestSave(c echo.Context) error {
 
 	// 文件写入
 	version := page.NextVersion(ctx, uniqueId)
-	file := fmt.Sprintf("%s/%s.%d.html", storagePath, uniqueId, version)
-	f, err := os.OpenFile(file, os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0644)
+	storageFile := fmt.Sprintf("%s/%s.%d.html", storagePath, uniqueId, version)
+	f, err := os.OpenFile(setting.SingleFile.Path+storageFile, os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0644)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, nil)
 	}
@@ -74,26 +75,27 @@ func RestSave(c echo.Context) error {
 	}
 
 	// 内容分析
-	article := readability.Parser().Parse(file)
+	article := readability.Parser().Parse(setting.SingleFile.Path + storageFile)
 
 	// 入库
 	_, err = page.SavePage(ctx, &model.Page{
-		UserId:   c.Get("uid").(int64),
+		UserId:   userId,
 		UniqueId: uniqueId,
 		Version:  version,
 		Title:    article.Title,
 		Url:      url,
 		FullSize: int(html.Size),
-		FullPath: file,
+		FullPath: storageFile,
 	})
 	if err != nil {
 		logger.Zap().Fatal("save page error", zap.Error(err), zap.String("url", article.Url))
 		return c.JSON(http.StatusInternalServerError, nil)
 	}
 
-	err = zincsearch.PutDocument(uniqueId, &model.ZincDocument{
+	err = zincsearch.PutDocument(userId, uniqueId, &model.ZincDocument{
 		Url:     url,
 		Title:   article.Title,
+		Excerpt: article.Excerpt,
 		Content: article.TextContent,
 	})
 	if err != nil {

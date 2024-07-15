@@ -3,6 +3,7 @@ package readability
 type Article struct {
 	Url         string `json:"url"`
 	Title       string `json:"title"`
+	Excerpt     string `json:"excerpt"`
 	Byline      string `json:"byline"`
 	Dir         string `json:"dir"`
 	Lang        string `json:"lang"`

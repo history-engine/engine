@@ -41,6 +41,7 @@ func NewEndpoint(prefix, dir string) *Endpoint {
 // Put 保存singlefile生成的html文件
 func (e *Endpoint) Put(c echo.Context) error {
 	ctx := c.Request().Context()
+	userId := c.Get("uid").(int64)
 
 	body, err := io.ReadAll(c.Request().Body)
 	if err != nil {
@@ -91,7 +92,7 @@ func (e *Endpoint) Put(c echo.Context) error {
 
 	// 入库
 	_, err = page.SavePage(ctx, &model.Page{
-		UserId:   c.Get("uid").(int64),
+		UserId:   userId,
 		UniqueId: uniqueId,
 		Version:  version,
 		Title:    article.Title,
@@ -104,7 +105,7 @@ func (e *Endpoint) Put(c echo.Context) error {
 		return c.String(http.StatusInternalServerError, "save page error")
 	}
 
-	err = zincsearch.PutDocument(uniqueId, &model.ZincDocument{
+	err = zincsearch.PutDocument(userId, uniqueId, &model.ZincDocument{
 		Url:     url,
 		Title:   article.Title,
 		Content: article.TextContent,

@@ -15,7 +15,7 @@ import (
 )
 
 // EsSearch Search V2 ES语法兼容
-func EsSearch(search model.SearchPage) (resp model.ZincSearchResponse, err error) {
+func EsSearch(userId int64, search model.SearchPage) (resp model.ZincSearchResponse, err error) {
 	query := model.ZincQueryForSDK{
 		Size: search.Limit,
 		From: (search.Page - 1) * search.Limit,
@@ -48,14 +48,15 @@ func EsSearch(search model.SearchPage) (resp model.ZincSearchResponse, err error
 				},
 			},
 		},
-		Source: []string{"ID", "title", "content", "url", "size"},
+		Source: []string{"ID", "title", "content", "excerpt", "url"},
 	}
 	body, err := json.Marshal(query)
 	if err != nil {
 		panic(err)
 	}
 
-	api := fmt.Sprintf(ApiSearchEs, setting.ZincSearch.Index)
+	index := fmt.Sprintf("%s_%d", setting.ZincSearch.IndexPrefix, userId)
+	api := fmt.Sprintf(ApiSearchEs, index)
 	req, err := http.NewRequest(http.MethodPost, setting.ZincSearch.Host+api, bytes.NewReader(body))
 	if err != nil {
 		logger.Zap().Error("new request error", zap.Error(err))

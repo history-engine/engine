@@ -14,10 +14,10 @@ import (
 
 // PutDocument 添加数据到ZincSearch索引
 // TODO 请求ZincSearch逻辑封装
-func PutDocument(uniqueId string, doc *model.ZincDocument) error {
+func PutDocument(userId int64, uniqueId string, doc *model.ZincDocument) error {
 	body, _ := json.Marshal(doc)
 
-	api := fmt.Sprintf(ApiDocCreateWithId, setting.ZincSearch.Index, uniqueId)
+	api := fmt.Sprintf(ApiDocCreateWithId, fmt.Sprintf("%s_%d", setting.ZincSearch.IndexPrefix, userId), uniqueId)
 	req, _ := http.NewRequest("PUT", setting.ZincSearch.Host+api, bytes.NewReader(body))
 
 	req.Header.Set("Content-Type", "application/json")
