@@ -74,7 +74,7 @@ func RestSave(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, nil)
 	}
 
-	// 内容分析
+	// 内容分析 todo 异步，部分页面同步模式处理太慢了
 	article := readability.Parser().Parse(setting.SingleFile.Path + storageFile)
 
 	// 入库
