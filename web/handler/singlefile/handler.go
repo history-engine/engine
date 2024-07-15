@@ -104,7 +104,7 @@ func (e *Endpoint) Put(c echo.Context) error {
 		return c.String(http.StatusInternalServerError, "save page error")
 	}
 
-	err = zincsearch.AddIndex(uniqueId, &model.ZincDocument{
+	err = zincsearch.PutDocument(uniqueId, &model.ZincDocument{
 		Url:     url,
 		Title:   article.Title,
 		Content: article.TextContent,

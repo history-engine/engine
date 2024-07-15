@@ -91,7 +91,7 @@ func RestSave(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, nil)
 	}
 
-	err = zincsearch.AddIndex(uniqueId, &model.ZincDocument{
+	err = zincsearch.PutDocument(uniqueId, &model.ZincDocument{
 		Url:     url,
 		Title:   article.Title,
 		Content: article.TextContent,

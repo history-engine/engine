@@ -55,7 +55,7 @@ func EsSearch(search model.SearchPage) (resp model.ZincSearchResponse, err error
 		panic(err)
 	}
 
-	api := fmt.Sprintf(ApiSearchV2, setting.ZincSearch.Index)
+	api := fmt.Sprintf(ApiSearchEs, setting.ZincSearch.Index)
 	req, err := http.NewRequest(http.MethodPost, setting.ZincSearch.Host+api, bytes.NewReader(body))
 	if err != nil {
 		logger.Zap().Error("new request error", zap.Error(err))

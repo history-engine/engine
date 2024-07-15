@@ -3,8 +3,8 @@ package zincsearch
 import "net/http"
 
 const (
-	ApiIndex    = "/api/%s/_doc/%s"
-	ApiSearchV2 = "/es/%s/_search"
+	ApiDocCreateWithId = "/api/%s/_doc/%s"
+	ApiSearchEs        = "/es/%s/_search"
 )
 
 var client *http.Client = http.DefaultClient
