@@ -32,10 +32,19 @@ func JwtAuth(next echo.HandlerFunc) echo.HandlerFunc {
 		if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
 			c.Set("jwt-claims", claims)
 			if uid, ok := claims["uid"]; ok {
-				c.Set("uid", uid)
+				if val, ok := uid.(float64); ok {
+					c.Set("uid", int64(val))
+				}
 			}
+			if username, ok := claims["username"]; ok {
+				c.Set("username", username)
+			}
+			if email, ok := claims["email"]; ok {
+				c.Set("email", email)
+			}
+			return next(c)
 		}
 
-		return next(c)
+		return errors.New("jwt auth failed")
 	}
 }

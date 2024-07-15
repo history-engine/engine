@@ -12,7 +12,7 @@ import (
 )
 
 func Info(c echo.Context) error {
-	if uid, ok := c.Get("uid").(float64); ok {
+	if uid, ok := c.Get("uid").(int64); ok {
 		u := user.Info(c.Request().Context(), int64(uid))
 		return utils.ApiSuccess(c, u)
 	}
