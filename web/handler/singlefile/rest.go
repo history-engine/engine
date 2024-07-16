@@ -92,7 +92,8 @@ func RestSave(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, nil)
 	}
 
-	err = zincsearch.PutDocument(userId, uniqueId, &model.ZincDocument{
+	zincId := fmt.Sprintf("%s%d", uniqueId, version)
+	err = zincsearch.PutDocument(userId, zincId, &model.ZincDocument{
 		Url:     url,
 		Title:   article.Title,
 		Excerpt: article.Excerpt,

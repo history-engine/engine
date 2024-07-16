@@ -2,6 +2,7 @@ package page
 
 import (
 	"context"
+	"fmt"
 	"github.com/jmoiron/sqlx"
 	"go.uber.org/zap"
 	"history-engine/engine/library/db"
@@ -88,7 +89,7 @@ func Page(ctx context.Context, start, rows int) ([]model.Page, error) {
 	return list, err
 }
 
-func Search(ctx context.Context, userId int64, search model.SearchPage) (maps map[string][]model.PageSearch, total int, err error) {
+func Search(ctx context.Context, userId int64, search model.SearchPage) (pageSearchs []model.PageSearch, total int, err error) {
 	zincSearch, err := zincsearch.EsSearch(userId, search)
 	if err != nil {
 		panic(err)
@@ -98,44 +99,46 @@ func Search(ctx context.Context, userId int64, search model.SearchPage) (maps ma
 		return
 	}
 
-	docs := make(map[string]model.ZincDocument, 0)
-	ids := make([]string, zincSearch.Hits.Total.Value)
-	for k, v := range zincSearch.Hits.Hits {
-		ids[k] = v.ID
+	// 提取页面id
+	docIdList := make([]string, 0)
+	for _, v := range zincSearch.Hits.Hits {
+		docIdList = append(docIdList, v.ID[0:32])
+	}
+
+	// 从数据获取页面信息
+	pages, err := BatchGetPage(ctx, docIdList)
+	docMap := make(map[string]model.Page, 0)
+	for _, v := range pages {
+		docMap[fmt.Sprintf("%s%d", v.UniqueId, v.Version)] = v
+	}
+
+	// 提取Zinc结果，部分数据从数据库补全
+	pageSearchs = make([]model.PageSearch, 0)
+	for _, v := range zincSearch.Hits.Hits {
+		page, ok := docMap[v.ID]
+		if !ok {
+			continue
+		}
+
+		pageSearch := model.PageSearch{
+			Avatar:  "https://avatars.akamai.steamstatic.com/6a9ae9c069cd4fff8bf954938727730cdb0fe27b.jpg",
+			Title:   page.Title,
+			Url:     page.Url,
+			Size:    page.FullSize,
+			Preview: setting.Web.Domain + "/page/view" + page.FullPath,
+			Version: page.Version,
+		}
+
 		if source, ok := v.Source.(map[string]interface{}); ok {
-			document := model.ZincDocument{}
-			if val, ok := source["title"].(string); ok {
-				document.Title = val
-			}
 			if val, ok := source["excerpt"].(string); ok {
-				document.Excerpt = val
+				pageSearch.Excerpt = val
 			}
 			if val, ok := source["content"].(string); ok {
-				document.Content = val
+				pageSearch.Content = val
 			}
-			if val, ok := source["url"].(string); ok {
-				document.Url = val
-			}
-
-			docs[v.ID] = document
+			pageSearchs = append(pageSearchs, pageSearch)
 		}
 	}
 
-	pages, err := BatchGetPage(ctx, ids)
-	maps = map[string][]model.PageSearch{}
-	for _, v := range pages {
-		if _, ok := maps[v.UniqueId]; !ok {
-			maps[v.UniqueId] = []model.PageSearch{}
-		}
-		maps[v.UniqueId] = append(maps[v.UniqueId], model.PageSearch{
-			Avatar:  "https://avatars.akamai.steamstatic.com/6a9ae9c069cd4fff8bf954938727730cdb0fe27b.jpg",
-			Title:   docs[v.UniqueId].Title,
-			Content: docs[v.UniqueId].Content,
-			Url:     v.Url,
-			Size:    v.FullSize,
-			Preview: setting.Web.Domain + "/page/view" + v.FullPath,
-		})
-	}
-
-	return maps, zincSearch.Hits.Total.Value, nil
+	return pageSearchs, zincSearch.Hits.Total.Value, nil
 }
