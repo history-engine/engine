@@ -29,7 +29,6 @@ func Register(ctx context.Context, req *model.UserRegisterReq) (*model.User, mod
 	}
 
 	if user.Id != 0 {
-		// todo 用户已存在
 		return nil, model.ErrorUserExist
 	}
 
