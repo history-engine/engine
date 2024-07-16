@@ -1,0 +1,36 @@
+{
+  "properties": {
+    "title": {
+      "type": "text",
+      "index": true,
+      "store": true,
+      "sortable": false,
+      "aggregatable": false,
+      "highlightable": false
+    },
+    "excerpt": {
+      "type": "text",
+      "index": true,
+      "store": true,
+      "sortable": false,
+      "aggregatable": false,
+      "highlightable": false
+    },
+    "content": {
+      "type": "text",
+      "index": true,
+      "store": false,
+      "sortable": false,
+      "aggregatable": false,
+      "highlightable": false
+    },
+    "url": {
+      "type": "text",
+      "index": true,
+      "store": false,
+      "sortable": false,
+      "aggregatable": false,
+      "highlightable": false
+    }
+  }
+}
