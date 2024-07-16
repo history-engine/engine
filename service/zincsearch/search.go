@@ -16,10 +16,10 @@ import (
 
 // EsSearch Search V2 ES语法兼容
 func EsSearch(userId int64, search model.SearchPage) (resp model.ZincSearchResponse, err error) {
-	query := model.ZincQueryForSDK{
+	query := model.ZincQuery{
 		Size: search.Limit,
 		From: (search.Page - 1) * search.Limit,
-		Sort: []string{"-@timestamp"},
+		Sort: []string{"-_score"},
 		Aggregations: map[string]model.Aggregations{
 			"histogram": {
 				DateHistogram: &model.AggregationDateHistogram{
@@ -28,11 +28,11 @@ func EsSearch(userId int64, search model.SearchPage) (resp model.ZincSearchRespo
 				},
 			},
 		},
-		Query: model.QueryForSDK{
-			Bool: &model.BoolQueryForSDK{
-				Must: []*model.QueryForSDK{
+		Query: model.Query{
+			Bool: &model.BoolQuery{
+				Must: []*model.Query{
 					{
-						Range: map[string]*model.RangeQueryForSDK{
+						Range: map[string]*model.RangeQuery{
 							"@timestamp": {
 								GTE:    search.StartTime.Format(time.RFC3339),
 								LT:     search.EndTime.Format(time.RFC3339),

@@ -29,10 +29,12 @@ type SearchPage struct {
 type PageSearch struct {
 	Avatar  string `json:"avatar"`
 	Title   string `json:"title"`
+	Excerpt string `json:"excerpt"`
 	Content string `json:"content"`
 	Size    int    `json:"size"`
 	Url     string `json:"url"`
 	Preview string `json:"preview"`
+	Version int    `json:"version"`
 }
 
 type SearchResponse struct {
