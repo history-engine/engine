@@ -42,12 +42,21 @@ func RestSave(c echo.Context) error {
 	}
 
 	if singlefile.CheckIgnore(url) {
-		logger.Zap().Info("ignore: " + url)
+		logger.Zap().Info("ignore by rule: " + url)
 		return c.JSON(http.StatusOK, nil)
 	}
 
 	uniqueId := utils.Md5str(url) // todo 自定义
-	logger.Zap().Debug("rest receive singleFile", zap.String("url", url), zap.String("uniqueId", uniqueId))
+	version, created := page.NextVersion(ctx, uniqueId)
+	if singlefile.CheckVersionInterval(created) {
+		logger.Zap().Info("ignore by interval: " + url)
+		return c.JSON(http.StatusOK, nil)
+	}
+
+	logger.Zap().Debug("rest receive singleFile",
+		zap.String("url", url),
+		zap.String("uniqueId", uniqueId),
+		zap.Int("version", version))
 
 	// 检查并创建目录
 	storagePath := fmt.Sprintf("/%s/%s", uniqueId[:2], uniqueId[2:4])
@@ -62,7 +71,6 @@ func RestSave(c echo.Context) error {
 	}
 
 	// 文件写入
-	version := page.NextVersion(ctx, uniqueId)
 	storageFile := fmt.Sprintf("%s/%s.%d.html", storagePath, uniqueId, version)
 	f, err := os.OpenFile(setting.SingleFile.Path+storageFile, os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0644)
 	if err != nil {

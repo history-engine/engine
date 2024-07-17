@@ -18,10 +18,6 @@ var pageLock = sync.Mutex{}
 
 // SavePage 保存页面
 func SavePage(ctx context.Context, page *model.Page) (int64, error) {
-	if page.Version == 0 {
-		page.Version = NextVersion(ctx, page.UniqueId)
-	}
-
 	if page.UpdatedAt.IsZero() {
 		page.UpdatedAt = time.Now()
 	}
@@ -35,14 +31,19 @@ func SavePage(ctx context.Context, page *model.Page) (int64, error) {
 		"lite_size=:lite_size, indexed_at=:indexed_at, updated_at=:updated_at"
 	res, err := x.NamedExecContext(ctx, sql, page)
 	if err != nil {
-		version := NextVersion(ctx, page.UniqueId)
-		logger.Zap().Error("save page error", zap.Error(err), zap.String("sql", sql), zap.Any("page", page), zap.Int("version", version))
+		logger.Zap().Error("save page error",
+			zap.Error(err),
+			zap.String("sql", sql), zap.Any("page", page),
+			zap.Int("version", page.Version))
 		return 0, err
 	}
 
 	page.Id, err = res.LastInsertId()
 	if err != nil {
-		logger.Zap().Error("get last insert id error", zap.Error(err), zap.String("sql", sql), zap.Any("page", page))
+		logger.Zap().Error("get last insert id error",
+			zap.Error(err),
+			zap.String("sql", sql),
+			zap.Any("page", page))
 		return 0, err
 	}
 

@@ -7,6 +7,7 @@ import (
 	"history-engine/engine/setting"
 	"net/url"
 	"regexp"
+	"time"
 )
 
 func CheckIgnore(address string) bool {
@@ -38,4 +39,10 @@ func CheckIgnore(address string) bool {
 	}
 
 	return ignore
+}
+
+func CheckVersionInterval(lastTime time.Time) bool {
+	end := lastTime.Add(time.Duration(setting.SingleFile.MinVersionInterval) * time.Second)
+	comp := time.Now().Compare(end)
+	return comp == -1
 }

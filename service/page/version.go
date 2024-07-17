@@ -2,26 +2,31 @@ package page
 
 import (
 	"context"
+	"database/sql"
+	"errors"
 	"fmt"
 	"go.uber.org/zap"
 	"history-engine/engine/library/db"
 	"history-engine/engine/library/logger"
+	"history-engine/engine/model"
 	"history-engine/engine/setting"
 	"log"
 	"os"
+	"time"
 )
 
 // NextVersion 获取下一个版本号
-func NextVersion(ctx context.Context, uniqueId string) int {
-	var version = 0
+func NextVersion(ctx context.Context, uniqueId string) (int, time.Time) {
+	page := model.Page{}
+
 	x := db.GetEngine()
-	sql := "select coalesce(max(version), 0) from page where unique_id=?"
-	err := x.GetContext(ctx, &version, sql, uniqueId)
-	if err != nil {
-		logger.Zap().Warn("get max version error", zap.String("sql", sql), zap.String("unique_id", uniqueId), zap.Error(err))
+	query := "select id, version, created_at from page where unique_id=? order by version desc limit 1"
+	err := x.GetContext(ctx, &page, query, uniqueId)
+	if err != nil && !errors.Is(err, sql.ErrNoRows) {
+		logger.Zap().Warn("get max version error", zap.String("sql", query), zap.String("unique_id", uniqueId), zap.Error(err))
 	}
 
-	return version + 1
+	return page.Version + 1, page.CreatedAt
 }
 
 // CleanHistory 清除历史版本
