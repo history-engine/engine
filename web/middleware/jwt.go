@@ -33,7 +33,7 @@ func JwtAuth(next echo.HandlerFunc) echo.HandlerFunc {
 			c.Set("jwt-claims", claims)
 			if uid, ok := claims["uid"]; ok {
 				if val, ok := uid.(float64); ok {
-					c.Set("uid", int64(val))
+					c.Set("uid", int(val))
 				}
 			}
 			if username, ok := claims["username"]; ok {

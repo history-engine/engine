@@ -2,99 +2,66 @@ package user
 
 import (
 	"context"
-	"database/sql"
-	"errors"
+	"go.uber.org/zap"
+	"history-engine/engine/ent"
+	"history-engine/engine/ent/user"
 	"history-engine/engine/library/db"
+	"history-engine/engine/library/logger"
 	"history-engine/engine/model"
 	"history-engine/engine/utils"
 )
 
-func Info(ctx context.Context, uid int64) *model.User {
+func Info(ctx context.Context, uid int) *ent.User {
 	x := db.GetEngine()
-	user := &model.User{}
-	err := x.GetContext(ctx, user, "select * from user where id=?", uid)
+
+	user, err := x.User.Get(ctx, uid)
 	if err != nil {
-		panic(err)
+		logger.Zap().Error("get user info err", zap.Error(err), zap.Int("uid", uid))
+		return nil
 	}
 
 	return user
 }
 
-func Register(ctx context.Context, req *model.UserRegisterReq) (*model.User, model.MsgCode) {
+func Register(ctx context.Context, req *model.UserRegisterReq) (*ent.User, model.MsgCode) {
 	x := db.GetEngine()
-	user := &model.User{}
-	err := x.GetContext(ctx, user, "select * from user where username=? or email=? limit 1", req.Username, req.Username)
-	if err != nil && !errors.Is(err, sql.ErrNoRows) {
-		panic(err)
+
+	count, err := x.User.Query().
+		Where(
+			user.Or(
+				user.Username(req.Username),
+				user.Email(req.Email),
+			),
+		).
+		Count(ctx)
+	if err != nil {
+		logger.Zap().Error("check user exist err", zap.Error(err), zap.Any("req", req))
+		return nil, model.Unknown
 	}
 
-	if user.Id != 0 {
+	if count > 0 {
 		return nil, model.ErrorUserExist
 	}
 
-	user.Username = req.Username
-	user.Email = req.Email
-	user.Password = utils.Md5str(req.Password)
-	query := "insert into user set " +
-		"username=:username, email=:email, password=:password"
-	res, err := x.NamedExecContext(ctx, query, user)
+	user, err := x.User.Create().
+		SetUsername(req.Username).
+		SetEmail(req.Email).
+		SetPassword(utils.Md5str(req.Password)).
+		Save(ctx)
 	if err != nil {
-		panic(err)
-	}
-
-	user.Id, err = res.LastInsertId()
-	if err != nil {
-		panic(err)
+		logger.Zap().Error("register err", zap.Error(err), zap.Any("req", req))
+		return nil, model.Unknown
 	}
 
 	return user, model.Ok
 }
 
-func List(ctx context.Context, req *model.UserListReq) ([]model.User, model.MsgCode) {
-	if req.Page <= 0 {
-		req.Page = 1
-	}
-
-	if req.Rows <= 0 {
-		req.Rows = 20
-	}
-
-	x := db.GetEngine()
-	users := make([]model.User, 0)
-	err := x.SelectContext(ctx, &users, "select * from user limit ?,?", (req.Page-1)*20, 20)
-	if err != nil {
-		panic(err)
-	}
-
-	return users, model.Ok
+func List(ctx context.Context, req *model.UserListReq) ([]*ent.User, model.MsgCode) {
+	// todo
+	return nil, model.Ok
 }
 
 func Create(ctx context.Context, req *model.UserCreateReq) model.MsgCode {
-	x := db.GetEngine()
-
-	// 重复检查
-	query := "select * from user where username=? or email=? limit 1"
-	user := &model.User{}
-	err := x.GetContext(ctx, user, query, req.Username, req.Email)
-	if err != nil && !errors.Is(err, sql.ErrNoRows) {
-		panic(err)
-	}
-
-	if user.Id != 0 {
-		return model.ErrorUserExist
-	}
-
-	user = &model.User{
-		Username: req.Username,
-		Email:    req.Email,
-		Password: utils.Md5str(req.Password),
-	}
-	query = "insert into user set " +
-		"username=:username, email=:email, password=:password"
-	_, err = x.NamedExecContext(ctx, query, user)
-	if err != nil {
-		panic(err)
-	}
-
+	// todo
 	return model.Ok
 }

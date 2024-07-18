@@ -2,79 +2,78 @@ package page
 
 import (
 	"context"
-	"database/sql"
-	"errors"
-	"fmt"
+	"entgo.io/ent/dialect/sql"
 	"go.uber.org/zap"
+	"history-engine/engine/ent"
+	"history-engine/engine/ent/page"
 	"history-engine/engine/library/db"
 	"history-engine/engine/library/logger"
-	"history-engine/engine/model"
+	"history-engine/engine/service/zincsearch"
 	"history-engine/engine/setting"
-	"log"
 	"os"
 	"time"
 )
 
 // NextVersion 获取下一个版本号
 func NextVersion(ctx context.Context, uniqueId string) (int, time.Time) {
-	page := model.Page{}
-
 	x := db.GetEngine()
-	query := "select id, version, created_at from page where unique_id=? order by version desc limit 1"
-	err := x.GetContext(ctx, &page, query, uniqueId)
-	if err != nil && !errors.Is(err, sql.ErrNoRows) {
-		logger.Zap().Warn("get max version error", zap.String("sql", query), zap.String("unique_id", uniqueId), zap.Error(err))
+	page, err := x.Page.Query().
+		Select(page.FieldID, page.FieldVersion, page.FieldCreatedAt).
+		Where(page.UniqueID(uniqueId)).
+		Order(page.ByVersion(sql.OrderDesc())).
+		First(ctx)
+
+	if err != nil {
+		if ent.IsNotFound(err) {
+			return 1, time.Time{}
+		}
+
+		logger.Zap().Warn("get max version error", zap.String("unique_id", uniqueId), zap.Error(err))
+		return 0, time.Now()
 	}
 
 	return page.Version + 1, page.CreatedAt
 }
 
-// CleanHistory 清除历史版本
-// TODO 清理对应的文件
-func CleanHistory(ctx context.Context, uniqueId string) error {
+// CleanHistory 清除历史版本、HTML文件、ZincSearch索引
+func CleanHistory(ctx context.Context, userId int, uniqueId string, version int) {
+	diff := version - setting.SingleFile.MaxVersion
+	if diff <= 0 {
+		return
+	}
+
 	x := db.GetEngine()
-
-	// 获取最大最小版本号
-	v := struct {
-		Min int
-		Max int
-	}{
-		Min: 0,
-		Max: 0,
+	var vs []struct {
+		Id      int64
+		Version int
+		Path    string
+	}
+	if err := x.Page.Query().
+		Where(page.UserID(userId), page.UniqueID(uniqueId), page.VersionLTE(diff)).
+		Select(page.FieldID, page.FieldVersion, page.FieldPath).
+		Scan(ctx, &vs); err != nil {
+		return
 	}
 
-	sql := "select min(version) as min, max(version) as max from page where unique_id=?"
-	err := x.GetContext(ctx, &v, sql, uniqueId)
-	if err != nil {
-		logger.Zap().Error("check min and max version error", zap.String("sql", sql), zap.String("unique_id", uniqueId), zap.Error(err))
-		return err
+	for _, v := range vs {
+		if err := x.Page.DeleteOneID(v.Id).Exec(ctx); err != nil {
+			logger.Zap().Error("delete page err", zap.Int64("id", v.Id))
+			continue
+		}
+
+		if err := os.Remove(setting.SingleFile.HtmlPath + v.Path); err != nil {
+			logger.Zap().Error("delete html file err", zap.String("path", v.Path))
+			continue
+		}
+
+		if err := zincsearch.DelDocument(userId, uniqueId, v.Version); err != nil {
+			logger.Zap().Error(
+				"delete zinc search doc err",
+				zap.String("unique_id", uniqueId),
+				zap.Int("version", v.Version),
+			)
+		}
 	}
 
-	if v.Max-v.Min < setting.SingleFile.MaxVersion {
-		return nil
-	}
-
-	// todo 改成全部查出来再删除比较好因为还要删除文件和索引
-	sql = "delete from page where unique_id=? and version < ?"
-	res, err := x.ExecContext(ctx, sql, uniqueId, v.Max-setting.SingleFile.MaxVersion+1)
-	if err != nil {
-		logger.Zap().Error("clean history version error", zap.Error(err), zap.String("sql", sql))
-		return err
-	}
-
-	n, _ := res.RowsAffected()
-	log.Printf("clean history version, unique_id:%s, max:%d, min:%d, affected:%d\n", uniqueId, v.Max, v.Min, n)
-
-	// 扫描文件, 删除文件
-	for i := v.Min; i > v.Min-setting.SingleFile.MaxVersion*2; i-- {
-		full := fmt.Sprintf("%s/%s/%s/%s.%d.html", setting.SingleFile.HtmlPath, uniqueId[0:2], uniqueId[2:4], uniqueId, i)
-		lite := fmt.Sprintf("%s/%s/%s/%s.%d.lite.html", setting.SingleFile.HtmlPath, uniqueId[0:2], uniqueId[2:4], uniqueId, i)
-		_ = os.Remove(full)
-		_ = os.Remove(lite)
-		log.Printf("delete file, unique_id:%s, version:%d\n", uniqueId, i)
-	}
-
-	// todo 删除索引
-
-	return nil
+	return
 }

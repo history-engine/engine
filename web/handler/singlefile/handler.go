@@ -6,8 +6,8 @@ import (
 	"github.com/labstack/echo/v4"
 	"go.uber.org/zap"
 	"golang.org/x/net/webdav"
+	"history-engine/engine/ent"
 	"history-engine/engine/library/logger"
-	"history-engine/engine/model"
 	"history-engine/engine/service/page"
 	"history-engine/engine/service/readability"
 	"history-engine/engine/service/singlefile"
@@ -39,7 +39,7 @@ func NewEndpoint(prefix, dir string) *Endpoint {
 // Put 保存singlefile生成的html文件
 func (e *Endpoint) Put(c echo.Context) error {
 	ctx := c.Request().Context()
-	userId := c.Get("uid").(int64)
+	userId := c.Get("uid").(int)
 
 	body, err := io.ReadAll(c.Request().Body)
 	if err != nil {
@@ -91,11 +91,11 @@ func (e *Endpoint) Put(c echo.Context) error {
 	}
 
 	// 入库
-	_, err = page.SavePage(ctx, &model.Page{
-		UserId:   userId,
-		UniqueId: uniqueId,
+	_, err = page.SavePage(ctx, &ent.Page{
+		UserID:   userId,
+		UniqueID: uniqueId,
 		Version:  version,
-		Url:      url,
+		URL:      url,
 		Size:     len(body),
 		Path:     file,
 	})
@@ -104,8 +104,9 @@ func (e *Endpoint) Put(c echo.Context) error {
 		return c.String(http.StatusInternalServerError, "save page error")
 	}
 
-	// 后台分析HTML
-	page.ParserPage(context.Background(), uniqueId)
+	// 后台分析HTML、清理历史版本
+	go page.ParserPage(context.Background(), uniqueId)
+	go page.CleanHistory(context.Background(), userId, uniqueId, version)
 
 	return c.String(http.StatusCreated, "ok")
 }

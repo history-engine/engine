@@ -38,7 +38,7 @@ user = "admin"
 password = "admin"
 
 [database]
-drive = "mysql"
+drive = "mysql" #取值范围：mysql(tidb、mariadb)、sqlite3、postgres
 db_path = "data/sqlite.db" # 仅sqlite数据库使用
 host = "127.0.0.1"
 port = 3306

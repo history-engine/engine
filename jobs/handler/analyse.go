@@ -34,7 +34,7 @@ func runAnalyse(ctx *cli.Context) error {
 		time.Sleep(time.Millisecond * 100)
 
 		for _, item := range list {
-			parse, err := url.Parse(item.Url)
+			parse, err := url.Parse(item.URL)
 			if err != nil {
 				panic(err)
 			}

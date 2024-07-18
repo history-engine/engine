@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"github.com/labstack/echo/v4"
 	"go.uber.org/zap"
+	"history-engine/engine/ent"
 	"history-engine/engine/library/logger"
-	"history-engine/engine/model"
 	"history-engine/engine/service/page"
 	"history-engine/engine/service/singlefile"
 	"history-engine/engine/setting"
@@ -18,7 +18,7 @@ import (
 
 func RestSave(c echo.Context) error {
 	ctx := c.Request().Context()
-	userId := c.Get("uid").(int64)
+	userId := c.Get("uid").(int)
 
 	err := c.Request().ParseMultipartForm(10 << 20)
 	if err != nil {
@@ -81,11 +81,11 @@ func RestSave(c echo.Context) error {
 	}
 
 	// 入库
-	_, err = page.SavePage(ctx, &model.Page{
-		UserId:   userId,
-		UniqueId: uniqueId,
+	_, err = page.SavePage(ctx, &ent.Page{
+		UserID:   userId,
+		UniqueID: uniqueId,
 		Version:  version,
-		Url:      url,
+		URL:      url,
 		Size:     int(html.Size),
 		Path:     storageFile,
 	})
@@ -94,8 +94,9 @@ func RestSave(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, nil)
 	}
 
-	// 后台分析HTML
+	// 后台分析HTML、清理历史版本
 	go page.ParserPage(context.Background(), uniqueId)
+	go page.CleanHistory(context.Background(), userId, uniqueId, version)
 
 	return c.JSON(http.StatusCreated, nil)
 }

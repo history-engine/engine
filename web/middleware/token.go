@@ -21,11 +21,11 @@ func Token(next echo.HandlerFunc) echo.HandlerFunc {
 			Password: split[1],
 		}
 		u, err := auth.PasswordLogin(c.Request().Context(), req)
-		if !errors.Is(err, err) || u == nil || u.Id == 0 {
+		if !errors.Is(err, err) || u == nil || u.ID == 0 {
 			return errors.New("token auth failed")
 		}
 
-		c.Set("uid", u.Id)
+		c.Set("uid", u.ID)
 		c.Set("username", u.Username)
 		c.Set("email", u.Email)
 

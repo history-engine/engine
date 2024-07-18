@@ -12,8 +12,8 @@ import (
 )
 
 func Info(c echo.Context) error {
-	if uid, ok := c.Get("uid").(int64); ok {
-		u := user.Info(c.Request().Context(), int64(uid))
+	if uid, ok := c.Get("uid").(int); ok {
+		u := user.Info(c.Request().Context(), uid)
 		return utils.ApiSuccess(c, u)
 	}
 
@@ -50,7 +50,7 @@ func Register(c echo.Context) error {
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		"uid":      u.Id,
+		"uid":      u.ID,
 		"username": u.Username,
 		"email":    u.Email,
 	})

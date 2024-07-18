@@ -14,8 +14,8 @@ func BasicAuth() echo.MiddlewareFunc {
 			Password: password,
 		}
 		u, err := auth.PasswordLogin(c.Request().Context(), req)
-		if u != nil && u.Id > 0 {
-			c.Set("uid", u.Id)
+		if u != nil && u.ID > 0 {
+			c.Set("uid", u.ID)
 			c.Set("username", u.Username)
 			c.Set("email", u.Email)
 			return true, nil

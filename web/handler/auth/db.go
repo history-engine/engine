@@ -30,7 +30,7 @@ func Password(c echo.Context) error {
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		"uid":      u.Id,
+		"uid":      u.ID,
 		"username": u.Username,
 		"email":    u.Email,
 	})
