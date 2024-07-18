@@ -1,23 +1,21 @@
 package singlefile
 
 import (
+	"context"
 	"fmt"
+	"github.com/labstack/echo/v4"
 	"go.uber.org/zap"
+	"golang.org/x/net/webdav"
 	"history-engine/engine/library/logger"
 	"history-engine/engine/model"
 	"history-engine/engine/service/page"
 	"history-engine/engine/service/readability"
 	"history-engine/engine/service/singlefile"
-	"history-engine/engine/service/zincsearch"
-	"history-engine/engine/setting"
 	"history-engine/engine/utils"
 	"io"
 	"log"
 	"net/http"
 	"os"
-
-	"github.com/labstack/echo/v4"
-	"golang.org/x/net/webdav"
 )
 
 type Endpoint struct {
@@ -92,33 +90,22 @@ func (e *Endpoint) Put(c echo.Context) error {
 		return c.String(http.StatusInternalServerError, "")
 	}
 
-	// 内容分析
-	article := readability.Parser().Parse(setting.SingleFile.Path + file)
-
 	// 入库
 	_, err = page.SavePage(ctx, &model.Page{
 		UserId:   userId,
 		UniqueId: uniqueId,
 		Version:  version,
-		Title:    article.Title,
 		Url:      url,
-		FullSize: len(body),
-		FullPath: file,
+		Size:     len(body),
+		Path:     file,
 	})
 	if err != nil {
-		logger.Zap().Fatal("save page error", zap.Error(err), zap.String("url", article.Url))
+		logger.Zap().Fatal("save page error", zap.Error(err), zap.String("url", url))
 		return c.String(http.StatusInternalServerError, "save page error")
 	}
 
-	err = zincsearch.PutDocument(userId, uniqueId, &model.ZincDocument{
-		Url:     url,
-		Title:   article.Title,
-		Content: article.TextContent,
-	})
-	if err != nil {
-		logger.Zap().Fatal("add index error", zap.Error(err), zap.String("uniqueId", uniqueId))
-		return c.String(http.StatusInternalServerError, "add index error")
-	}
+	// 后台分析HTML
+	page.ParserPage(context.Background(), uniqueId)
 
 	return c.String(http.StatusCreated, "ok")
 }

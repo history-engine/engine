@@ -3,16 +3,69 @@ package page
 import (
 	"context"
 	"fmt"
-	"github.com/jmoiron/sqlx"
-	"go.uber.org/zap"
 	"history-engine/engine/library/db"
 	"history-engine/engine/library/logger"
 	"history-engine/engine/model"
+	"history-engine/engine/service/readability"
 	"history-engine/engine/service/zincsearch"
 	"history-engine/engine/setting"
 	"sync"
 	"time"
+
+	"github.com/jmoiron/sqlx"
+	"go.uber.org/zap"
 )
+
+// UpdatePage 更新页面信息
+func UpdatePage(ctx context.Context, id int64, page model.Page) error {
+	x := db.GetEngine()
+	query := "update page set " +
+		"user_id=:user_id, unique_id=:unique_id, version=:version, title=:title, " +
+		"url=:url, path=:path, size=:size, indexed_at=:indexed_at where id = :id limit 1"
+	result, err := x.NamedExecContext(ctx, query, page)
+	if err != nil {
+		return err
+	}
+
+	aff, err := result.RowsAffected()
+	logger.Zap().Debug("update page", zap.Int64("id", id), zap.Int64("aff", aff))
+
+	return err
+}
+
+// ParserPage 调用readability分析HTML文件，添加到ZincSearch、保存数据库
+func ParserPage(ctx context.Context, uniqueId string) []error {
+	pages, err := BatchGetPage(ctx, []string{uniqueId})
+	if err != nil {
+		return []error{err}
+	}
+
+	errs := make([]error, 0)
+	for _, v := range pages {
+		article := readability.Parser().Parse(setting.SingleFile.Path + v.Path)
+		if article == nil {
+			continue
+		}
+
+		zincId := fmt.Sprintf("%s%d", uniqueId, v.Version)
+		err = zincsearch.PutDocument(v.UserId, zincId, &model.ZincDocument{
+			Url:     v.Url,
+			Title:   article.Title,
+			Excerpt: article.Excerpt,
+			Content: article.TextContent,
+		})
+		if err != nil {
+			logger.Zap().Warn("add index error", zap.Error(err), zap.String("uniqueId", uniqueId))
+			errs = append(errs, err)
+		}
+
+		v.Title = article.Title
+		v.IndexedAt = time.Now()
+		UpdatePage(ctx, v.Id, v)
+	}
+
+	return errs
+}
 
 var pageLock = sync.Mutex{}
 
@@ -27,8 +80,7 @@ func SavePage(ctx context.Context, page *model.Page) (int64, error) {
 	x := db.GetEngine()
 	sql := "insert into page set " +
 		"user_id=:user_id, unique_id=:unique_id, version=:version, title=:title, " +
-		"url=:url, full_path=:full_path, full_size=:full_size, lite_path=:lite_path, " +
-		"lite_size=:lite_size, indexed_at=:indexed_at, updated_at=:updated_at"
+		"url=:url, path=:path, size=:size, indexed_at=:indexed_at, updated_at=:updated_at"
 	res, err := x.NamedExecContext(ctx, sql, page)
 	if err != nil {
 		logger.Zap().Error("save page error",
@@ -58,7 +110,7 @@ func SavePage(ctx context.Context, page *model.Page) (int64, error) {
 	return page.Id, nil
 }
 
-// TODO 少获取几个字段
+// BatchGetPage TODO 少获取几个字段
 func BatchGetPage(ctx context.Context, uniqueId []string) ([]model.Page, error) {
 	if len(uniqueId) == 0 {
 		return nil, nil
@@ -79,6 +131,7 @@ func BatchGetPage(ctx context.Context, uniqueId []string) ([]model.Page, error) 
 	return pages, nil
 }
 
+// Page 分页获取页面
 func Page(ctx context.Context, start, rows int) ([]model.Page, error) {
 	x := db.GetEngine()
 	var list []model.Page
@@ -90,6 +143,7 @@ func Page(ctx context.Context, start, rows int) ([]model.Page, error) {
 	return list, err
 }
 
+// Search 页面搜索
 func Search(ctx context.Context, userId int64, search model.SearchPage) (pageSearchs []model.PageSearch, total int, err error) {
 	zincSearch, err := zincsearch.EsSearch(userId, search)
 	if err != nil {
@@ -123,14 +177,16 @@ func Search(ctx context.Context, userId int64, search model.SearchPage) (pageSea
 
 		pageSearch := model.PageSearch{
 			Avatar:  "https://avatars.akamai.steamstatic.com/6a9ae9c069cd4fff8bf954938727730cdb0fe27b.jpg",
-			Title:   page.Title,
 			Url:     page.Url,
-			Size:    page.FullSize,
-			Preview: setting.Web.Domain + "/page/view" + page.FullPath,
+			Size:    page.Size,
+			Preview: setting.Web.Domain + "/page/view" + page.Path,
 			Version: page.Version,
 		}
 
 		if source, ok := v.Source.(map[string]interface{}); ok {
+			if val, ok := source["title"].(string); ok {
+				pageSearch.Title = val
+			}
 			if val, ok := source["excerpt"].(string); ok {
 				pageSearch.Excerpt = val
 			}

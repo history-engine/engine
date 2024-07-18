@@ -1,15 +1,14 @@
 package singlefile
 
 import (
+	"context"
 	"fmt"
 	"github.com/labstack/echo/v4"
 	"go.uber.org/zap"
 	"history-engine/engine/library/logger"
 	"history-engine/engine/model"
 	"history-engine/engine/service/page"
-	"history-engine/engine/service/readability"
 	"history-engine/engine/service/singlefile"
-	"history-engine/engine/service/zincsearch"
 	"history-engine/engine/setting"
 	"history-engine/engine/utils"
 	"io"
@@ -30,7 +29,6 @@ func RestSave(c echo.Context) error {
 	html, err := c.FormFile("file")
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, nil)
-
 	}
 	src, err := html.Open()
 	if err != nil {
@@ -82,35 +80,22 @@ func RestSave(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, nil)
 	}
 
-	// 内容分析 todo 异步，部分页面同步模式处理太慢了
-	article := readability.Parser().Parse(setting.SingleFile.Path + storageFile)
-
 	// 入库
 	_, err = page.SavePage(ctx, &model.Page{
 		UserId:   userId,
 		UniqueId: uniqueId,
 		Version:  version,
-		Title:    article.Title,
 		Url:      url,
-		FullSize: int(html.Size),
-		FullPath: storageFile,
+		Size:     int(html.Size),
+		Path:     storageFile,
 	})
 	if err != nil {
-		logger.Zap().Fatal("save page error", zap.Error(err), zap.String("url", article.Url))
+		logger.Zap().Fatal("save page error", zap.Error(err), zap.String("url", url))
 		return c.JSON(http.StatusInternalServerError, nil)
 	}
 
-	zincId := fmt.Sprintf("%s%d", uniqueId, version)
-	err = zincsearch.PutDocument(userId, zincId, &model.ZincDocument{
-		Url:     url,
-		Title:   article.Title,
-		Excerpt: article.Excerpt,
-		Content: article.TextContent,
-	})
-	if err != nil {
-		logger.Zap().Fatal("add index error", zap.Error(err), zap.String("uniqueId", uniqueId))
-		return c.JSON(http.StatusInternalServerError, nil)
-	}
+	// 后台分析HTML
+	go page.ParserPage(context.Background(), uniqueId)
 
 	return c.JSON(http.StatusCreated, nil)
 }
