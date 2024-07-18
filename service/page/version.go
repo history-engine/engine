@@ -67,8 +67,8 @@ func CleanHistory(ctx context.Context, uniqueId string) error {
 
 	// 扫描文件, 删除文件
 	for i := v.Min; i > v.Min-setting.SingleFile.MaxVersion*2; i-- {
-		full := fmt.Sprintf("%s/%s/%s/%s.%d.html", setting.SingleFile.Path, uniqueId[0:2], uniqueId[2:4], uniqueId, i)
-		lite := fmt.Sprintf("%s/%s/%s/%s.%d.lite.html", setting.SingleFile.Path, uniqueId[0:2], uniqueId[2:4], uniqueId, i)
+		full := fmt.Sprintf("%s/%s/%s/%s.%d.html", setting.SingleFile.HtmlPath, uniqueId[0:2], uniqueId[2:4], uniqueId, i)
+		lite := fmt.Sprintf("%s/%s/%s/%s.%d.lite.html", setting.SingleFile.HtmlPath, uniqueId[0:2], uniqueId[2:4], uniqueId, i)
 		_ = os.Remove(full)
 		_ = os.Remove(lite)
 		log.Printf("delete file, unique_id:%s, version:%d\n", uniqueId, i)

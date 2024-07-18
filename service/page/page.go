@@ -42,7 +42,7 @@ func ParserPage(ctx context.Context, uniqueId string) []error {
 
 	errs := make([]error, 0)
 	for _, v := range pages {
-		article := readability.Parser().Parse(setting.SingleFile.Path + v.Path)
+		article := readability.Parser().Parse(setting.SingleFile.HtmlPath + v.Path)
 		if article == nil {
 			continue
 		}

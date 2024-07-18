@@ -12,7 +12,7 @@ func singleFileRouteRegister(r *echo.Group) {
 	r.Add("POST", "/rest", singlefile.RestSave, middleware.Token)
 
 	r.Use(middleware.BasicAuth())
-	e := singlefile.NewEndpoint("/", setting.SingleFile.Path)
+	e := singlefile.NewEndpoint("/", setting.SingleFile.HtmlPath)
 	r.Add("PUT", "/html/:file", e.Put)
 	r.Add("OPTIONS", "/html/:file", e.Cover)
 	r.Add("MKCOL", "/html/:file", e.Cover)

@@ -7,8 +7,8 @@ import (
 )
 
 func View(c echo.Context) error {
-	file := setting.SingleFile.Path + "/" + c.Param("path")
-	if !utils.FileExists(file) {
+	file := setting.SingleFile.HtmlPath + "/" + c.Param("path")
+	if !utils.FileExist(file) {
 		return c.String(404, "file not found")
 	}
 

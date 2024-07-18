@@ -18,13 +18,7 @@ var (
 type Mozilla struct{}
 
 func NewMozilla() Readability {
-	_, err := exec.LookPath("readability-parse")
-	if err != nil {
-		panic("readability-parse not exist")
-	}
-
 	regex, _ = regexp.Compile(`(?s)<!--.*?(htt.+://\S+).*?saved\sdate.*?-->`)
-
 	return Mozilla{}
 }
 

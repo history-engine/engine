@@ -1,56 +1,50 @@
 package setting
 
 import (
+	"history-engine/engine/utils"
+	"log"
 	"os"
 
 	"github.com/spf13/viper"
 )
 
 var Log = struct {
-	Path  string
+	File  string
 	Level string
 }{
 	Level: "info",
-	Path:  "",
+	File:  "data/runtime.log",
 }
 
 func loadLogger() {
 	v := viper.Sub("log")
-	Log.Level = v.GetString("log_level")
-	Log.Path = v.GetString("log_path")
-	checkFileExist()
-}
-
-func checkFileExist() {
-	if Log.Path == "" {
-		return
-	}
-	if !fileExist(Log.Path) {
-		if err := createFile(Log.Path); err != nil {
-			panic(err)
+	if v != nil {
+		if v.IsSet("log_level") {
+			Log.Level = v.GetString("log_level")
+		}
+		if v.IsSet("log_path") {
+			Log.File = v.GetString("log_file")
 		}
 	}
+
+	log.Printf("log level:%s, log file:%s\n", Log.Level, Log.File)
+	checkLogFile()
 }
 
-func createFile(path string) error {
-	file, err := os.OpenFile(path, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0666)
+func checkLogFile() {
+	if utils.FileExist(Log.File) {
+		return
+	}
+
+	file, err := os.OpenFile(Log.File, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0666)
 	if err != nil {
-		return err
+		log.Fatalf("create log file err:%v\n", err)
 	}
 
 	defer func(file *os.File) {
 		err := file.Close()
 		if err != nil {
-			panic(err)
+			log.Printf("close log file err:%v\n", err)
 		}
 	}(file)
-	return nil
-}
-
-func fileExist(path string) bool {
-	if _, err := os.Stat(path); os.IsNotExist(err) {
-		return false
-	}
-
-	return true
 }

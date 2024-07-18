@@ -19,9 +19,9 @@ func initZap() error {
 		config = zap.NewProductionConfig()
 	}
 
-	if setting.Log.Path != "" {
-		config.OutputPaths = []string{setting.Log.Path}
-		config.ErrorOutputPaths = []string{setting.Log.Path}
+	if setting.Log.File != "" {
+		config.OutputPaths = []string{setting.Log.File}
+		config.ErrorOutputPaths = []string{setting.Log.File}
 	} else {
 		config.OutputPaths = []string{"stdout"}
 		config.ErrorOutputPaths = []string{"stderr"}

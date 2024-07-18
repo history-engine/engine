@@ -58,11 +58,11 @@ func RestSave(c echo.Context) error {
 
 	// 检查并创建目录
 	storagePath := fmt.Sprintf("/%s/%s", uniqueId[:2], uniqueId[2:4])
-	if _, err = os.Stat(setting.SingleFile.Path + storagePath); err != nil {
+	if _, err = os.Stat(setting.SingleFile.HtmlPath + storagePath); err != nil {
 		if !os.IsNotExist(err) { // TODO 未知错误,记录日志
 			return c.JSON(http.StatusInternalServerError, nil)
 		}
-		if err := os.MkdirAll(setting.SingleFile.Path+storagePath, 0775); err != nil {
+		if err := os.MkdirAll(setting.SingleFile.HtmlPath+storagePath, 0775); err != nil {
 			// todo 这里可能有多种情况
 			return c.JSON(http.StatusInternalServerError, nil)
 		}
@@ -70,7 +70,7 @@ func RestSave(c echo.Context) error {
 
 	// 文件写入
 	storageFile := fmt.Sprintf("%s/%s.%d.html", storagePath, uniqueId, version)
-	f, err := os.OpenFile(setting.SingleFile.Path+storageFile, os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0644)
+	f, err := os.OpenFile(setting.SingleFile.HtmlPath+storageFile, os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0644)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, nil)
 	}

@@ -9,6 +9,8 @@ var (
 
 func loadJwt() {
 	v := viper.Sub("jwt")
-	JwtKey = "he" + v.GetString("jwt_key")
-	JwtSecret = []byte(v.GetString("jwt_secret"))
+	if v != nil {
+		JwtKey = v.GetString("jwt_key")
+		JwtSecret = []byte(v.GetString("jwt_secret"))
+	}
 }
