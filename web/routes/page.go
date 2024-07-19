@@ -7,8 +7,7 @@ import (
 )
 
 func pageRouteRegister(r *echo.Group) {
-	r.Use(middleware.JwtAuth)
-
-	r.GET("/search", page.Search)
-	r.GET("/view/:path", page.View)
+	r.GET("/search", page.Search, middleware.JwtAuth)
+	r.GET("/view/:path", page.View, middleware.JwtAuth)
+	r.POST("/save", page.Save, middleware.Token)
 }

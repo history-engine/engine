@@ -1,4 +1,4 @@
-package singlefile
+package page
 
 import (
 	"context"
@@ -16,7 +16,7 @@ import (
 	"os"
 )
 
-func RestSave(c echo.Context) error {
+func Save(c echo.Context) error {
 	ctx := c.Request().Context()
 	userId := c.Get("uid").(int)
 
