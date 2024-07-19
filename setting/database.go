@@ -4,7 +4,6 @@ import (
 	"entgo.io/ent/dialect"
 	"fmt"
 	"github.com/spf13/viper"
-	"history-engine/engine/utils"
 	"log"
 	"net/url"
 	"time"
@@ -75,20 +74,6 @@ func loadDatabase() {
 	} else {
 		log.Printf("database drive: %s, host: %s:%d, name: %s\n", Database.Drive, Database.Host, Database.Port, Database.Name)
 	}
-
-	checkSqliteFile()
-}
-
-func checkSqliteFile() {
-	if Database.Drive != "sqlite" {
-		return
-	}
-
-	if utils.FileExist(Database.Path) {
-		return
-	}
-
-	// todo create empty db file
 }
 
 func GetDSN() string {
