@@ -15,7 +15,7 @@ var (
 	}{
 		Port:   8080,
 		Addr:   "0.0.0.0",
-		Domain: "localhost",
+		Domain: "http://localhost",
 		UiPath: "data/webui",
 	}
 )
