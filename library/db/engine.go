@@ -4,11 +4,11 @@ import (
 	"context"
 	_ "github.com/go-sql-driver/mysql"
 	_ "github.com/lib/pq"
-	_ "github.com/mattn/go-sqlite3"
 	"history-engine/engine/ent"
 	"history-engine/engine/library/wait"
 	"history-engine/engine/setting"
 	"log"
+	_ "modernc.org/sqlite"
 )
 
 var client *ent.Client

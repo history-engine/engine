@@ -3,6 +3,7 @@ env = "prod" # 可选值：dev、prod
 enable_register = true
 lang="zh-CN"
 data_path = "data"
+time_zone = "Asia/Shanghai"
 
 [log]
 log_file = "data/runtime.log"

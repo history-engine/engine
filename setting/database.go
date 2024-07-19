@@ -6,6 +6,7 @@ import (
 	"github.com/spf13/viper"
 	"history-engine/engine/utils"
 	"log"
+	"net/url"
 	"time"
 )
 
@@ -91,16 +92,19 @@ func checkSqliteFile() {
 }
 
 func GetDSN() string {
+	loc := url.QueryEscape(Common.TimeZone)
+
 	switch Database.Drive {
 	case dialect.SQLite:
 		return fmt.Sprintf(
-			"file:%s?mode=rwc&cache=shared&_journal_mode=WAL&_fk=1",
+			"file:%s?mode=rwc&cache=shared&_journal_mode=WAL&_fk=1&loc=%s",
 			Database.Path,
+			loc,
 		)
 
 	case dialect.MySQL:
 		return fmt.Sprintf(
-			"%s:%s@tcp(%s:%d)/%s?charset=%s&timeout=%s&parseTime=true",
+			"%s:%s@tcp(%s:%d)/%s?charset=%s&timeout=%s&parseTime=true&loc=%s",
 			Database.User,
 			Database.Password,
 			Database.Host,
@@ -108,16 +112,18 @@ func GetDSN() string {
 			Database.Name,
 			Database.Charset,
 			Database.Timeout,
+			loc,
 		)
 
 	case dialect.Postgres:
 		return fmt.Sprintf(
-			"host=%s port=%d user=%s dbname=%s password=%s",
+			"host=%s port=%d user=%s dbname=%s password=%s TimeZone=%s",
 			Database.Host,
 			Database.Port,
 			Database.User,
 			Database.Name,
 			Database.Password,
+			loc,
 		)
 	}
 

@@ -12,11 +12,13 @@ var Common = struct {
 	EnableRegister bool
 	Lang           string
 	DataPath       string
+	TimeZone       string
 }{
 	Env:            "dev",
 	EnableRegister: false,
 	Lang:           "zh-CN",
 	DataPath:       "data",
+	TimeZone:       "Asia/Shanghai",
 }
 
 func loadCommon() {
@@ -33,6 +35,9 @@ func loadCommon() {
 		}
 		if v.IsSet("data_path") {
 			Common.DataPath = v.GetString("data_path")
+		}
+		if v.IsSet("time_zone") {
+			Common.TimeZone = v.GetString("time_zone")
 		}
 	}
 
