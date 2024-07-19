@@ -12,9 +12,7 @@ var (
 	// PageColumns holds the columns for the "page" table.
 	PageColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt64, Increment: true},
-		{Name: "created_at", Type: field.TypeTime},
-		{Name: "updated_at", Type: field.TypeTime},
-		{Name: "user_id", Type: field.TypeInt},
+		{Name: "user_id", Type: field.TypeInt64},
 		{Name: "unique_id", Type: field.TypeString, Size: 32},
 		{Name: "version", Type: field.TypeInt, Default: 1},
 		{Name: "title", Type: field.TypeString, Size: 300},
@@ -22,6 +20,8 @@ var (
 		{Name: "path", Type: field.TypeString, Size: 500},
 		{Name: "size", Type: field.TypeInt, Default: 0},
 		{Name: "indexed_at", Type: field.TypeTime},
+		{Name: "created_at", Type: field.TypeTime},
+		{Name: "updated_at", Type: field.TypeTime},
 	}
 	// PageTable holds the schema information for the "page" table.
 	PageTable = &schema.Table{
@@ -32,19 +32,19 @@ var (
 			{
 				Name:    "page_user_id_unique_id_version",
 				Unique:  true,
-				Columns: []*schema.Column{PageColumns[3], PageColumns[4], PageColumns[5]},
+				Columns: []*schema.Column{PageColumns[1], PageColumns[2], PageColumns[3]},
 			},
 		},
 	}
 	// UserColumns holds the columns for the "user" table.
 	UserColumns = []*schema.Column{
-		{Name: "id", Type: field.TypeInt, Increment: true},
-		{Name: "created_at", Type: field.TypeTime},
-		{Name: "updated_at", Type: field.TypeTime},
+		{Name: "id", Type: field.TypeInt64, Increment: true},
 		{Name: "username", Type: field.TypeString, Unique: true, Size: 50},
 		{Name: "email", Type: field.TypeString, Unique: true, Size: 100},
 		{Name: "password", Type: field.TypeString, Size: 32},
 		{Name: "admin", Type: field.TypeInt, Default: 0},
+		{Name: "created_at", Type: field.TypeTime},
+		{Name: "updated_at", Type: field.TypeTime},
 	}
 	// UserTable holds the schema information for the "user" table.
 	UserTable = &schema.Table{
@@ -55,12 +55,12 @@ var (
 			{
 				Name:    "user_username",
 				Unique:  true,
-				Columns: []*schema.Column{UserColumns[3]},
+				Columns: []*schema.Column{UserColumns[1]},
 			},
 			{
 				Name:    "user_email",
 				Unique:  true,
-				Columns: []*schema.Column{UserColumns[4]},
+				Columns: []*schema.Column{UserColumns[2]},
 			},
 		},
 	}

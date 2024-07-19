@@ -3,11 +3,10 @@ package setting
 import (
 	"entgo.io/ent/dialect"
 	"fmt"
+	"github.com/spf13/viper"
 	"history-engine/engine/utils"
 	"log"
 	"time"
-
-	"github.com/spf13/viper"
 )
 
 var (
@@ -41,17 +40,36 @@ func loadDatabase() {
 		if v.IsSet("drive") {
 			Database.Drive = v.GetString("drive")
 		}
-		Database.Host = v.GetString("host")
-		Database.Port = v.GetInt("port")
-		Database.Name = v.GetString("name")
-		Database.User = v.GetString("user")
-		Database.Password = v.GetString("password")
-		Database.Ssl = v.GetBool("ssl")
-		Database.Charset = v.GetString("charset")
-		Database.Timeout = v.GetDuration("timeout")
+		if v.IsSet("db_path") {
+			Database.Path = v.GetString("db_path")
+		}
+		if v.IsSet("host") {
+			Database.Host = v.GetString("host")
+		}
+		if v.IsSet("port") {
+			Database.Port = v.GetInt("port")
+		}
+		if v.IsSet("name") {
+			Database.Name = v.GetString("name")
+		}
+		if v.IsSet("user") {
+			Database.User = v.GetString("user")
+		}
+		if v.IsSet("password") {
+			Database.Password = v.GetString("password")
+		}
+		if v.IsSet("ssl") {
+			Database.Ssl = v.GetBool("ssl")
+		}
+		if v.IsSet("charset") {
+			Database.Charset = v.GetString("charset")
+		}
+		if v.IsSet("timeout") {
+			Database.Timeout = v.GetDuration("timeout")
+		}
 	}
 
-	if Database.Drive == "sqlite" {
+	if Database.Drive == dialect.SQLite {
 		log.Printf("database drive: %s, path: %s\n", Database.Drive, Database.Path)
 	} else {
 		log.Printf("database drive: %s, host: %s:%d, name: %s\n", Database.Drive, Database.Host, Database.Port, Database.Name)
@@ -76,7 +94,7 @@ func GetDSN() string {
 	switch Database.Drive {
 	case dialect.SQLite:
 		return fmt.Sprintf(
-			"file:%s?mode=rwc&cache=shared&_journal_mode=WAL",
+			"file:%s?mode=rwc&cache=shared&_journal_mode=WAL&_fk=1",
 			Database.Path,
 		)
 

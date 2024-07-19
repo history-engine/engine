@@ -17,6 +17,8 @@ vendor/
 .idea
 .vscode
 data/*.log
+data/*.db
+data/*sqlite*
 data/html/
 
 setting.toml

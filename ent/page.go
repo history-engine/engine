@@ -17,12 +17,8 @@ type Page struct {
 	config `json:"-"`
 	// ID of the ent.
 	ID int64 `json:"id,omitempty"`
-	// 入库时间
-	CreatedAt time.Time `json:"created_at,omitempty"`
-	// 最后更新时间
-	UpdatedAt time.Time `json:"updated_at,omitempty"`
 	// 用户id
-	UserID int `json:"user_id,omitempty"`
+	UserID int64 `json:"user_id,omitempty"`
 	// 页面唯一id
 	UniqueID string `json:"unique_id,omitempty"`
 	// 版本
@@ -36,7 +32,11 @@ type Page struct {
 	// 文件大小
 	Size int `json:"size,omitempty"`
 	// 最后索引时间
-	IndexedAt    time.Time `json:"indexed_at,omitempty"`
+	IndexedAt time.Time `json:"indexed_at,omitempty"`
+	// 入库时间
+	CreatedAt time.Time `json:"created_at,omitempty"`
+	// 最后更新时间
+	UpdatedAt    time.Time `json:"updated_at,omitempty"`
 	selectValues sql.SelectValues
 }
 
@@ -49,7 +49,7 @@ func (*Page) scanValues(columns []string) ([]any, error) {
 			values[i] = new(sql.NullInt64)
 		case page.FieldUniqueID, page.FieldTitle, page.FieldURL, page.FieldPath:
 			values[i] = new(sql.NullString)
-		case page.FieldCreatedAt, page.FieldUpdatedAt, page.FieldIndexedAt:
+		case page.FieldIndexedAt, page.FieldCreatedAt, page.FieldUpdatedAt:
 			values[i] = new(sql.NullTime)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -72,23 +72,11 @@ func (pa *Page) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field id", value)
 			}
 			pa.ID = int64(value.Int64)
-		case page.FieldCreatedAt:
-			if value, ok := values[i].(*sql.NullTime); !ok {
-				return fmt.Errorf("unexpected type %T for field created_at", values[i])
-			} else if value.Valid {
-				pa.CreatedAt = value.Time
-			}
-		case page.FieldUpdatedAt:
-			if value, ok := values[i].(*sql.NullTime); !ok {
-				return fmt.Errorf("unexpected type %T for field updated_at", values[i])
-			} else if value.Valid {
-				pa.UpdatedAt = value.Time
-			}
 		case page.FieldUserID:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field user_id", values[i])
 			} else if value.Valid {
-				pa.UserID = int(value.Int64)
+				pa.UserID = value.Int64
 			}
 		case page.FieldUniqueID:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -132,6 +120,18 @@ func (pa *Page) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				pa.IndexedAt = value.Time
 			}
+		case page.FieldCreatedAt:
+			if value, ok := values[i].(*sql.NullTime); !ok {
+				return fmt.Errorf("unexpected type %T for field created_at", values[i])
+			} else if value.Valid {
+				pa.CreatedAt = value.Time
+			}
+		case page.FieldUpdatedAt:
+			if value, ok := values[i].(*sql.NullTime); !ok {
+				return fmt.Errorf("unexpected type %T for field updated_at", values[i])
+			} else if value.Valid {
+				pa.UpdatedAt = value.Time
+			}
 		default:
 			pa.selectValues.Set(columns[i], values[i])
 		}
@@ -168,12 +168,6 @@ func (pa *Page) String() string {
 	var builder strings.Builder
 	builder.WriteString("Page(")
 	builder.WriteString(fmt.Sprintf("id=%v, ", pa.ID))
-	builder.WriteString("created_at=")
-	builder.WriteString(pa.CreatedAt.Format(time.ANSIC))
-	builder.WriteString(", ")
-	builder.WriteString("updated_at=")
-	builder.WriteString(pa.UpdatedAt.Format(time.ANSIC))
-	builder.WriteString(", ")
 	builder.WriteString("user_id=")
 	builder.WriteString(fmt.Sprintf("%v", pa.UserID))
 	builder.WriteString(", ")
@@ -197,6 +191,12 @@ func (pa *Page) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("indexed_at=")
 	builder.WriteString(pa.IndexedAt.Format(time.ANSIC))
+	builder.WriteString(", ")
+	builder.WriteString("created_at=")
+	builder.WriteString(pa.CreatedAt.Format(time.ANSIC))
+	builder.WriteString(", ")
+	builder.WriteString("updated_at=")
+	builder.WriteString(pa.UpdatedAt.Format(time.ANSIC))
 	builder.WriteByte(')')
 	return builder.String()
 }

@@ -261,12 +261,12 @@ func (pq *PageQuery) Clone() *PageQuery {
 // Example:
 //
 //	var v []struct {
-//		CreatedAt time.Time `json:"created_at,omitempty"`
+//		UserID int64 `json:"user_id,omitempty"`
 //		Count int `json:"count,omitempty"`
 //	}
 //
 //	client.Page.Query().
-//		GroupBy(page.FieldCreatedAt).
+//		GroupBy(page.FieldUserID).
 //		Aggregate(ent.Count()).
 //		Scan(ctx, &v)
 func (pq *PageQuery) GroupBy(field string, fields ...string) *PageGroupBy {
@@ -284,11 +284,11 @@ func (pq *PageQuery) GroupBy(field string, fields ...string) *PageGroupBy {
 // Example:
 //
 //	var v []struct {
-//		CreatedAt time.Time `json:"created_at,omitempty"`
+//		UserID int64 `json:"user_id,omitempty"`
 //	}
 //
 //	client.Page.Query().
-//		Select(page.FieldCreatedAt).
+//		Select(page.FieldUserID).
 //		Scan(ctx, &v)
 func (pq *PageQuery) Select(fields ...string) *PageSelect {
 	pq.ctx.Fields = append(pq.ctx.Fields, fields...)

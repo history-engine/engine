@@ -20,36 +20,8 @@ type PageCreate struct {
 	hooks    []Hook
 }
 
-// SetCreatedAt sets the "created_at" field.
-func (pc *PageCreate) SetCreatedAt(t time.Time) *PageCreate {
-	pc.mutation.SetCreatedAt(t)
-	return pc
-}
-
-// SetNillableCreatedAt sets the "created_at" field if the given value is not nil.
-func (pc *PageCreate) SetNillableCreatedAt(t *time.Time) *PageCreate {
-	if t != nil {
-		pc.SetCreatedAt(*t)
-	}
-	return pc
-}
-
-// SetUpdatedAt sets the "updated_at" field.
-func (pc *PageCreate) SetUpdatedAt(t time.Time) *PageCreate {
-	pc.mutation.SetUpdatedAt(t)
-	return pc
-}
-
-// SetNillableUpdatedAt sets the "updated_at" field if the given value is not nil.
-func (pc *PageCreate) SetNillableUpdatedAt(t *time.Time) *PageCreate {
-	if t != nil {
-		pc.SetUpdatedAt(*t)
-	}
-	return pc
-}
-
 // SetUserID sets the "user_id" field.
-func (pc *PageCreate) SetUserID(i int) *PageCreate {
+func (pc *PageCreate) SetUserID(i int64) *PageCreate {
 	pc.mutation.SetUserID(i)
 	return pc
 }
@@ -120,6 +92,34 @@ func (pc *PageCreate) SetNillableIndexedAt(t *time.Time) *PageCreate {
 	return pc
 }
 
+// SetCreatedAt sets the "created_at" field.
+func (pc *PageCreate) SetCreatedAt(t time.Time) *PageCreate {
+	pc.mutation.SetCreatedAt(t)
+	return pc
+}
+
+// SetNillableCreatedAt sets the "created_at" field if the given value is not nil.
+func (pc *PageCreate) SetNillableCreatedAt(t *time.Time) *PageCreate {
+	if t != nil {
+		pc.SetCreatedAt(*t)
+	}
+	return pc
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (pc *PageCreate) SetUpdatedAt(t time.Time) *PageCreate {
+	pc.mutation.SetUpdatedAt(t)
+	return pc
+}
+
+// SetNillableUpdatedAt sets the "updated_at" field if the given value is not nil.
+func (pc *PageCreate) SetNillableUpdatedAt(t *time.Time) *PageCreate {
+	if t != nil {
+		pc.SetUpdatedAt(*t)
+	}
+	return pc
+}
+
 // SetID sets the "id" field.
 func (pc *PageCreate) SetID(i int64) *PageCreate {
 	pc.mutation.SetID(i)
@@ -161,14 +161,6 @@ func (pc *PageCreate) ExecX(ctx context.Context) {
 
 // defaults sets the default values of the builder before save.
 func (pc *PageCreate) defaults() {
-	if _, ok := pc.mutation.CreatedAt(); !ok {
-		v := page.DefaultCreatedAt()
-		pc.mutation.SetCreatedAt(v)
-	}
-	if _, ok := pc.mutation.UpdatedAt(); !ok {
-		v := page.DefaultUpdatedAt()
-		pc.mutation.SetUpdatedAt(v)
-	}
 	if _, ok := pc.mutation.Version(); !ok {
 		v := page.DefaultVersion
 		pc.mutation.SetVersion(v)
@@ -181,16 +173,18 @@ func (pc *PageCreate) defaults() {
 		v := page.DefaultIndexedAt
 		pc.mutation.SetIndexedAt(v)
 	}
+	if _, ok := pc.mutation.CreatedAt(); !ok {
+		v := page.DefaultCreatedAt()
+		pc.mutation.SetCreatedAt(v)
+	}
+	if _, ok := pc.mutation.UpdatedAt(); !ok {
+		v := page.DefaultUpdatedAt()
+		pc.mutation.SetUpdatedAt(v)
+	}
 }
 
 // check runs all checks and user-defined validators on the builder.
 func (pc *PageCreate) check() error {
-	if _, ok := pc.mutation.CreatedAt(); !ok {
-		return &ValidationError{Name: "created_at", err: errors.New(`ent: missing required field "Page.created_at"`)}
-	}
-	if _, ok := pc.mutation.UpdatedAt(); !ok {
-		return &ValidationError{Name: "updated_at", err: errors.New(`ent: missing required field "Page.updated_at"`)}
-	}
 	if _, ok := pc.mutation.UserID(); !ok {
 		return &ValidationError{Name: "user_id", err: errors.New(`ent: missing required field "Page.user_id"`)}
 	}
@@ -235,6 +229,12 @@ func (pc *PageCreate) check() error {
 	if _, ok := pc.mutation.IndexedAt(); !ok {
 		return &ValidationError{Name: "indexed_at", err: errors.New(`ent: missing required field "Page.indexed_at"`)}
 	}
+	if _, ok := pc.mutation.CreatedAt(); !ok {
+		return &ValidationError{Name: "created_at", err: errors.New(`ent: missing required field "Page.created_at"`)}
+	}
+	if _, ok := pc.mutation.UpdatedAt(); !ok {
+		return &ValidationError{Name: "updated_at", err: errors.New(`ent: missing required field "Page.updated_at"`)}
+	}
 	return nil
 }
 
@@ -267,16 +267,8 @@ func (pc *PageCreate) createSpec() (*Page, *sqlgraph.CreateSpec) {
 		_node.ID = id
 		_spec.ID.Value = id
 	}
-	if value, ok := pc.mutation.CreatedAt(); ok {
-		_spec.SetField(page.FieldCreatedAt, field.TypeTime, value)
-		_node.CreatedAt = value
-	}
-	if value, ok := pc.mutation.UpdatedAt(); ok {
-		_spec.SetField(page.FieldUpdatedAt, field.TypeTime, value)
-		_node.UpdatedAt = value
-	}
 	if value, ok := pc.mutation.UserID(); ok {
-		_spec.SetField(page.FieldUserID, field.TypeInt, value)
+		_spec.SetField(page.FieldUserID, field.TypeInt64, value)
 		_node.UserID = value
 	}
 	if value, ok := pc.mutation.UniqueID(); ok {
@@ -306,6 +298,14 @@ func (pc *PageCreate) createSpec() (*Page, *sqlgraph.CreateSpec) {
 	if value, ok := pc.mutation.IndexedAt(); ok {
 		_spec.SetField(page.FieldIndexedAt, field.TypeTime, value)
 		_node.IndexedAt = value
+	}
+	if value, ok := pc.mutation.CreatedAt(); ok {
+		_spec.SetField(page.FieldCreatedAt, field.TypeTime, value)
+		_node.CreatedAt = value
+	}
+	if value, ok := pc.mutation.UpdatedAt(); ok {
+		_spec.SetField(page.FieldUpdatedAt, field.TypeTime, value)
+		_node.UpdatedAt = value
 	}
 	return _node, _spec
 }

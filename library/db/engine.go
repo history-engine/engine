@@ -1,6 +1,7 @@
 package db
 
 import (
+	"context"
 	_ "github.com/go-sql-driver/mysql"
 	_ "github.com/lib/pq"
 	_ "github.com/mattn/go-sqlite3"
@@ -18,6 +19,10 @@ func initEngine() {
 	client, err = ent.Open(setting.Database.Drive, setting.GetDSN())
 	if err != nil {
 		log.Fatalf("connect to %s err: %v\b", setting.Database.Drive, err)
+	}
+
+	if err := client.Schema.Create(context.Background()); err != nil {
+		log.Fatalf("failed creating schema resources: %v", err)
 	}
 
 	wait.Done()

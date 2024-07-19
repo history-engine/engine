@@ -18,7 +18,7 @@ import (
 
 func Save(c echo.Context) error {
 	ctx := c.Request().Context()
-	userId := c.Get("uid").(int)
+	userId := c.Get("uid").(int64)
 
 	err := c.Request().ParseMultipartForm(10 << 20)
 	if err != nil {

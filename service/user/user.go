@@ -12,12 +12,12 @@ import (
 	"history-engine/engine/utils"
 )
 
-func Info(ctx context.Context, uid int) *ent.User {
+func Info(ctx context.Context, uid int64) *ent.User {
 	x := db.GetEngine()
 
 	user, err := x.User.Get(ctx, uid)
 	if err != nil {
-		logger.Zap().Error("get user info err", zap.Error(err), zap.Int("uid", uid))
+		logger.Zap().Error("get user info err", zap.Error(err), zap.Int64("uid", uid))
 		return nil
 	}
 

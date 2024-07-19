@@ -6,6 +6,7 @@ import (
 	"entgo.io/ent/schema"
 	"entgo.io/ent/schema/field"
 	"entgo.io/ent/schema/index"
+	"time"
 )
 
 // User holds the schema definition for the User entity.
@@ -16,10 +17,13 @@ type User struct {
 // Fields of the User.
 func (User) Fields() []ent.Field {
 	return []ent.Field{
+		field.Int64("id"),
 		field.String("username").MaxLen(50).Unique().Comment("用户名"),
 		field.String("email").MaxLen(100).Unique().Comment("邮箱地址"),
 		field.String("password").MaxLen(32).StructTag(`json:"-"`).Comment("版本"),
 		field.Int("admin").Max(1).Default(0).Comment("是否是管理员"),
+		field.Time("created_at").Immutable().Default(time.Now).Comment("入库时间"),
+		field.Time("updated_at").Default(time.Now).UpdateDefault(time.Now).Comment("最后更新时间"),
 	}
 }
 
@@ -33,12 +37,6 @@ func (User) Indexes() []ent.Index {
 	return []ent.Index{
 		index.Fields("username").Unique(),
 		index.Fields("email").Unique(),
-	}
-}
-
-func (User) Mixin() []ent.Mixin {
-	return []ent.Mixin{
-		TimeMixin{},
 	}
 }
 

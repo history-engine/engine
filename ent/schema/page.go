@@ -18,7 +18,7 @@ type Page struct {
 func (Page) Fields() []ent.Field {
 	return []ent.Field{
 		field.Int64("id"),
-		field.Int("user_id").Comment("用户id"),
+		field.Int64("user_id").Comment("用户id"),
 		field.String("unique_id").MaxLen(32).Immutable().Comment("页面唯一id"),
 		field.Int("version").Default(1).Comment("版本"),
 		field.String("title").MaxLen(300).Comment("页面标题"),
@@ -26,6 +26,8 @@ func (Page) Fields() []ent.Field {
 		field.String("path").MaxLen(500).Comment("完整本地文件地址"),
 		field.Int("size").Default(0).Comment("文件大小"),
 		field.Time("indexed_at").Default(time.Time{}).Comment("最后索引时间"),
+		field.Time("created_at").Immutable().Default(time.Now).Comment("入库时间"),
+		field.Time("updated_at").Default(time.Now).UpdateDefault(time.Now).Comment("最后更新时间"),
 	}
 }
 
@@ -38,12 +40,6 @@ func (Page) Edges() []ent.Edge {
 func (Page) Indexes() []ent.Index {
 	return []ent.Index{
 		index.Fields("user_id", "unique_id", "version").Unique(),
-	}
-}
-
-func (Page) Mixin() []ent.Mixin {
-	return []ent.Mixin{
-		TimeMixin{},
 	}
 }
 

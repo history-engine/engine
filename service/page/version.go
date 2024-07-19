@@ -36,7 +36,7 @@ func NextVersion(ctx context.Context, uniqueId string) (int, time.Time) {
 }
 
 // CleanHistory 清除历史版本、HTML文件、ZincSearch索引
-func CleanHistory(ctx context.Context, userId int, uniqueId string, version int) {
+func CleanHistory(ctx context.Context, userId int64, uniqueId string, version int) {
 	diff := version - setting.SingleFile.MaxVersion
 	if diff <= 0 {
 		return
@@ -45,7 +45,7 @@ func CleanHistory(ctx context.Context, userId int, uniqueId string, version int)
 	x := db.GetEngine()
 	var vs []struct {
 		Id      int64
-		Version int
+		Version uint
 		Path    string
 	}
 	if err := x.Page.Query().
@@ -70,7 +70,7 @@ func CleanHistory(ctx context.Context, userId int, uniqueId string, version int)
 			logger.Zap().Error(
 				"delete zinc search doc err",
 				zap.String("unique_id", uniqueId),
-				zap.Int("version", v.Version),
+				zap.Uint("version", v.Version),
 			)
 		}
 	}

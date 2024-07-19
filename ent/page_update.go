@@ -28,21 +28,15 @@ func (pu *PageUpdate) Where(ps ...predicate.Page) *PageUpdate {
 	return pu
 }
 
-// SetUpdatedAt sets the "updated_at" field.
-func (pu *PageUpdate) SetUpdatedAt(t time.Time) *PageUpdate {
-	pu.mutation.SetUpdatedAt(t)
-	return pu
-}
-
 // SetUserID sets the "user_id" field.
-func (pu *PageUpdate) SetUserID(i int) *PageUpdate {
+func (pu *PageUpdate) SetUserID(i int64) *PageUpdate {
 	pu.mutation.ResetUserID()
 	pu.mutation.SetUserID(i)
 	return pu
 }
 
 // SetNillableUserID sets the "user_id" field if the given value is not nil.
-func (pu *PageUpdate) SetNillableUserID(i *int) *PageUpdate {
+func (pu *PageUpdate) SetNillableUserID(i *int64) *PageUpdate {
 	if i != nil {
 		pu.SetUserID(*i)
 	}
@@ -50,7 +44,7 @@ func (pu *PageUpdate) SetNillableUserID(i *int) *PageUpdate {
 }
 
 // AddUserID adds i to the "user_id" field.
-func (pu *PageUpdate) AddUserID(i int) *PageUpdate {
+func (pu *PageUpdate) AddUserID(i int64) *PageUpdate {
 	pu.mutation.AddUserID(i)
 	return pu
 }
@@ -153,6 +147,12 @@ func (pu *PageUpdate) SetNillableIndexedAt(t *time.Time) *PageUpdate {
 	return pu
 }
 
+// SetUpdatedAt sets the "updated_at" field.
+func (pu *PageUpdate) SetUpdatedAt(t time.Time) *PageUpdate {
+	pu.mutation.SetUpdatedAt(t)
+	return pu
+}
+
 // Mutation returns the PageMutation object of the builder.
 func (pu *PageUpdate) Mutation() *PageMutation {
 	return pu.mutation
@@ -226,14 +226,11 @@ func (pu *PageUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			}
 		}
 	}
-	if value, ok := pu.mutation.UpdatedAt(); ok {
-		_spec.SetField(page.FieldUpdatedAt, field.TypeTime, value)
-	}
 	if value, ok := pu.mutation.UserID(); ok {
-		_spec.SetField(page.FieldUserID, field.TypeInt, value)
+		_spec.SetField(page.FieldUserID, field.TypeInt64, value)
 	}
 	if value, ok := pu.mutation.AddedUserID(); ok {
-		_spec.AddField(page.FieldUserID, field.TypeInt, value)
+		_spec.AddField(page.FieldUserID, field.TypeInt64, value)
 	}
 	if value, ok := pu.mutation.Version(); ok {
 		_spec.SetField(page.FieldVersion, field.TypeInt, value)
@@ -259,6 +256,9 @@ func (pu *PageUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if value, ok := pu.mutation.IndexedAt(); ok {
 		_spec.SetField(page.FieldIndexedAt, field.TypeTime, value)
 	}
+	if value, ok := pu.mutation.UpdatedAt(); ok {
+		_spec.SetField(page.FieldUpdatedAt, field.TypeTime, value)
+	}
 	if n, err = sqlgraph.UpdateNodes(ctx, pu.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{page.Label}
@@ -279,21 +279,15 @@ type PageUpdateOne struct {
 	mutation *PageMutation
 }
 
-// SetUpdatedAt sets the "updated_at" field.
-func (puo *PageUpdateOne) SetUpdatedAt(t time.Time) *PageUpdateOne {
-	puo.mutation.SetUpdatedAt(t)
-	return puo
-}
-
 // SetUserID sets the "user_id" field.
-func (puo *PageUpdateOne) SetUserID(i int) *PageUpdateOne {
+func (puo *PageUpdateOne) SetUserID(i int64) *PageUpdateOne {
 	puo.mutation.ResetUserID()
 	puo.mutation.SetUserID(i)
 	return puo
 }
 
 // SetNillableUserID sets the "user_id" field if the given value is not nil.
-func (puo *PageUpdateOne) SetNillableUserID(i *int) *PageUpdateOne {
+func (puo *PageUpdateOne) SetNillableUserID(i *int64) *PageUpdateOne {
 	if i != nil {
 		puo.SetUserID(*i)
 	}
@@ -301,7 +295,7 @@ func (puo *PageUpdateOne) SetNillableUserID(i *int) *PageUpdateOne {
 }
 
 // AddUserID adds i to the "user_id" field.
-func (puo *PageUpdateOne) AddUserID(i int) *PageUpdateOne {
+func (puo *PageUpdateOne) AddUserID(i int64) *PageUpdateOne {
 	puo.mutation.AddUserID(i)
 	return puo
 }
@@ -401,6 +395,12 @@ func (puo *PageUpdateOne) SetNillableIndexedAt(t *time.Time) *PageUpdateOne {
 	if t != nil {
 		puo.SetIndexedAt(*t)
 	}
+	return puo
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (puo *PageUpdateOne) SetUpdatedAt(t time.Time) *PageUpdateOne {
+	puo.mutation.SetUpdatedAt(t)
 	return puo
 }
 
@@ -507,14 +507,11 @@ func (puo *PageUpdateOne) sqlSave(ctx context.Context) (_node *Page, err error) 
 			}
 		}
 	}
-	if value, ok := puo.mutation.UpdatedAt(); ok {
-		_spec.SetField(page.FieldUpdatedAt, field.TypeTime, value)
-	}
 	if value, ok := puo.mutation.UserID(); ok {
-		_spec.SetField(page.FieldUserID, field.TypeInt, value)
+		_spec.SetField(page.FieldUserID, field.TypeInt64, value)
 	}
 	if value, ok := puo.mutation.AddedUserID(); ok {
-		_spec.AddField(page.FieldUserID, field.TypeInt, value)
+		_spec.AddField(page.FieldUserID, field.TypeInt64, value)
 	}
 	if value, ok := puo.mutation.Version(); ok {
 		_spec.SetField(page.FieldVersion, field.TypeInt, value)
@@ -539,6 +536,9 @@ func (puo *PageUpdateOne) sqlSave(ctx context.Context) (_node *Page, err error) 
 	}
 	if value, ok := puo.mutation.IndexedAt(); ok {
 		_spec.SetField(page.FieldIndexedAt, field.TypeTime, value)
+	}
+	if value, ok := puo.mutation.UpdatedAt(); ok {
+		_spec.SetField(page.FieldUpdatedAt, field.TypeTime, value)
 	}
 	_node = &Page{config: puo.config}
 	_spec.Assign = _node.assignValues

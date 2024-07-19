@@ -13,7 +13,7 @@ import (
 // TODO 请求ZincSearch逻辑封装
 
 // PutDocument 添加数据到ZincSearch索引
-func PutDocument(userId int, docId string, doc *model.ZincDocument) error {
+func PutDocument(userId int64, docId string, doc *model.ZincDocument) error {
 	body, _ := json.Marshal(doc)
 	api := fmt.Sprintf(ApiDocCreateWithId, fmt.Sprintf("%s_%d", setting.ZincSearch.IndexPrefix, userId), docId)
 	req, _ := http.NewRequest("PUT", setting.ZincSearch.Host+api, bytes.NewReader(body))
@@ -33,7 +33,7 @@ func PutDocument(userId int, docId string, doc *model.ZincDocument) error {
 }
 
 // DelDocument 删除索引中的数据
-func DelDocument(userId int, uniqueId string, version int) error {
+func DelDocument(userId int64, uniqueId string, version uint) error {
 	index := fmt.Sprintf("%s_%d", setting.ZincSearch.IndexPrefix, userId)
 	docId := fmt.Sprintf("%s%d", uniqueId, version)
 	api := fmt.Sprintf(ApiDocDeleteWithId, index, docId)
