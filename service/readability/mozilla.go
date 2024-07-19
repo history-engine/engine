@@ -3,8 +3,6 @@ package readability
 import (
 	"bytes"
 	"encoding/json"
-	"go.uber.org/zap"
-	"history-engine/engine/library/logger"
 	"os/exec"
 	"regexp"
 	"strings"
@@ -22,29 +20,27 @@ func NewMozilla() Readability {
 	return Mozilla{}
 }
 
-func (m Mozilla) Parse(path string) *Article {
+func (m Mozilla) Parse(path string) (*Article, error) {
 	var stdErr bytes.Buffer
 	cmd := exec.Command("readability-parse", path)
 	cmd.Stderr = &stdErr
 	data, err := cmd.Output()
 	if err != nil {
-		logger.Zap().Error("exec readability-parse err", zap.String("stderr", stdErr.String()))
-		return nil
+		return nil, err
 	}
 
 	article := &Article{}
 	err = json.Unmarshal(data, article)
 	if err != nil {
-		logger.Zap().Error("unmarshal readability output err", zap.Error(err))
-		return nil
+		return nil, err
 	}
 
 	article.TextContent = strings.ReplaceAll(article.TextContent, "\n", "")
 
-	return article
+	return article, nil
 }
 
-func (m Mozilla) ParseContent(content []byte) *Article {
+func (m Mozilla) ParseContent(content []byte) (*Article, error) {
 	//TODO implement me
 	panic("implement me")
 }

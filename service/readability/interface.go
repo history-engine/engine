@@ -14,7 +14,7 @@ type Article struct {
 }
 
 type Readability interface {
-	Parse(path string) *Article
-	ParseContent(content []byte) *Article
+	Parse(path string) (*Article, error)
+	ParseContent(content []byte) (*Article, error)
 	ExtractSingleFileUrl(content []byte) string
 }
