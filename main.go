@@ -22,6 +22,7 @@ func main() {
 	app.Before = loadSetting
 	app.Commands = []*cli.Command{web.Web, jobs.Jobs}
 	app.Version = fmt.Sprintf("%s, build with: %s, time: %s", buildVersion, runtime.Version(), time.Now().Format(time.RFC3339))
+	app.DefaultCommand = web.Web.Name
 
 	app.Flags = append(app.Flags, []cli.Flag{
 		&cli.StringFlag{
