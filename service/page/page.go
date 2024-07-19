@@ -4,6 +4,7 @@ import (
 	"context"
 	"entgo.io/ent/dialect/sql"
 	"fmt"
+	"go.uber.org/zap"
 	"history-engine/engine/ent"
 	"history-engine/engine/ent/page"
 	"history-engine/engine/library/db"
@@ -14,19 +15,17 @@ import (
 	"history-engine/engine/setting"
 	"sync"
 	"time"
-
-	"go.uber.org/zap"
 )
 
 // ParserPage 调用readability分析HTML文件，添加到ZincSearch、保存数据库
-func ParserPage(ctx context.Context, uniqueId string) []error {
+func ParserPage(ctx context.Context, uniqueId string) {
 	pages, err := BatchGetPage(ctx, []string{uniqueId})
 	if err != nil {
-		return []error{err}
+		logger.Zap().Warn("parse page err", zap.Error(err), zap.String("unique_id", uniqueId))
+		return
 	}
 
 	x := db.GetEngine()
-	errs := make([]error, 0)
 	for _, v := range pages {
 		if !v.IndexedAt.IsZero() {
 			continue
@@ -34,7 +33,7 @@ func ParserPage(ctx context.Context, uniqueId string) []error {
 
 		article, err := readability.Parser().Parse(setting.SingleFile.HtmlPath + v.Path)
 		if err != nil {
-			errs = append(errs, err)
+			logger.Zap().Warn("parse page err", zap.Error(err), zap.String("unique_id", uniqueId))
 			continue
 		}
 
@@ -46,19 +45,16 @@ func ParserPage(ctx context.Context, uniqueId string) []error {
 			Content: article.TextContent,
 		}
 		if err = zincsearch.PutDocument(v.UserID, zincId, zincDoc); err != nil {
-			logger.Zap().Warn("add index error", zap.Error(err), zap.String("uniqueId", uniqueId))
-			errs = append(errs, err)
+			logger.Zap().Warn("put zinc doc err", zap.Error(err), zap.String("unique_id", uniqueId))
 			continue
 		}
 
 		_, err = x.Page.Update().SetTitle(article.Title).SetIndexedAt(time.Now()).Where(page.ID(v.ID)).Save(ctx)
 		if err != nil {
-			errs = append(errs, err)
+			logger.Zap().Warn("update page err", zap.Error(err), zap.String("unique_id", uniqueId))
 			continue
 		}
 	}
-
-	return errs
 }
 
 var pageLock = sync.Mutex{}
