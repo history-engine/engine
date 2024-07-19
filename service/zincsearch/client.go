@@ -4,6 +4,7 @@ import "net/http"
 
 const (
 	ApiDocCreateWithId = "/api/%s/_doc/%s"
+	ApiDocDeleteWithId = "/api/%s/_doc/%s"
 	ApiSearchEs        = "/es/%s/_search"
 )
 
