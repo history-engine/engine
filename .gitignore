@@ -16,6 +16,8 @@
 vendor/
 .idea
 .vscode
-data/
+data/*.log
+data/html/
+
 setting.toml
 release/

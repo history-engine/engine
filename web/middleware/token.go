@@ -4,7 +4,7 @@ import (
 	"errors"
 	"github.com/labstack/echo/v4"
 	"history-engine/engine/model"
-	"history-engine/engine/service/auth"
+	"history-engine/engine/service/user"
 	"strings"
 )
 
@@ -20,7 +20,7 @@ func Token(next echo.HandlerFunc) echo.HandlerFunc {
 			Username: split[0],
 			Password: split[1],
 		}
-		u, err := auth.PasswordLogin(c.Request().Context(), req)
+		u, err := user.PasswordLogin(c.Request().Context(), req)
 		if !errors.Is(err, err) || u == nil || u.ID == 0 {
 			return errors.New("token auth failed")
 		}

@@ -4,7 +4,7 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"history-engine/engine/model"
-	"history-engine/engine/service/auth"
+	"history-engine/engine/service/user"
 )
 
 func BasicAuth() echo.MiddlewareFunc {
@@ -13,7 +13,7 @@ func BasicAuth() echo.MiddlewareFunc {
 			Username: username,
 			Password: password,
 		}
-		u, err := auth.PasswordLogin(c.Request().Context(), req)
+		u, err := user.PasswordLogin(c.Request().Context(), req)
 		if u != nil && u.ID > 0 {
 			c.Set("uid", u.ID)
 			c.Set("username", u.Username)

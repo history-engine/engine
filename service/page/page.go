@@ -18,12 +18,6 @@ import (
 	"go.uber.org/zap"
 )
 
-// UpdatePage 更新页面信息
-func UpdatePage(ctx context.Context, id int, row *ent.Page) error {
-	// todo
-	return nil
-}
-
 // ParserPage 调用readability分析HTML文件，添加到ZincSearch、保存数据库
 func ParserPage(ctx context.Context, uniqueId string) []error {
 	pages, err := BatchGetPage(ctx, []string{uniqueId})

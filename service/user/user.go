@@ -2,6 +2,7 @@ package user
 
 import (
 	"context"
+	"errors"
 	"go.uber.org/zap"
 	"history-engine/engine/ent"
 	"history-engine/engine/ent/user"
@@ -64,4 +65,26 @@ func List(ctx context.Context, req *model.UserListReq) ([]*ent.User, model.MsgCo
 func Create(ctx context.Context, req *model.UserCreateReq) model.MsgCode {
 	// todo
 	return model.Ok
+}
+
+func PasswordLogin(ctx context.Context, req *model.PasswordLoginReq) (*ent.User, error) {
+	x := db.GetEngine()
+
+	user, err := x.User.Query().
+		Where(
+			user.Or(
+				user.Username(req.Username),
+				user.Email(req.Username),
+			),
+			user.Password(utils.Md5str(req.Password)),
+		).
+		First(ctx)
+	if ent.IsNotFound(err) {
+		return nil, errors.New("user not found")
+	} else if err != nil {
+		logger.Zap().Error("password login err", zap.Error(err))
+		return nil, err
+	}
+
+	return user, nil
 }
