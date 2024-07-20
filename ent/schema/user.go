@@ -5,7 +5,6 @@ import (
 	"entgo.io/ent/dialect/entsql"
 	"entgo.io/ent/schema"
 	"entgo.io/ent/schema/field"
-	"entgo.io/ent/schema/index"
 	"time"
 )
 
@@ -34,10 +33,7 @@ func (User) Edges() []ent.Edge {
 
 // Indexes of the User.
 func (User) Indexes() []ent.Index {
-	return []ent.Index{
-		index.Fields("username").Unique(),
-		index.Fields("email").Unique(),
-	}
+	return []ent.Index{}
 }
 
 func (User) Annotations() []schema.Annotation {
