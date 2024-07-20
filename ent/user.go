@@ -25,6 +25,8 @@ type User struct {
 	Password string `json:"-"`
 	// 是否是管理员
 	Admin int `json:"admin,omitempty"`
+	// 头像
+	Avatar string `json:"avatar,omitempty"`
 	// 入库时间
 	CreatedAt time.Time `json:"created_at,omitempty"`
 	// 最后更新时间
@@ -39,7 +41,7 @@ func (*User) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case user.FieldID, user.FieldAdmin:
 			values[i] = new(sql.NullInt64)
-		case user.FieldUsername, user.FieldEmail, user.FieldPassword:
+		case user.FieldUsername, user.FieldEmail, user.FieldPassword, user.FieldAvatar:
 			values[i] = new(sql.NullString)
 		case user.FieldCreatedAt, user.FieldUpdatedAt:
 			values[i] = new(sql.NullTime)
@@ -87,6 +89,12 @@ func (u *User) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field admin", values[i])
 			} else if value.Valid {
 				u.Admin = int(value.Int64)
+			}
+		case user.FieldAvatar:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field avatar", values[i])
+			} else if value.Valid {
+				u.Avatar = value.String
 			}
 		case user.FieldCreatedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
@@ -147,6 +155,9 @@ func (u *User) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("admin=")
 	builder.WriteString(fmt.Sprintf("%v", u.Admin))
+	builder.WriteString(", ")
+	builder.WriteString("avatar=")
+	builder.WriteString(u.Avatar)
 	builder.WriteString(", ")
 	builder.WriteString("created_at=")
 	builder.WriteString(u.CreatedAt.Format(time.ANSIC))

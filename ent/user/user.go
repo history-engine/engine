@@ -21,6 +21,8 @@ const (
 	FieldPassword = "password"
 	// FieldAdmin holds the string denoting the admin field in the database.
 	FieldAdmin = "admin"
+	// FieldAvatar holds the string denoting the avatar field in the database.
+	FieldAvatar = "avatar"
 	// FieldCreatedAt holds the string denoting the created_at field in the database.
 	FieldCreatedAt = "created_at"
 	// FieldUpdatedAt holds the string denoting the updated_at field in the database.
@@ -36,6 +38,7 @@ var Columns = []string{
 	FieldEmail,
 	FieldPassword,
 	FieldAdmin,
+	FieldAvatar,
 	FieldCreatedAt,
 	FieldUpdatedAt,
 }
@@ -61,6 +64,8 @@ var (
 	DefaultAdmin int
 	// AdminValidator is a validator for the "admin" field. It is called by the builders before save.
 	AdminValidator func(int) error
+	// AvatarValidator is a validator for the "avatar" field. It is called by the builders before save.
+	AvatarValidator func(string) error
 	// DefaultCreatedAt holds the default value on creation for the "created_at" field.
 	DefaultCreatedAt func() time.Time
 	// DefaultUpdatedAt holds the default value on creation for the "updated_at" field.
@@ -95,6 +100,11 @@ func ByPassword(opts ...sql.OrderTermOption) OrderOption {
 // ByAdmin orders the results by the admin field.
 func ByAdmin(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldAdmin, opts...).ToFunc()
+}
+
+// ByAvatar orders the results by the avatar field.
+func ByAvatar(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldAvatar, opts...).ToFunc()
 }
 
 // ByCreatedAt orders the results by the created_at field.

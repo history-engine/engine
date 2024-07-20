@@ -43,6 +43,7 @@ var (
 		{Name: "email", Type: field.TypeString, Unique: true, Size: 100},
 		{Name: "password", Type: field.TypeString, Size: 32},
 		{Name: "admin", Type: field.TypeInt, Default: 0},
+		{Name: "avatar", Type: field.TypeString, Size: 2048},
 		{Name: "created_at", Type: field.TypeTime},
 		{Name: "updated_at", Type: field.TypeTime},
 	}
@@ -51,18 +52,6 @@ var (
 		Name:       "user",
 		Columns:    UserColumns,
 		PrimaryKey: []*schema.Column{UserColumns[0]},
-		Indexes: []*schema.Index{
-			{
-				Name:    "user_username",
-				Unique:  true,
-				Columns: []*schema.Column{UserColumns[1]},
-			},
-			{
-				Name:    "user_email",
-				Unique:  true,
-				Columns: []*schema.Column{UserColumns[2]},
-			},
-		},
 	}
 	// Tables holds all the tables in the schema.
 	Tables = []*schema.Table{
