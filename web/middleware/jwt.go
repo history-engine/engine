@@ -1,10 +1,11 @@
 package middleware
 
 import (
-	"errors"
 	"github.com/golang-jwt/jwt"
 	"github.com/labstack/echo/v4"
+	"history-engine/engine/model"
 	"history-engine/engine/setting"
+	"history-engine/engine/utils"
 )
 
 // JwtAuth Jwt验证
@@ -19,14 +20,14 @@ func JwtAuth(next echo.HandlerFunc) echo.HandlerFunc {
 		}
 
 		if jwtToken == "" {
-			return errors.New("jwt auth failed")
+			return utils.ApiError(c, model.ErrorJWTExpired)
 		}
 
 		token, err := jwt.Parse(jwtToken, func(token *jwt.Token) (interface{}, error) {
 			return setting.JwtSecret, nil
 		})
 		if err != nil || token == nil || !token.Valid {
-			return errors.New("jwt auth failed")
+			return utils.ApiError(c, model.ErrorLoginFailed)
 		}
 
 		if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
@@ -45,6 +46,6 @@ func JwtAuth(next echo.HandlerFunc) echo.HandlerFunc {
 			return next(c)
 		}
 
-		return errors.New("jwt auth failed")
+		return utils.ApiError(c, model.ErrorLoginFailed)
 	}
 }
