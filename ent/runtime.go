@@ -3,6 +3,7 @@
 package ent
 
 import (
+	"history-engine/engine/ent/host"
 	"history-engine/engine/ent/page"
 	"history-engine/engine/ent/schema"
 	"history-engine/engine/ent/user"
@@ -13,6 +14,28 @@ import (
 // (default values, validators, hooks and policies) and stitches it
 // to their package variables.
 func init() {
+	hostFields := schema.Host{}.Fields()
+	_ = hostFields
+	// hostDescHost is the schema descriptor for host field.
+	hostDescHost := hostFields[2].Descriptor()
+	// host.HostValidator is a validator for the "host" field. It is called by the builders before save.
+	host.HostValidator = hostDescHost.Validators[0].(func(string) error)
+	// hostDescType is the schema descriptor for type field.
+	hostDescType := hostFields[3].Descriptor()
+	// host.DefaultType holds the default value on creation for the type field.
+	host.DefaultType = hostDescType.Default.(int)
+	// host.TypeValidator is a validator for the "type" field. It is called by the builders before save.
+	host.TypeValidator = hostDescType.Validators[0].(func(int) error)
+	// hostDescCreatedAt is the schema descriptor for created_at field.
+	hostDescCreatedAt := hostFields[4].Descriptor()
+	// host.DefaultCreatedAt holds the default value on creation for the created_at field.
+	host.DefaultCreatedAt = hostDescCreatedAt.Default.(func() time.Time)
+	// hostDescUpdatedAt is the schema descriptor for updated_at field.
+	hostDescUpdatedAt := hostFields[5].Descriptor()
+	// host.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	host.DefaultUpdatedAt = hostDescUpdatedAt.Default.(func() time.Time)
+	// host.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	host.UpdateDefaultUpdatedAt = hostDescUpdatedAt.UpdateDefault.(func() time.Time)
 	pageFields := schema.Page{}.Fields()
 	_ = pageFields
 	// pageDescUniqueID is the schema descriptor for unique_id field.

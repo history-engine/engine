@@ -9,6 +9,28 @@ import (
 )
 
 var (
+	// HostColumns holds the columns for the "host" table.
+	HostColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt64, Increment: true},
+		{Name: "user_id", Type: field.TypeInt64},
+		{Name: "host", Type: field.TypeString, Size: 100},
+		{Name: "type", Type: field.TypeInt, Default: 0},
+		{Name: "created_at", Type: field.TypeTime},
+		{Name: "updated_at", Type: field.TypeTime},
+	}
+	// HostTable holds the schema information for the "host" table.
+	HostTable = &schema.Table{
+		Name:       "host",
+		Columns:    HostColumns,
+		PrimaryKey: []*schema.Column{HostColumns[0]},
+		Indexes: []*schema.Index{
+			{
+				Name:    "host_user_id_host_type",
+				Unique:  true,
+				Columns: []*schema.Column{HostColumns[1], HostColumns[2], HostColumns[3]},
+			},
+		},
+	}
 	// PageColumns holds the columns for the "page" table.
 	PageColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt64, Increment: true},
@@ -55,12 +77,16 @@ var (
 	}
 	// Tables holds all the tables in the schema.
 	Tables = []*schema.Table{
+		HostTable,
 		PageTable,
 		UserTable,
 	}
 )
 
 func init() {
+	HostTable.Annotation = &entsql.Annotation{
+		Table: "host",
+	}
 	PageTable.Annotation = &entsql.Annotation{
 		Table: "page",
 	}
