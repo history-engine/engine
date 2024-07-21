@@ -67,6 +67,8 @@ var (
 	UniqueIDValidator func(string) error
 	// DefaultVersion holds the default value on creation for the "version" field.
 	DefaultVersion int
+	// DefaultTitle holds the default value on creation for the "title" field.
+	DefaultTitle string
 	// TitleValidator is a validator for the "title" field. It is called by the builders before save.
 	TitleValidator func(string) error
 	// URLValidator is a validator for the "url" field. It is called by the builders before save.

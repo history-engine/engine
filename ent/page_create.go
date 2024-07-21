@@ -52,6 +52,14 @@ func (pc *PageCreate) SetTitle(s string) *PageCreate {
 	return pc
 }
 
+// SetNillableTitle sets the "title" field if the given value is not nil.
+func (pc *PageCreate) SetNillableTitle(s *string) *PageCreate {
+	if s != nil {
+		pc.SetTitle(*s)
+	}
+	return pc
+}
+
 // SetURL sets the "url" field.
 func (pc *PageCreate) SetURL(s string) *PageCreate {
 	pc.mutation.SetURL(s)
@@ -164,6 +172,10 @@ func (pc *PageCreate) defaults() {
 	if _, ok := pc.mutation.Version(); !ok {
 		v := page.DefaultVersion
 		pc.mutation.SetVersion(v)
+	}
+	if _, ok := pc.mutation.Title(); !ok {
+		v := page.DefaultTitle
+		pc.mutation.SetTitle(v)
 	}
 	if _, ok := pc.mutation.Size(); !ok {
 		v := page.DefaultSize

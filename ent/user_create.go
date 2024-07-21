@@ -58,6 +58,14 @@ func (uc *UserCreate) SetAvatar(s string) *UserCreate {
 	return uc
 }
 
+// SetNillableAvatar sets the "avatar" field if the given value is not nil.
+func (uc *UserCreate) SetNillableAvatar(s *string) *UserCreate {
+	if s != nil {
+		uc.SetAvatar(*s)
+	}
+	return uc
+}
+
 // SetCreatedAt sets the "created_at" field.
 func (uc *UserCreate) SetCreatedAt(t time.Time) *UserCreate {
 	uc.mutation.SetCreatedAt(t)
@@ -130,6 +138,10 @@ func (uc *UserCreate) defaults() {
 	if _, ok := uc.mutation.Admin(); !ok {
 		v := user.DefaultAdmin
 		uc.mutation.SetAdmin(v)
+	}
+	if _, ok := uc.mutation.Avatar(); !ok {
+		v := user.DefaultAvatar
+		uc.mutation.SetAvatar(v)
 	}
 	if _, ok := uc.mutation.CreatedAt(); !ok {
 		v := user.DefaultCreatedAt()

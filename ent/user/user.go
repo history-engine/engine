@@ -64,6 +64,8 @@ var (
 	DefaultAdmin int
 	// AdminValidator is a validator for the "admin" field. It is called by the builders before save.
 	AdminValidator func(int) error
+	// DefaultAvatar holds the default value on creation for the "avatar" field.
+	DefaultAvatar string
 	// AvatarValidator is a validator for the "avatar" field. It is called by the builders before save.
 	AvatarValidator func(string) error
 	// DefaultCreatedAt holds the default value on creation for the "created_at" field.

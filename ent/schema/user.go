@@ -21,7 +21,7 @@ func (User) Fields() []ent.Field {
 		field.String("email").MaxLen(100).Unique().Comment("邮箱地址"),
 		field.String("password").MaxLen(32).StructTag(`json:"-"`).Comment("版本"),
 		field.Int("admin").Max(1).Default(0).Comment("是否是管理员"),
-		field.String("avatar").MaxLen(2048).Comment("头像"),
+		field.String("avatar").Default("").MaxLen(2048).Comment("头像"),
 		field.Time("created_at").Immutable().Default(time.Now).Comment("入库时间"),
 		field.Time("updated_at").Default(time.Now).UpdateDefault(time.Now).Comment("最后更新时间"),
 	}

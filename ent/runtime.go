@@ -25,6 +25,8 @@ func init() {
 	page.DefaultVersion = pageDescVersion.Default.(int)
 	// pageDescTitle is the schema descriptor for title field.
 	pageDescTitle := pageFields[4].Descriptor()
+	// page.DefaultTitle holds the default value on creation for the title field.
+	page.DefaultTitle = pageDescTitle.Default.(string)
 	// page.TitleValidator is a validator for the "title" field. It is called by the builders before save.
 	page.TitleValidator = pageDescTitle.Validators[0].(func(string) error)
 	// pageDescURL is the schema descriptor for url field.
@@ -75,6 +77,8 @@ func init() {
 	user.AdminValidator = userDescAdmin.Validators[0].(func(int) error)
 	// userDescAvatar is the schema descriptor for avatar field.
 	userDescAvatar := userFields[5].Descriptor()
+	// user.DefaultAvatar holds the default value on creation for the avatar field.
+	user.DefaultAvatar = userDescAvatar.Default.(string)
 	// user.AvatarValidator is a validator for the "avatar" field. It is called by the builders before save.
 	user.AvatarValidator = userDescAvatar.Validators[0].(func(string) error)
 	// userDescCreatedAt is the schema descriptor for created_at field.
