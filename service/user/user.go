@@ -51,7 +51,7 @@ func Register(ctx context.Context, req *model.UserRegisterReq) (*ent.User, model
 		Save(ctx)
 	if err != nil {
 		logger.Zap().Error("register err", zap.Error(err), zap.Any("req", req))
-		return nil, model.Unknown
+		return nil, model.ErrorEmpty
 	}
 
 	return user, model.Ok

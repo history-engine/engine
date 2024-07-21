@@ -59,7 +59,15 @@ func Register(c echo.Context) error {
 		panic(err)
 	}
 
-	return utils.ApiSuccess(c, map[string]any{"jwt_token": tokenString})
+	c.SetCookie(&http.Cookie{
+		Name:     setting.JwtKey,
+		Value:    tokenString,
+		Expires:  time.Now().Add(86400 * 24 * time.Second),
+		Path:     "/",
+		HttpOnly: true,
+	})
+
+	return utils.ApiSuccess(c, map[string]any{"jwt_token": tokenString, "user": u})
 }
 
 // PasswordLogin 密码登录
