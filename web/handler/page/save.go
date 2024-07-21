@@ -7,8 +7,8 @@ import (
 	"go.uber.org/zap"
 	"history-engine/engine/ent"
 	"history-engine/engine/library/logger"
+	"history-engine/engine/service/host"
 	"history-engine/engine/service/page"
-	"history-engine/engine/service/singlefile"
 	"history-engine/engine/setting"
 	"history-engine/engine/utils"
 	"io"
@@ -39,14 +39,16 @@ func Save(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, nil)
 	}
 
-	if singlefile.CheckIgnore(url) {
-		logger.Zap().Info("ignore by rule: " + url)
-		return c.JSON(http.StatusOK, nil)
+	if !host.Include(userId, url) {
+		if host.Exclude(userId, url) {
+			logger.Zap().Info("ignore by rule: " + url)
+			return c.JSON(http.StatusOK, nil)
+		}
 	}
 
 	uniqueId := utils.Md5str(url) // todo 自定义
 	version, created := page.NextVersion(ctx, uniqueId)
-	if singlefile.CheckVersionInterval(created) {
+	if utils.CheckVersionInterval(setting.SingleFile.MinVersionInterval, created) {
 		logger.Zap().Info("ignore by interval: " + url)
 		return c.JSON(http.StatusOK, nil)
 	}
