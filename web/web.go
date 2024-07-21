@@ -2,6 +2,7 @@ package web
 
 import (
 	"history-engine/engine/library/db"
+	"history-engine/engine/library/localcache"
 	"history-engine/engine/library/logger"
 	"history-engine/engine/library/server"
 	"history-engine/engine/web/routes"
@@ -21,6 +22,7 @@ var Web = &cli.Command{
 func before(c *cli.Context) error {
 	logger.EnableLogger()
 	db.EnableDb()
+	localcache.EnableLocalCache()
 	return nil
 }
 
