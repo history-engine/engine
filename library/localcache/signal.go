@@ -9,10 +9,10 @@ var _ shutdown.Stopper = stopper{}
 type stopper struct{}
 
 func initSignal() {
-	shutdown.RegisterStopper("localcache", stopper{})
+	shutdown.RegisterStopper("local-cache", stopper{})
 }
 
 func (m stopper) Stop() error {
-	// todo
+	persistent()
 	return nil
 }
