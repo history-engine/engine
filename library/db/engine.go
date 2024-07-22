@@ -4,7 +4,9 @@ import (
 	"context"
 	_ "github.com/go-sql-driver/mysql"
 	_ "github.com/lib/pq"
+	"go.uber.org/zap"
 	"history-engine/engine/ent"
+	"history-engine/engine/library/logger"
 	"history-engine/engine/library/wait"
 	"history-engine/engine/setting"
 	"log"
@@ -16,7 +18,11 @@ var client *ent.Client
 func initEngine() {
 	var err error
 
-	client, err = ent.Open(setting.Database.Drive, setting.GetDSN())
+	opt := ent.Log(func(a ...any) {
+		logger.Zap().Info("ent debug", zap.Any("info", a))
+	})
+
+	client, err = ent.Open(setting.Database.Drive, setting.GetDSN(), opt)
 	if err != nil {
 		log.Fatalf("connect to %s err: %v\b", setting.Database.Drive, err)
 	}

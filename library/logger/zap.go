@@ -27,7 +27,6 @@ func initZap() error {
 	config.Encoding = setting.Log.Format
 
 	_zap, err = config.Build()
-	_zap.Info("zap logger init success")
 
 	wait.Done()
 	return err
