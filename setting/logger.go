@@ -9,30 +9,35 @@ import (
 )
 
 var Log = struct {
-	File  string
-	Level string
+	File   string
+	Level  string
+	Format string
 }{
-	Level: "info",
-	File:  "data/runtime.log",
+	Level:  "info",
+	File:   "",
+	Format: "console",
 }
 
 func loadLogger() {
 	v := viper.Sub("log")
 	if v != nil {
-		if v.IsSet("log_level") {
-			Log.Level = v.GetString("log_level")
+		if v.IsSet("level") {
+			Log.Level = v.GetString("level")
 		}
-		if v.IsSet("log_path") {
-			Log.File = v.GetString("log_file")
+		if v.IsSet("path") {
+			Log.File = v.GetString("file")
+		}
+		if v.IsSet("format") {
+			Log.Format = v.GetString("format")
 		}
 	}
 
-	log.Printf("log level:%s, log file:%s\n", Log.Level, Log.File)
+	log.Printf("log level: %s, format: %s, log file: %s\n", Log.Level, Log.Format, Log.File)
 	checkLogFile()
 }
 
 func checkLogFile() {
-	if utils.FileExist(Log.File) {
+	if Log.File == "" || utils.FileExist(Log.File) {
 		return
 	}
 

@@ -22,12 +22,9 @@ func initZap() error {
 	if setting.Log.File != "" {
 		config.OutputPaths = []string{setting.Log.File}
 		config.ErrorOutputPaths = []string{setting.Log.File}
-	} else {
-		config.OutputPaths = []string{"stdout"}
-		config.ErrorOutputPaths = []string{"stderr"}
 	}
 
-	config.Encoding = "json"
+	config.Encoding = setting.Log.Format
 
 	_zap, err = config.Build()
 	_zap.Info("zap logger init success")
