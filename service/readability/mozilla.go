@@ -3,6 +3,7 @@ package readability
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
 	"os/exec"
 	"regexp"
 	"strings"
@@ -26,7 +27,7 @@ func (m Mozilla) Parse(path string) (*Article, error) {
 	cmd.Stderr = &stdErr
 	data, err := cmd.Output()
 	if err != nil {
-		return nil, err
+		return nil, errors.Join(err, errors.New(stdErr.String()))
 	}
 
 	article := &Article{}

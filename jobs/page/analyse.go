@@ -1,4 +1,4 @@
-package handler
+package page
 
 import (
 	"github.com/urfave/cli/v2"

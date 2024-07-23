@@ -33,7 +33,7 @@ func PutDocument(userId int64, docId string, doc *model.ZincDocument) error {
 }
 
 // DelDocument 删除索引中的数据
-func DelDocument(userId int64, uniqueId string, version uint) error {
+func DelDocument(userId int64, uniqueId string, version int) error {
 	index := fmt.Sprintf("%s_%d", setting.ZincSearch.IndexPrefix, userId)
 	docId := fmt.Sprintf("%s%d", uniqueId, version)
 	api := fmt.Sprintf(ApiDocDeleteWithId, index, docId)

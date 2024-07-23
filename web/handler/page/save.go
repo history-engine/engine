@@ -97,7 +97,7 @@ func Save(c echo.Context) error {
 	}
 
 	// 后台分析HTML、清理历史版本
-	go page.ParserPage(context.Background(), uniqueId)
+	go page.ParserPage(context.Background(), userId, uniqueId, version)
 	go page.CleanHistory(context.Background(), userId, uniqueId, version)
 
 	return c.JSON(http.StatusCreated, nil)

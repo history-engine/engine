@@ -45,7 +45,7 @@ func CleanHistory(ctx context.Context, userId int64, uniqueId string, version in
 	x := db.GetEngine()
 	var vs []struct {
 		Id      int64
-		Version uint
+		Version int
 		Path    string
 	}
 	if err := x.Page.Query().
@@ -70,7 +70,7 @@ func CleanHistory(ctx context.Context, userId int64, uniqueId string, version in
 			logger.Zap().Error(
 				"delete zinc search doc err",
 				zap.String("unique_id", uniqueId),
-				zap.Uint("version", v.Version),
+				zap.Int("version", v.Version),
 			)
 		}
 	}
