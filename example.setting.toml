@@ -6,7 +6,7 @@ data_path = "data"
 time_zone = "Asia/Shanghai"
 
 [log]
-log_file = "data/runtime.log"
+file = "data/runtime.log"
 level = "debug"
 format = "console" # json、console
 

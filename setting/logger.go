@@ -24,7 +24,7 @@ func loadLogger() {
 		if v.IsSet("level") {
 			Log.Level = v.GetString("level")
 		}
-		if v.IsSet("path") {
+		if v.IsSet("file") {
 			Log.File = v.GetString("file")
 		}
 		if v.IsSet("format") {

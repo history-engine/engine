@@ -123,6 +123,7 @@ func Search(ctx context.Context, userId int64, search model.SearchPage) (pageSea
 	for _, v := range zincSearch.Hits.Hits {
 		page, ok := docMap[v.ID]
 		if !ok {
+			// todo 可能是zinc存在，当时数据库没有
 			continue
 		}
 
