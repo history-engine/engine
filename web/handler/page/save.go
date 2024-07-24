@@ -59,7 +59,7 @@ func Save(c echo.Context) error {
 		zap.Int("version", version))
 
 	// 检查并创建目录
-	storagePath := fmt.Sprintf("/%s/%s", uniqueId[:2], uniqueId[2:4])
+	storagePath := fmt.Sprintf("/%d/%s/%s", userId, uniqueId[:2], uniqueId[2:4])
 	if _, err = os.Stat(setting.SingleFile.HtmlPath + storagePath); err != nil {
 		if !os.IsNotExist(err) { // TODO 未知错误,记录日志
 			return c.JSON(http.StatusInternalServerError, nil)

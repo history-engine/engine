@@ -3,6 +3,8 @@ package page
 import (
 	"github.com/urfave/cli/v2"
 	"go.uber.org/zap"
+	"history-engine/engine/ent"
+	entPage "history-engine/engine/ent/page"
 	"history-engine/engine/library/db"
 	"history-engine/engine/library/logger"
 	"history-engine/engine/service/host"
@@ -25,7 +27,7 @@ func runIntegrityCheck(ctx *cli.Context) error {
 	limit := 100
 	x := db.GetEngine().Page
 	for {
-		list, err := x.Query().Offset(start).Limit(limit).All(ctx.Context)
+		list, err := x.Query().Order(ent.Desc(entPage.FieldID)).Offset(start).Limit(limit).All(ctx.Context)
 		if err != nil {
 			panic(err)
 		}

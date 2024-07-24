@@ -131,7 +131,7 @@ func Search(ctx context.Context, userId int64, search model.SearchPage) (pageSea
 			Avatar:  "https://avatars.akamai.steamstatic.com/6a9ae9c069cd4fff8bf954938727730cdb0fe27b.jpg",
 			Url:     page.URL,
 			Size:    page.Size,
-			Preview: setting.Web.Domain + "/page/view" + page.Path,
+			Preview: setting.Web.Domain + "/page/view" + fmt.Sprintf("/%s.%d.html", page.UniqueID, page.Version),
 			Version: page.Version,
 		}
 
