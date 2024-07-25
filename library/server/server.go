@@ -57,6 +57,7 @@ func (s *Server) boot() {
 	log.Printf("server start at %s\n", listen)
 	if err := s.http.Start(listen); err != nil {
 		s.runError <- err
+		s.shutdown()
 	}
 }
 
