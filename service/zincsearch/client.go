@@ -1,6 +1,10 @@
 package zincsearch
 
-import "net/http"
+import (
+	"fmt"
+	"history-engine/engine/setting"
+	"net/http"
+)
 
 const (
 	ApiDocCreateWithId = "/api/%s/_doc/%s"
@@ -20,4 +24,8 @@ func SetClient(c *http.Client) {
 
 func SendRequest(api, method string, body []byte) {
 	// todo
+}
+
+func IndexName(userId int64) string {
+	return fmt.Sprintf("%s_%s_%d", setting.ZincSearch.IndexPrefix, setting.Common.Env, userId)
 }
