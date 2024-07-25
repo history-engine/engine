@@ -1,15 +1,12 @@
 package zincsearch
 
 import (
-	"bytes"
 	"encoding/json"
 	"errors"
 	"fmt"
 	"go.uber.org/zap"
 	"history-engine/engine/library/logger"
 	"history-engine/engine/model"
-	"history-engine/engine/setting"
-	"io"
 	"net/http"
 	"time"
 )
@@ -50,28 +47,13 @@ func EsSearch(userId int64, search model.SearchPage) (resp model.ZincSearchRespo
 		},
 		Source: []string{"ID", "content", "excerpt"},
 	}
-	body, err := json.Marshal(query)
-	if err != nil {
-		panic(err)
-	}
 
 	api := fmt.Sprintf(ApiSearchEs, IndexName(userId))
-	req, err := http.NewRequest(http.MethodPost, setting.ZincSearch.Host+api, bytes.NewReader(body))
+	body, err := SendRequest(api, http.MethodPost, query)
 	if err != nil {
-		logger.Zap().Error("new request error", zap.Error(err))
 		return
 	}
 
-	req.Header.Set("Content-Type", "application/json")
-	req.SetBasicAuth(setting.ZincSearch.User, setting.ZincSearch.Password)
-
-	res, err := client.Do(req)
-	if err != nil {
-		panic(err)
-	}
-	defer res.Body.Close()
-
-	body, _ = io.ReadAll(res.Body)
 	err = json.Unmarshal(body, &resp)
 	if err != nil {
 		logger.Zap().Error("search zinc err", zap.ByteString("resp", body))
