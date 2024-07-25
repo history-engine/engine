@@ -37,7 +37,7 @@ var (
 		{Name: "user_id", Type: field.TypeInt64},
 		{Name: "unique_id", Type: field.TypeString, Size: 32},
 		{Name: "version", Type: field.TypeInt, Default: 1},
-		{Name: "title", Type: field.TypeString, Size: 300, Default: ""},
+		{Name: "title", Type: field.TypeString, Size: 500, Default: ""},
 		{Name: "url", Type: field.TypeString, Size: 2048},
 		{Name: "path", Type: field.TypeString, Size: 500},
 		{Name: "size", Type: field.TypeInt, Default: 0},
