@@ -49,7 +49,7 @@ func loadSingleFile() {
 
 func checkStoragePath() {
 	if utils.PathExist(SingleFile.HtmlPath) {
-		log.Printf("html stroage paht: %s\n", SingleFile.HtmlPath)
+		log.Printf("html stroage path: %s\n", SingleFile.HtmlPath)
 		return
 	}
 
