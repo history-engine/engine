@@ -29,7 +29,7 @@ version_check_limit = 100 # 检查版本数量限制
 
 [readability]
 parser = "mozilla" # 解析器，目前只支持mozilla
-exec_path = "/usr/lib/readability.js"
+exec_path = "/usr/lib/readability.js" # readability-parse脚本路径，为空会从系统环境变量PATH下查找
 
 [zincsearch]
 host = "http://localhost"
