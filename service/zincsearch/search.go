@@ -48,7 +48,7 @@ func EsSearch(userId int64, search model.SearchPage) (resp model.ZincSearchRespo
 				},
 			},
 		},
-		Source: []string{"ID", "title", "content", "excerpt", "url"},
+		Source: []string{"ID", "content", "excerpt"},
 	}
 	body, err := json.Marshal(query)
 	if err != nil {
