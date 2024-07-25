@@ -9,6 +9,7 @@ import (
 	"history-engine/engine/library/db"
 	"history-engine/engine/library/logger"
 	"history-engine/engine/model"
+	"history-engine/engine/service/zincsearch"
 	"history-engine/engine/utils"
 )
 
@@ -24,6 +25,7 @@ func Info(ctx context.Context, uid int64) *ent.User {
 	return user
 }
 
+// Register todo 不再返回model.MsgCode
 func Register(ctx context.Context, req *model.UserRegisterReq) (*ent.User, model.MsgCode) {
 	x := db.GetEngine()
 
@@ -52,6 +54,10 @@ func Register(ctx context.Context, req *model.UserRegisterReq) (*ent.User, model
 	if err != nil {
 		logger.Zap().Error("register err", zap.Error(err), zap.Any("req", req))
 		return nil, model.ErrorEmpty
+	}
+
+	if err := zincsearch.CreateIndex(user.ID); err != nil {
+		return nil, model.ErrorInternal
 	}
 
 	return user, model.Ok
