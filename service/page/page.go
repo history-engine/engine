@@ -8,45 +8,10 @@ import (
 	"history-engine/engine/ent/page"
 	"history-engine/engine/library/db"
 	"history-engine/engine/model"
-	"history-engine/engine/service/readability"
 	"history-engine/engine/service/zincsearch"
 	"history-engine/engine/setting"
 	"sync"
-	"time"
 )
-
-// ParserPage 调用readability分析HTML文件，添加到ZincSearch、保存数据库
-func ParserPage(ctx context.Context, userId int64, uniqueId string, version int) error {
-	x := db.GetEngine()
-
-	item, err := x.Page.Query().Where(page.UserID(userId), page.UniqueID(uniqueId), page.Version(version)).First(ctx)
-	if err != nil {
-		return err
-	}
-
-	article, err := readability.Parser().Parse(setting.SingleFile.HtmlPath + item.Path)
-	if err != nil {
-		return err
-	}
-
-	zincId := fmt.Sprintf("%s%d", uniqueId, item.Version)
-	zincDoc := &model.ZincDocument{
-		Url:     item.URL,
-		Title:   article.Title,
-		Excerpt: article.Excerpt,
-		Content: article.TextContent,
-	}
-	if err = zincsearch.PutDocument(item.UserID, zincId, zincDoc); err != nil {
-		return err
-	}
-
-	_, err = x.Page.Update().SetTitle(article.Title).SetIndexedAt(time.Now()).Where(page.ID(item.ID)).Save(ctx)
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
 
 var pageLock = sync.Mutex{}
 

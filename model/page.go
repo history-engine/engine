@@ -26,3 +26,10 @@ type SearchResponse struct {
 	Total int `json:"total"`
 	Pages any `json:"pages"`
 }
+
+type PageParse struct {
+	Id       int64
+	UserId   int64
+	UniqueId string
+	Version  int
+}

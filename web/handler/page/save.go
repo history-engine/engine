@@ -83,7 +83,7 @@ func Save(c echo.Context) error {
 	}
 
 	// 入库
-	_, err = page.SavePage(ctx, &ent.Page{
+	row, err := page.SavePage(ctx, &ent.Page{
 		UserID:   userId,
 		UniqueID: uniqueId,
 		Version:  version,
@@ -97,7 +97,7 @@ func Save(c echo.Context) error {
 	}
 
 	// 后台分析HTML、清理历史版本
-	go page.ParserPage(context.Background(), userId, uniqueId, version)
+	go page.ParserPageWithId(row.ID)
 	go page.CleanHistory(context.Background(), userId, uniqueId, version)
 
 	return c.JSON(http.StatusCreated, nil)

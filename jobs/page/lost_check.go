@@ -95,7 +95,9 @@ func runLostCheck(ctx *cli.Context) error {
 				continue
 			}
 
-			_ = page.ParserPage(ctx.Context, user.ID, uniqueId, version)
+			if err := page.ParserPageWithId(row.ID); err != nil {
+				panic(err)
+			}
 			logger.Zap().Info("find lost data", zap.String("path", file), zap.Int64("new id", row.ID))
 		}
 	}

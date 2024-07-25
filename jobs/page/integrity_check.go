@@ -57,8 +57,11 @@ func runIntegrityCheck(ctx *cli.Context) error {
 			}
 
 			if item.Title == "" || item.IndexedAt.IsZero() {
-				err = page.ParserPage(ctx.Context, item.UserID, item.UniqueID, item.Version)
-				logger.Zap().Info("HTML file not parse", zap.Error(err), zap.Int64("id", item.ID), zap.String("url", item.URL))
+				err := page.ParserPageWithId(item.ID)
+				if err != nil {
+					panic(err)
+				}
+				logger.Zap().Info("HTML file not parse", zap.Int64("id", item.ID), zap.String("url", item.URL))
 			}
 		}
 	}
