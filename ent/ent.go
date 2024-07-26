@@ -6,6 +6,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"history-engine/engine/ent/filetype"
 	"history-engine/engine/ent/host"
 	"history-engine/engine/ent/page"
 	"history-engine/engine/ent/user"
@@ -75,9 +76,10 @@ var (
 func checkColumn(table, column string) error {
 	initCheck.Do(func() {
 		columnCheck = sql.NewColumnCheck(map[string]func(string) bool{
-			host.Table: host.ValidColumn,
-			page.Table: page.ValidColumn,
-			user.Table: user.ValidColumn,
+			filetype.Table: filetype.ValidColumn,
+			host.Table:     host.ValidColumn,
+			page.Table:     page.ValidColumn,
+			user.Table:     user.ValidColumn,
 		})
 	})
 	return columnCheck(table, column)

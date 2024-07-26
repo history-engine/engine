@@ -8,6 +8,18 @@ import (
 	"history-engine/engine/ent"
 )
 
+// The FileTypeFunc type is an adapter to allow the use of ordinary
+// function as FileType mutator.
+type FileTypeFunc func(context.Context, *ent.FileTypeMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f FileTypeFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.FileTypeMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.FileTypeMutation", m)
+}
+
 // The HostFunc type is an adapter to allow the use of ordinary
 // function as Host mutator.
 type HostFunc func(context.Context, *ent.HostMutation) (ent.Value, error)

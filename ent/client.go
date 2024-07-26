@@ -11,6 +11,7 @@ import (
 
 	"history-engine/engine/ent/migrate"
 
+	"history-engine/engine/ent/filetype"
 	"history-engine/engine/ent/host"
 	"history-engine/engine/ent/page"
 	"history-engine/engine/ent/user"
@@ -25,6 +26,8 @@ type Client struct {
 	config
 	// Schema is the client for creating, migrating and dropping schema.
 	Schema *migrate.Schema
+	// FileType is the client for interacting with the FileType builders.
+	FileType *FileTypeClient
 	// Host is the client for interacting with the Host builders.
 	Host *HostClient
 	// Page is the client for interacting with the Page builders.
@@ -42,6 +45,7 @@ func NewClient(opts ...Option) *Client {
 
 func (c *Client) init() {
 	c.Schema = migrate.NewSchema(c.driver)
+	c.FileType = NewFileTypeClient(c.config)
 	c.Host = NewHostClient(c.config)
 	c.Page = NewPageClient(c.config)
 	c.User = NewUserClient(c.config)
@@ -135,11 +139,12 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 	cfg := c.config
 	cfg.driver = tx
 	return &Tx{
-		ctx:    ctx,
-		config: cfg,
-		Host:   NewHostClient(cfg),
-		Page:   NewPageClient(cfg),
-		User:   NewUserClient(cfg),
+		ctx:      ctx,
+		config:   cfg,
+		FileType: NewFileTypeClient(cfg),
+		Host:     NewHostClient(cfg),
+		Page:     NewPageClient(cfg),
+		User:     NewUserClient(cfg),
 	}, nil
 }
 
@@ -157,18 +162,19 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 	cfg := c.config
 	cfg.driver = &txDriver{tx: tx, drv: c.driver}
 	return &Tx{
-		ctx:    ctx,
-		config: cfg,
-		Host:   NewHostClient(cfg),
-		Page:   NewPageClient(cfg),
-		User:   NewUserClient(cfg),
+		ctx:      ctx,
+		config:   cfg,
+		FileType: NewFileTypeClient(cfg),
+		Host:     NewHostClient(cfg),
+		Page:     NewPageClient(cfg),
+		User:     NewUserClient(cfg),
 	}, nil
 }
 
 // Debug returns a new debug-client. It's used to get verbose logging on specific operations.
 //
 //	client.Debug().
-//		Host.
+//		FileType.
 //		Query().
 //		Count(ctx)
 func (c *Client) Debug() *Client {
@@ -190,6 +196,7 @@ func (c *Client) Close() error {
 // Use adds the mutation hooks to all the entity clients.
 // In order to add hooks to a specific client, call: `client.Node.Use(...)`.
 func (c *Client) Use(hooks ...Hook) {
+	c.FileType.Use(hooks...)
 	c.Host.Use(hooks...)
 	c.Page.Use(hooks...)
 	c.User.Use(hooks...)
@@ -198,6 +205,7 @@ func (c *Client) Use(hooks ...Hook) {
 // Intercept adds the query interceptors to all the entity clients.
 // In order to add interceptors to a specific client, call: `client.Node.Intercept(...)`.
 func (c *Client) Intercept(interceptors ...Interceptor) {
+	c.FileType.Intercept(interceptors...)
 	c.Host.Intercept(interceptors...)
 	c.Page.Intercept(interceptors...)
 	c.User.Intercept(interceptors...)
@@ -206,6 +214,8 @@ func (c *Client) Intercept(interceptors ...Interceptor) {
 // Mutate implements the ent.Mutator interface.
 func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 	switch m := m.(type) {
+	case *FileTypeMutation:
+		return c.FileType.mutate(ctx, m)
 	case *HostMutation:
 		return c.Host.mutate(ctx, m)
 	case *PageMutation:
@@ -214,6 +224,139 @@ func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 		return c.User.mutate(ctx, m)
 	default:
 		return nil, fmt.Errorf("ent: unknown mutation type %T", m)
+	}
+}
+
+// FileTypeClient is a client for the FileType schema.
+type FileTypeClient struct {
+	config
+}
+
+// NewFileTypeClient returns a client for the FileType from the given config.
+func NewFileTypeClient(c config) *FileTypeClient {
+	return &FileTypeClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `filetype.Hooks(f(g(h())))`.
+func (c *FileTypeClient) Use(hooks ...Hook) {
+	c.hooks.FileType = append(c.hooks.FileType, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `filetype.Intercept(f(g(h())))`.
+func (c *FileTypeClient) Intercept(interceptors ...Interceptor) {
+	c.inters.FileType = append(c.inters.FileType, interceptors...)
+}
+
+// Create returns a builder for creating a FileType entity.
+func (c *FileTypeClient) Create() *FileTypeCreate {
+	mutation := newFileTypeMutation(c.config, OpCreate)
+	return &FileTypeCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of FileType entities.
+func (c *FileTypeClient) CreateBulk(builders ...*FileTypeCreate) *FileTypeCreateBulk {
+	return &FileTypeCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *FileTypeClient) MapCreateBulk(slice any, setFunc func(*FileTypeCreate, int)) *FileTypeCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &FileTypeCreateBulk{err: fmt.Errorf("calling to FileTypeClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*FileTypeCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &FileTypeCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for FileType.
+func (c *FileTypeClient) Update() *FileTypeUpdate {
+	mutation := newFileTypeMutation(c.config, OpUpdate)
+	return &FileTypeUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *FileTypeClient) UpdateOne(ft *FileType) *FileTypeUpdateOne {
+	mutation := newFileTypeMutation(c.config, OpUpdateOne, withFileType(ft))
+	return &FileTypeUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *FileTypeClient) UpdateOneID(id int64) *FileTypeUpdateOne {
+	mutation := newFileTypeMutation(c.config, OpUpdateOne, withFileTypeID(id))
+	return &FileTypeUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for FileType.
+func (c *FileTypeClient) Delete() *FileTypeDelete {
+	mutation := newFileTypeMutation(c.config, OpDelete)
+	return &FileTypeDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *FileTypeClient) DeleteOne(ft *FileType) *FileTypeDeleteOne {
+	return c.DeleteOneID(ft.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *FileTypeClient) DeleteOneID(id int64) *FileTypeDeleteOne {
+	builder := c.Delete().Where(filetype.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &FileTypeDeleteOne{builder}
+}
+
+// Query returns a query builder for FileType.
+func (c *FileTypeClient) Query() *FileTypeQuery {
+	return &FileTypeQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeFileType},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a FileType entity by its id.
+func (c *FileTypeClient) Get(ctx context.Context, id int64) (*FileType, error) {
+	return c.Query().Where(filetype.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *FileTypeClient) GetX(ctx context.Context, id int64) *FileType {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// Hooks returns the client hooks.
+func (c *FileTypeClient) Hooks() []Hook {
+	return c.hooks.FileType
+}
+
+// Interceptors returns the client interceptors.
+func (c *FileTypeClient) Interceptors() []Interceptor {
+	return c.inters.FileType
+}
+
+func (c *FileTypeClient) mutate(ctx context.Context, m *FileTypeMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&FileTypeCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&FileTypeUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&FileTypeUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&FileTypeDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown FileType mutation op: %q", m.Op())
 	}
 }
 
@@ -619,9 +762,9 @@ func (c *UserClient) mutate(ctx context.Context, m *UserMutation) (Value, error)
 // hooks and interceptors per client, for fast access.
 type (
 	hooks struct {
-		Host, Page, User []ent.Hook
+		FileType, Host, Page, User []ent.Hook
 	}
 	inters struct {
-		Host, Page, User []ent.Interceptor
+		FileType, Host, Page, User []ent.Interceptor
 	}
 )

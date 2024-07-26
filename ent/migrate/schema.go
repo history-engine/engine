@@ -9,6 +9,28 @@ import (
 )
 
 var (
+	// FileTypeColumns holds the columns for the "file_type" table.
+	FileTypeColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt64, Increment: true},
+		{Name: "user_id", Type: field.TypeInt64},
+		{Name: "suffix", Type: field.TypeString, Size: 100},
+		{Name: "type", Type: field.TypeInt, Default: 0},
+		{Name: "created_at", Type: field.TypeTime},
+		{Name: "updated_at", Type: field.TypeTime},
+	}
+	// FileTypeTable holds the schema information for the "file_type" table.
+	FileTypeTable = &schema.Table{
+		Name:       "file_type",
+		Columns:    FileTypeColumns,
+		PrimaryKey: []*schema.Column{FileTypeColumns[0]},
+		Indexes: []*schema.Index{
+			{
+				Name:    "filetype_user_id_suffix",
+				Unique:  true,
+				Columns: []*schema.Column{FileTypeColumns[1], FileTypeColumns[2]},
+			},
+		},
+	}
 	// HostColumns holds the columns for the "host" table.
 	HostColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt64, Increment: true},
@@ -77,6 +99,7 @@ var (
 	}
 	// Tables holds all the tables in the schema.
 	Tables = []*schema.Table{
+		FileTypeTable,
 		HostTable,
 		PageTable,
 		UserTable,
@@ -84,6 +107,9 @@ var (
 )
 
 func init() {
+	FileTypeTable.Annotation = &entsql.Annotation{
+		Table: "file_type",
+	}
 	HostTable.Annotation = &entsql.Annotation{
 		Table: "host",
 	}

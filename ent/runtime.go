@@ -3,6 +3,7 @@
 package ent
 
 import (
+	"history-engine/engine/ent/filetype"
 	"history-engine/engine/ent/host"
 	"history-engine/engine/ent/page"
 	"history-engine/engine/ent/schema"
@@ -14,6 +15,28 @@ import (
 // (default values, validators, hooks and policies) and stitches it
 // to their package variables.
 func init() {
+	filetypeFields := schema.FileType{}.Fields()
+	_ = filetypeFields
+	// filetypeDescSuffix is the schema descriptor for suffix field.
+	filetypeDescSuffix := filetypeFields[2].Descriptor()
+	// filetype.SuffixValidator is a validator for the "suffix" field. It is called by the builders before save.
+	filetype.SuffixValidator = filetypeDescSuffix.Validators[0].(func(string) error)
+	// filetypeDescType is the schema descriptor for type field.
+	filetypeDescType := filetypeFields[3].Descriptor()
+	// filetype.DefaultType holds the default value on creation for the type field.
+	filetype.DefaultType = filetypeDescType.Default.(int)
+	// filetype.TypeValidator is a validator for the "type" field. It is called by the builders before save.
+	filetype.TypeValidator = filetypeDescType.Validators[0].(func(int) error)
+	// filetypeDescCreatedAt is the schema descriptor for created_at field.
+	filetypeDescCreatedAt := filetypeFields[4].Descriptor()
+	// filetype.DefaultCreatedAt holds the default value on creation for the created_at field.
+	filetype.DefaultCreatedAt = filetypeDescCreatedAt.Default.(func() time.Time)
+	// filetypeDescUpdatedAt is the schema descriptor for updated_at field.
+	filetypeDescUpdatedAt := filetypeFields[5].Descriptor()
+	// filetype.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	filetype.DefaultUpdatedAt = filetypeDescUpdatedAt.Default.(func() time.Time)
+	// filetype.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	filetype.UpdateDefaultUpdatedAt = filetypeDescUpdatedAt.UpdateDefault.(func() time.Time)
 	hostFields := schema.Host{}.Fields()
 	_ = hostFields
 	// hostDescHost is the schema descriptor for host field.
