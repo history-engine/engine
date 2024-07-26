@@ -39,6 +39,7 @@ func runLostCheck(ctx *cli.Context) error {
 
 		root := fmt.Sprintf("%s/%d", setting.SingleFile.HtmlPath, user.ID)
 		if !utils.PathExist(root) {
+			logger.Zap().Info("user html root not exist：" + root)
 			continue
 		}
 
@@ -51,12 +52,15 @@ func runLostCheck(ctx *cli.Context) error {
 		})
 
 		for file, size := range files {
+			logger.Zap().Info("find lost data", zap.String("path", file))
+
 			split := strings.Split(file, "/")
 			name := split[len(split)-1]
 			split = strings.Split(name, ".")
 			uniqueId := split[0]
 			version, err := strconv.Atoi(split[1])
 			if err != nil {
+				logger.Zap().Warn("version conv err", zap.String("version", split[1]))
 				continue
 			}
 
@@ -70,20 +74,26 @@ func runLostCheck(ctx *cli.Context) error {
 			head := make([]byte, 2048)
 			f, err := os.Open(file)
 			if err != nil {
+				logger.Zap().Warn("open html file err", zap.Error(err), zap.String("file", file))
 				continue
 			}
 
 			_, err = f.Read(head)
 			if err != nil {
+				logger.Zap().Warn("read html file err", zap.Error(err), zap.String("file", file))
 				continue
 			}
 
 			url := readability.Parser().ExtractSingleFileUrl(head)
 			if len(url) == 0 || (!host.Include(user.ID, url) && host.Exclude(user.ID, url)) {
+				_ = os.Remove(file)
+				logger.Zap().Info("ignore by rule: " + url)
 				continue
 			}
 
 			if !filetype.Include(user.ID, url) && filetype.Exclude(user.ID, url) {
+				_ = os.Remove(file)
+				logger.Zap().Info("ignore by suffix: " + url)
 				continue
 			}
 
@@ -97,13 +107,13 @@ func runLostCheck(ctx *cli.Context) error {
 				SetSize(int(size)).
 				Save(ctx.Context)
 			if err != nil {
+				logger.Zap().Warn("create page err", zap.Error(err), zap.String("file", file))
 				continue
 			}
 
 			if err := page.ParserPageWithId(row.ID); err != nil {
-				panic(err)
+				logger.Zap().Warn("parse page err", zap.Error(err), zap.String("file", file), zap.Int64("id", row.ID))
 			}
-			logger.Zap().Info("find lost data", zap.String("path", file), zap.Int64("new id", row.ID))
 		}
 	}
 
