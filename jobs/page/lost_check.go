@@ -7,6 +7,7 @@ import (
 	entPage "history-engine/engine/ent/page"
 	"history-engine/engine/library/db"
 	"history-engine/engine/library/logger"
+	"history-engine/engine/service/filetype"
 	"history-engine/engine/service/host"
 	"history-engine/engine/service/page"
 	"history-engine/engine/service/readability"
@@ -79,6 +80,10 @@ func runLostCheck(ctx *cli.Context) error {
 
 			url := readability.Parser().ExtractSingleFileUrl(head)
 			if len(url) == 0 || (!host.Include(user.ID, url) && host.Exclude(user.ID, url)) {
+				continue
+			}
+
+			if !filetype.Include(user.ID, url) && filetype.Exclude(user.ID, url) {
 				continue
 			}
 

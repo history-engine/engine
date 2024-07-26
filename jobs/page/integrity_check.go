@@ -7,6 +7,7 @@ import (
 	entPage "history-engine/engine/ent/page"
 	"history-engine/engine/library/db"
 	"history-engine/engine/library/logger"
+	"history-engine/engine/service/filetype"
 	"history-engine/engine/service/host"
 	"history-engine/engine/service/page"
 	"history-engine/engine/service/zincsearch"
@@ -40,6 +41,11 @@ func runIntegrityCheck(ctx *cli.Context) error {
 		time.Sleep(time.Millisecond * 100)
 
 		for _, item := range list {
+			if !filetype.Include(item.UserID, item.URL) && filetype.Exclude(item.UserID, item.URL) {
+				logger.Zap().Info("ignore by suffix: " + item.URL)
+				continue
+			}
+
 			if !host.Include(item.UserID, item.URL) {
 				if host.Exclude(item.UserID, item.URL) {
 					logger.Zap().Info("ignore by rule: " + item.URL)

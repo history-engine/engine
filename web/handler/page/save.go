@@ -7,6 +7,7 @@ import (
 	"go.uber.org/zap"
 	"history-engine/engine/ent"
 	"history-engine/engine/library/logger"
+	"history-engine/engine/service/filetype"
 	"history-engine/engine/service/host"
 	"history-engine/engine/service/page"
 	"history-engine/engine/setting"
@@ -39,11 +40,14 @@ func Save(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, nil)
 	}
 
-	if !host.Include(userId, url) {
-		if host.Exclude(userId, url) {
-			logger.Zap().Info("ignore by rule: " + url)
-			return c.JSON(http.StatusOK, nil)
-		}
+	if !filetype.Include(userId, url) && filetype.Exclude(userId, url) {
+		logger.Zap().Info("ignore by suffix: " + url)
+		return c.JSON(http.StatusOK, nil)
+	}
+
+	if !host.Include(userId, url) && host.Exclude(userId, url) {
+		logger.Zap().Info("ignore by rule: " + url)
+		return c.JSON(http.StatusOK, nil)
 	}
 
 	uniqueId := utils.Md5str(url) // todo 自定义
