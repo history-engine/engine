@@ -25,6 +25,10 @@ type Page struct {
 	Version int `json:"version,omitempty"`
 	// 页面标题
 	Title string `json:"title,omitempty"`
+	// 摘要
+	Excerpt string `json:"excerpt,omitempty"`
+	// 提取后的内容
+	Content string `json:"content,omitempty"`
 	// 原始地址
 	URL string `json:"url,omitempty"`
 	// 完整本地文件地址
@@ -47,7 +51,7 @@ func (*Page) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case page.FieldID, page.FieldUserID, page.FieldVersion, page.FieldSize:
 			values[i] = new(sql.NullInt64)
-		case page.FieldUniqueID, page.FieldTitle, page.FieldURL, page.FieldPath:
+		case page.FieldUniqueID, page.FieldTitle, page.FieldExcerpt, page.FieldContent, page.FieldURL, page.FieldPath:
 			values[i] = new(sql.NullString)
 		case page.FieldIndexedAt, page.FieldCreatedAt, page.FieldUpdatedAt:
 			values[i] = new(sql.NullTime)
@@ -95,6 +99,18 @@ func (pa *Page) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field title", values[i])
 			} else if value.Valid {
 				pa.Title = value.String
+			}
+		case page.FieldExcerpt:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field excerpt", values[i])
+			} else if value.Valid {
+				pa.Excerpt = value.String
+			}
+		case page.FieldContent:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field content", values[i])
+			} else if value.Valid {
+				pa.Content = value.String
 			}
 		case page.FieldURL:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -179,6 +195,12 @@ func (pa *Page) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("title=")
 	builder.WriteString(pa.Title)
+	builder.WriteString(", ")
+	builder.WriteString("excerpt=")
+	builder.WriteString(pa.Excerpt)
+	builder.WriteString(", ")
+	builder.WriteString("content=")
+	builder.WriteString(pa.Content)
 	builder.WriteString(", ")
 	builder.WriteString("url=")
 	builder.WriteString(pa.URL)

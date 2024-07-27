@@ -21,6 +21,10 @@ const (
 	FieldVersion = "version"
 	// FieldTitle holds the string denoting the title field in the database.
 	FieldTitle = "title"
+	// FieldExcerpt holds the string denoting the excerpt field in the database.
+	FieldExcerpt = "excerpt"
+	// FieldContent holds the string denoting the content field in the database.
+	FieldContent = "content"
 	// FieldURL holds the string denoting the url field in the database.
 	FieldURL = "url"
 	// FieldPath holds the string denoting the path field in the database.
@@ -44,6 +48,8 @@ var Columns = []string{
 	FieldUniqueID,
 	FieldVersion,
 	FieldTitle,
+	FieldExcerpt,
+	FieldContent,
 	FieldURL,
 	FieldPath,
 	FieldSize,
@@ -71,6 +77,12 @@ var (
 	DefaultTitle string
 	// TitleValidator is a validator for the "title" field. It is called by the builders before save.
 	TitleValidator func(string) error
+	// DefaultExcerpt holds the default value on creation for the "excerpt" field.
+	DefaultExcerpt string
+	// ExcerptValidator is a validator for the "excerpt" field. It is called by the builders before save.
+	ExcerptValidator func(string) error
+	// DefaultContent holds the default value on creation for the "content" field.
+	DefaultContent string
 	// URLValidator is a validator for the "url" field. It is called by the builders before save.
 	URLValidator func(string) error
 	// PathValidator is a validator for the "path" field. It is called by the builders before save.
@@ -113,6 +125,16 @@ func ByVersion(opts ...sql.OrderTermOption) OrderOption {
 // ByTitle orders the results by the title field.
 func ByTitle(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldTitle, opts...).ToFunc()
+}
+
+// ByExcerpt orders the results by the excerpt field.
+func ByExcerpt(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldExcerpt, opts...).ToFunc()
+}
+
+// ByContent orders the results by the content field.
+func ByContent(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldContent, opts...).ToFunc()
 }
 
 // ByURL orders the results by the url field.

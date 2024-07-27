@@ -74,6 +74,16 @@ func Title(v string) predicate.Page {
 	return predicate.Page(sql.FieldEQ(FieldTitle, v))
 }
 
+// Excerpt applies equality check predicate on the "excerpt" field. It's identical to ExcerptEQ.
+func Excerpt(v string) predicate.Page {
+	return predicate.Page(sql.FieldEQ(FieldExcerpt, v))
+}
+
+// Content applies equality check predicate on the "content" field. It's identical to ContentEQ.
+func Content(v string) predicate.Page {
+	return predicate.Page(sql.FieldEQ(FieldContent, v))
+}
+
 // URL applies equality check predicate on the "url" field. It's identical to URLEQ.
 func URL(v string) predicate.Page {
 	return predicate.Page(sql.FieldEQ(FieldURL, v))
@@ -312,6 +322,136 @@ func TitleEqualFold(v string) predicate.Page {
 // TitleContainsFold applies the ContainsFold predicate on the "title" field.
 func TitleContainsFold(v string) predicate.Page {
 	return predicate.Page(sql.FieldContainsFold(FieldTitle, v))
+}
+
+// ExcerptEQ applies the EQ predicate on the "excerpt" field.
+func ExcerptEQ(v string) predicate.Page {
+	return predicate.Page(sql.FieldEQ(FieldExcerpt, v))
+}
+
+// ExcerptNEQ applies the NEQ predicate on the "excerpt" field.
+func ExcerptNEQ(v string) predicate.Page {
+	return predicate.Page(sql.FieldNEQ(FieldExcerpt, v))
+}
+
+// ExcerptIn applies the In predicate on the "excerpt" field.
+func ExcerptIn(vs ...string) predicate.Page {
+	return predicate.Page(sql.FieldIn(FieldExcerpt, vs...))
+}
+
+// ExcerptNotIn applies the NotIn predicate on the "excerpt" field.
+func ExcerptNotIn(vs ...string) predicate.Page {
+	return predicate.Page(sql.FieldNotIn(FieldExcerpt, vs...))
+}
+
+// ExcerptGT applies the GT predicate on the "excerpt" field.
+func ExcerptGT(v string) predicate.Page {
+	return predicate.Page(sql.FieldGT(FieldExcerpt, v))
+}
+
+// ExcerptGTE applies the GTE predicate on the "excerpt" field.
+func ExcerptGTE(v string) predicate.Page {
+	return predicate.Page(sql.FieldGTE(FieldExcerpt, v))
+}
+
+// ExcerptLT applies the LT predicate on the "excerpt" field.
+func ExcerptLT(v string) predicate.Page {
+	return predicate.Page(sql.FieldLT(FieldExcerpt, v))
+}
+
+// ExcerptLTE applies the LTE predicate on the "excerpt" field.
+func ExcerptLTE(v string) predicate.Page {
+	return predicate.Page(sql.FieldLTE(FieldExcerpt, v))
+}
+
+// ExcerptContains applies the Contains predicate on the "excerpt" field.
+func ExcerptContains(v string) predicate.Page {
+	return predicate.Page(sql.FieldContains(FieldExcerpt, v))
+}
+
+// ExcerptHasPrefix applies the HasPrefix predicate on the "excerpt" field.
+func ExcerptHasPrefix(v string) predicate.Page {
+	return predicate.Page(sql.FieldHasPrefix(FieldExcerpt, v))
+}
+
+// ExcerptHasSuffix applies the HasSuffix predicate on the "excerpt" field.
+func ExcerptHasSuffix(v string) predicate.Page {
+	return predicate.Page(sql.FieldHasSuffix(FieldExcerpt, v))
+}
+
+// ExcerptEqualFold applies the EqualFold predicate on the "excerpt" field.
+func ExcerptEqualFold(v string) predicate.Page {
+	return predicate.Page(sql.FieldEqualFold(FieldExcerpt, v))
+}
+
+// ExcerptContainsFold applies the ContainsFold predicate on the "excerpt" field.
+func ExcerptContainsFold(v string) predicate.Page {
+	return predicate.Page(sql.FieldContainsFold(FieldExcerpt, v))
+}
+
+// ContentEQ applies the EQ predicate on the "content" field.
+func ContentEQ(v string) predicate.Page {
+	return predicate.Page(sql.FieldEQ(FieldContent, v))
+}
+
+// ContentNEQ applies the NEQ predicate on the "content" field.
+func ContentNEQ(v string) predicate.Page {
+	return predicate.Page(sql.FieldNEQ(FieldContent, v))
+}
+
+// ContentIn applies the In predicate on the "content" field.
+func ContentIn(vs ...string) predicate.Page {
+	return predicate.Page(sql.FieldIn(FieldContent, vs...))
+}
+
+// ContentNotIn applies the NotIn predicate on the "content" field.
+func ContentNotIn(vs ...string) predicate.Page {
+	return predicate.Page(sql.FieldNotIn(FieldContent, vs...))
+}
+
+// ContentGT applies the GT predicate on the "content" field.
+func ContentGT(v string) predicate.Page {
+	return predicate.Page(sql.FieldGT(FieldContent, v))
+}
+
+// ContentGTE applies the GTE predicate on the "content" field.
+func ContentGTE(v string) predicate.Page {
+	return predicate.Page(sql.FieldGTE(FieldContent, v))
+}
+
+// ContentLT applies the LT predicate on the "content" field.
+func ContentLT(v string) predicate.Page {
+	return predicate.Page(sql.FieldLT(FieldContent, v))
+}
+
+// ContentLTE applies the LTE predicate on the "content" field.
+func ContentLTE(v string) predicate.Page {
+	return predicate.Page(sql.FieldLTE(FieldContent, v))
+}
+
+// ContentContains applies the Contains predicate on the "content" field.
+func ContentContains(v string) predicate.Page {
+	return predicate.Page(sql.FieldContains(FieldContent, v))
+}
+
+// ContentHasPrefix applies the HasPrefix predicate on the "content" field.
+func ContentHasPrefix(v string) predicate.Page {
+	return predicate.Page(sql.FieldHasPrefix(FieldContent, v))
+}
+
+// ContentHasSuffix applies the HasSuffix predicate on the "content" field.
+func ContentHasSuffix(v string) predicate.Page {
+	return predicate.Page(sql.FieldHasSuffix(FieldContent, v))
+}
+
+// ContentEqualFold applies the EqualFold predicate on the "content" field.
+func ContentEqualFold(v string) predicate.Page {
+	return predicate.Page(sql.FieldEqualFold(FieldContent, v))
+}
+
+// ContentContainsFold applies the ContainsFold predicate on the "content" field.
+func ContentContainsFold(v string) predicate.Page {
+	return predicate.Page(sql.FieldContainsFold(FieldContent, v))
 }
 
 // URLEQ applies the EQ predicate on the "url" field.

@@ -60,6 +60,34 @@ func (pc *PageCreate) SetNillableTitle(s *string) *PageCreate {
 	return pc
 }
 
+// SetExcerpt sets the "excerpt" field.
+func (pc *PageCreate) SetExcerpt(s string) *PageCreate {
+	pc.mutation.SetExcerpt(s)
+	return pc
+}
+
+// SetNillableExcerpt sets the "excerpt" field if the given value is not nil.
+func (pc *PageCreate) SetNillableExcerpt(s *string) *PageCreate {
+	if s != nil {
+		pc.SetExcerpt(*s)
+	}
+	return pc
+}
+
+// SetContent sets the "content" field.
+func (pc *PageCreate) SetContent(s string) *PageCreate {
+	pc.mutation.SetContent(s)
+	return pc
+}
+
+// SetNillableContent sets the "content" field if the given value is not nil.
+func (pc *PageCreate) SetNillableContent(s *string) *PageCreate {
+	if s != nil {
+		pc.SetContent(*s)
+	}
+	return pc
+}
+
 // SetURL sets the "url" field.
 func (pc *PageCreate) SetURL(s string) *PageCreate {
 	pc.mutation.SetURL(s)
@@ -177,6 +205,14 @@ func (pc *PageCreate) defaults() {
 		v := page.DefaultTitle
 		pc.mutation.SetTitle(v)
 	}
+	if _, ok := pc.mutation.Excerpt(); !ok {
+		v := page.DefaultExcerpt
+		pc.mutation.SetExcerpt(v)
+	}
+	if _, ok := pc.mutation.Content(); !ok {
+		v := page.DefaultContent
+		pc.mutation.SetContent(v)
+	}
 	if _, ok := pc.mutation.Size(); !ok {
 		v := page.DefaultSize
 		pc.mutation.SetSize(v)
@@ -218,6 +254,17 @@ func (pc *PageCreate) check() error {
 		if err := page.TitleValidator(v); err != nil {
 			return &ValidationError{Name: "title", err: fmt.Errorf(`ent: validator failed for field "Page.title": %w`, err)}
 		}
+	}
+	if _, ok := pc.mutation.Excerpt(); !ok {
+		return &ValidationError{Name: "excerpt", err: errors.New(`ent: missing required field "Page.excerpt"`)}
+	}
+	if v, ok := pc.mutation.Excerpt(); ok {
+		if err := page.ExcerptValidator(v); err != nil {
+			return &ValidationError{Name: "excerpt", err: fmt.Errorf(`ent: validator failed for field "Page.excerpt": %w`, err)}
+		}
+	}
+	if _, ok := pc.mutation.Content(); !ok {
+		return &ValidationError{Name: "content", err: errors.New(`ent: missing required field "Page.content"`)}
 	}
 	if _, ok := pc.mutation.URL(); !ok {
 		return &ValidationError{Name: "url", err: errors.New(`ent: missing required field "Page.url"`)}
@@ -294,6 +341,14 @@ func (pc *PageCreate) createSpec() (*Page, *sqlgraph.CreateSpec) {
 	if value, ok := pc.mutation.Title(); ok {
 		_spec.SetField(page.FieldTitle, field.TypeString, value)
 		_node.Title = value
+	}
+	if value, ok := pc.mutation.Excerpt(); ok {
+		_spec.SetField(page.FieldExcerpt, field.TypeString, value)
+		_node.Excerpt = value
+	}
+	if value, ok := pc.mutation.Content(); ok {
+		_spec.SetField(page.FieldContent, field.TypeString, value)
+		_node.Content = value
 	}
 	if value, ok := pc.mutation.URL(); ok {
 		_spec.SetField(page.FieldURL, field.TypeString, value)

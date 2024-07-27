@@ -75,28 +75,38 @@ func init() {
 	page.DefaultTitle = pageDescTitle.Default.(string)
 	// page.TitleValidator is a validator for the "title" field. It is called by the builders before save.
 	page.TitleValidator = pageDescTitle.Validators[0].(func(string) error)
+	// pageDescExcerpt is the schema descriptor for excerpt field.
+	pageDescExcerpt := pageFields[5].Descriptor()
+	// page.DefaultExcerpt holds the default value on creation for the excerpt field.
+	page.DefaultExcerpt = pageDescExcerpt.Default.(string)
+	// page.ExcerptValidator is a validator for the "excerpt" field. It is called by the builders before save.
+	page.ExcerptValidator = pageDescExcerpt.Validators[0].(func(string) error)
+	// pageDescContent is the schema descriptor for content field.
+	pageDescContent := pageFields[6].Descriptor()
+	// page.DefaultContent holds the default value on creation for the content field.
+	page.DefaultContent = pageDescContent.Default.(string)
 	// pageDescURL is the schema descriptor for url field.
-	pageDescURL := pageFields[5].Descriptor()
+	pageDescURL := pageFields[7].Descriptor()
 	// page.URLValidator is a validator for the "url" field. It is called by the builders before save.
 	page.URLValidator = pageDescURL.Validators[0].(func(string) error)
 	// pageDescPath is the schema descriptor for path field.
-	pageDescPath := pageFields[6].Descriptor()
+	pageDescPath := pageFields[8].Descriptor()
 	// page.PathValidator is a validator for the "path" field. It is called by the builders before save.
 	page.PathValidator = pageDescPath.Validators[0].(func(string) error)
 	// pageDescSize is the schema descriptor for size field.
-	pageDescSize := pageFields[7].Descriptor()
+	pageDescSize := pageFields[9].Descriptor()
 	// page.DefaultSize holds the default value on creation for the size field.
 	page.DefaultSize = pageDescSize.Default.(int)
 	// pageDescIndexedAt is the schema descriptor for indexed_at field.
-	pageDescIndexedAt := pageFields[8].Descriptor()
+	pageDescIndexedAt := pageFields[10].Descriptor()
 	// page.DefaultIndexedAt holds the default value on creation for the indexed_at field.
 	page.DefaultIndexedAt = pageDescIndexedAt.Default.(time.Time)
 	// pageDescCreatedAt is the schema descriptor for created_at field.
-	pageDescCreatedAt := pageFields[9].Descriptor()
+	pageDescCreatedAt := pageFields[11].Descriptor()
 	// page.DefaultCreatedAt holds the default value on creation for the created_at field.
 	page.DefaultCreatedAt = pageDescCreatedAt.Default.(func() time.Time)
 	// pageDescUpdatedAt is the schema descriptor for updated_at field.
-	pageDescUpdatedAt := pageFields[10].Descriptor()
+	pageDescUpdatedAt := pageFields[12].Descriptor()
 	// page.DefaultUpdatedAt holds the default value on creation for the updated_at field.
 	page.DefaultUpdatedAt = pageDescUpdatedAt.Default.(func() time.Time)
 	// page.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.

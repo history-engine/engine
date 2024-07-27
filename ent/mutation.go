@@ -1279,6 +1279,8 @@ type PageMutation struct {
 	version       *int
 	addversion    *int
 	title         *string
+	excerpt       *string
+	content       *string
 	url           *string
 	_path         *string
 	size          *int
@@ -1580,6 +1582,78 @@ func (m *PageMutation) ResetTitle() {
 	m.title = nil
 }
 
+// SetExcerpt sets the "excerpt" field.
+func (m *PageMutation) SetExcerpt(s string) {
+	m.excerpt = &s
+}
+
+// Excerpt returns the value of the "excerpt" field in the mutation.
+func (m *PageMutation) Excerpt() (r string, exists bool) {
+	v := m.excerpt
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldExcerpt returns the old "excerpt" field's value of the Page entity.
+// If the Page object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *PageMutation) OldExcerpt(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldExcerpt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldExcerpt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldExcerpt: %w", err)
+	}
+	return oldValue.Excerpt, nil
+}
+
+// ResetExcerpt resets all changes to the "excerpt" field.
+func (m *PageMutation) ResetExcerpt() {
+	m.excerpt = nil
+}
+
+// SetContent sets the "content" field.
+func (m *PageMutation) SetContent(s string) {
+	m.content = &s
+}
+
+// Content returns the value of the "content" field in the mutation.
+func (m *PageMutation) Content() (r string, exists bool) {
+	v := m.content
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldContent returns the old "content" field's value of the Page entity.
+// If the Page object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *PageMutation) OldContent(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldContent is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldContent requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldContent: %w", err)
+	}
+	return oldValue.Content, nil
+}
+
+// ResetContent resets all changes to the "content" field.
+func (m *PageMutation) ResetContent() {
+	m.content = nil
+}
+
 // SetURL sets the "url" field.
 func (m *PageMutation) SetURL(s string) {
 	m.url = &s
@@ -1850,7 +1924,7 @@ func (m *PageMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *PageMutation) Fields() []string {
-	fields := make([]string, 0, 10)
+	fields := make([]string, 0, 12)
 	if m.user_id != nil {
 		fields = append(fields, page.FieldUserID)
 	}
@@ -1862,6 +1936,12 @@ func (m *PageMutation) Fields() []string {
 	}
 	if m.title != nil {
 		fields = append(fields, page.FieldTitle)
+	}
+	if m.excerpt != nil {
+		fields = append(fields, page.FieldExcerpt)
+	}
+	if m.content != nil {
+		fields = append(fields, page.FieldContent)
 	}
 	if m.url != nil {
 		fields = append(fields, page.FieldURL)
@@ -1897,6 +1977,10 @@ func (m *PageMutation) Field(name string) (ent.Value, bool) {
 		return m.Version()
 	case page.FieldTitle:
 		return m.Title()
+	case page.FieldExcerpt:
+		return m.Excerpt()
+	case page.FieldContent:
+		return m.Content()
 	case page.FieldURL:
 		return m.URL()
 	case page.FieldPath:
@@ -1926,6 +2010,10 @@ func (m *PageMutation) OldField(ctx context.Context, name string) (ent.Value, er
 		return m.OldVersion(ctx)
 	case page.FieldTitle:
 		return m.OldTitle(ctx)
+	case page.FieldExcerpt:
+		return m.OldExcerpt(ctx)
+	case page.FieldContent:
+		return m.OldContent(ctx)
 	case page.FieldURL:
 		return m.OldURL(ctx)
 	case page.FieldPath:
@@ -1974,6 +2062,20 @@ func (m *PageMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetTitle(v)
+		return nil
+	case page.FieldExcerpt:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetExcerpt(v)
+		return nil
+	case page.FieldContent:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetContent(v)
 		return nil
 	case page.FieldURL:
 		v, ok := value.(string)
@@ -2116,6 +2218,12 @@ func (m *PageMutation) ResetField(name string) error {
 		return nil
 	case page.FieldTitle:
 		m.ResetTitle()
+		return nil
+	case page.FieldExcerpt:
+		m.ResetExcerpt()
+		return nil
+	case page.FieldContent:
+		m.ResetContent()
 		return nil
 	case page.FieldURL:
 		m.ResetURL()

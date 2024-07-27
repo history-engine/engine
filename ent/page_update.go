@@ -84,6 +84,34 @@ func (pu *PageUpdate) SetNillableTitle(s *string) *PageUpdate {
 	return pu
 }
 
+// SetExcerpt sets the "excerpt" field.
+func (pu *PageUpdate) SetExcerpt(s string) *PageUpdate {
+	pu.mutation.SetExcerpt(s)
+	return pu
+}
+
+// SetNillableExcerpt sets the "excerpt" field if the given value is not nil.
+func (pu *PageUpdate) SetNillableExcerpt(s *string) *PageUpdate {
+	if s != nil {
+		pu.SetExcerpt(*s)
+	}
+	return pu
+}
+
+// SetContent sets the "content" field.
+func (pu *PageUpdate) SetContent(s string) *PageUpdate {
+	pu.mutation.SetContent(s)
+	return pu
+}
+
+// SetNillableContent sets the "content" field if the given value is not nil.
+func (pu *PageUpdate) SetNillableContent(s *string) *PageUpdate {
+	if s != nil {
+		pu.SetContent(*s)
+	}
+	return pu
+}
+
 // SetURL sets the "url" field.
 func (pu *PageUpdate) SetURL(s string) *PageUpdate {
 	pu.mutation.SetURL(s)
@@ -201,6 +229,11 @@ func (pu *PageUpdate) check() error {
 			return &ValidationError{Name: "title", err: fmt.Errorf(`ent: validator failed for field "Page.title": %w`, err)}
 		}
 	}
+	if v, ok := pu.mutation.Excerpt(); ok {
+		if err := page.ExcerptValidator(v); err != nil {
+			return &ValidationError{Name: "excerpt", err: fmt.Errorf(`ent: validator failed for field "Page.excerpt": %w`, err)}
+		}
+	}
 	if v, ok := pu.mutation.URL(); ok {
 		if err := page.URLValidator(v); err != nil {
 			return &ValidationError{Name: "url", err: fmt.Errorf(`ent: validator failed for field "Page.url": %w`, err)}
@@ -240,6 +273,12 @@ func (pu *PageUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if value, ok := pu.mutation.Title(); ok {
 		_spec.SetField(page.FieldTitle, field.TypeString, value)
+	}
+	if value, ok := pu.mutation.Excerpt(); ok {
+		_spec.SetField(page.FieldExcerpt, field.TypeString, value)
+	}
+	if value, ok := pu.mutation.Content(); ok {
+		_spec.SetField(page.FieldContent, field.TypeString, value)
 	}
 	if value, ok := pu.mutation.URL(); ok {
 		_spec.SetField(page.FieldURL, field.TypeString, value)
@@ -331,6 +370,34 @@ func (puo *PageUpdateOne) SetTitle(s string) *PageUpdateOne {
 func (puo *PageUpdateOne) SetNillableTitle(s *string) *PageUpdateOne {
 	if s != nil {
 		puo.SetTitle(*s)
+	}
+	return puo
+}
+
+// SetExcerpt sets the "excerpt" field.
+func (puo *PageUpdateOne) SetExcerpt(s string) *PageUpdateOne {
+	puo.mutation.SetExcerpt(s)
+	return puo
+}
+
+// SetNillableExcerpt sets the "excerpt" field if the given value is not nil.
+func (puo *PageUpdateOne) SetNillableExcerpt(s *string) *PageUpdateOne {
+	if s != nil {
+		puo.SetExcerpt(*s)
+	}
+	return puo
+}
+
+// SetContent sets the "content" field.
+func (puo *PageUpdateOne) SetContent(s string) *PageUpdateOne {
+	puo.mutation.SetContent(s)
+	return puo
+}
+
+// SetNillableContent sets the "content" field if the given value is not nil.
+func (puo *PageUpdateOne) SetNillableContent(s *string) *PageUpdateOne {
+	if s != nil {
+		puo.SetContent(*s)
 	}
 	return puo
 }
@@ -465,6 +532,11 @@ func (puo *PageUpdateOne) check() error {
 			return &ValidationError{Name: "title", err: fmt.Errorf(`ent: validator failed for field "Page.title": %w`, err)}
 		}
 	}
+	if v, ok := puo.mutation.Excerpt(); ok {
+		if err := page.ExcerptValidator(v); err != nil {
+			return &ValidationError{Name: "excerpt", err: fmt.Errorf(`ent: validator failed for field "Page.excerpt": %w`, err)}
+		}
+	}
 	if v, ok := puo.mutation.URL(); ok {
 		if err := page.URLValidator(v); err != nil {
 			return &ValidationError{Name: "url", err: fmt.Errorf(`ent: validator failed for field "Page.url": %w`, err)}
@@ -521,6 +593,12 @@ func (puo *PageUpdateOne) sqlSave(ctx context.Context) (_node *Page, err error) 
 	}
 	if value, ok := puo.mutation.Title(); ok {
 		_spec.SetField(page.FieldTitle, field.TypeString, value)
+	}
+	if value, ok := puo.mutation.Excerpt(); ok {
+		_spec.SetField(page.FieldExcerpt, field.TypeString, value)
+	}
+	if value, ok := puo.mutation.Content(); ok {
+		_spec.SetField(page.FieldContent, field.TypeString, value)
 	}
 	if value, ok := puo.mutation.URL(); ok {
 		_spec.SetField(page.FieldURL, field.TypeString, value)
