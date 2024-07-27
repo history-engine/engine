@@ -9,7 +9,6 @@ import (
 	"history-engine/engine/library/logger"
 	"history-engine/engine/service/filetype"
 	"history-engine/engine/service/host"
-	"history-engine/engine/service/page"
 	"history-engine/engine/service/readability"
 	"history-engine/engine/setting"
 	"history-engine/engine/utils"
@@ -98,7 +97,7 @@ func runLostCheck(ctx *cli.Context) error {
 			}
 
 			htmlPath := strings.Replace(file, setting.SingleFile.HtmlPath, "", 1)
-			row, err := x.Page.Create().
+			_, err = x.Page.Create().
 				SetUserID(user.ID).
 				SetUniqueID(uniqueId).
 				SetVersion(version).
@@ -109,10 +108,6 @@ func runLostCheck(ctx *cli.Context) error {
 			if err != nil {
 				logger.Zap().Warn("create page err", zap.Error(err), zap.String("file", file))
 				continue
-			}
-
-			if err := page.ParserPageWithId(row.ID); err != nil {
-				logger.Zap().Warn("parse page err", zap.Error(err), zap.String("file", file), zap.Int64("id", row.ID))
 			}
 		}
 	}
