@@ -37,9 +37,27 @@ func EsSearch(userId int64, search model.SearchPage) (resp model.ZincSearchRespo
 							},
 						},
 					},
+				},
+				Should: []*model.Query{
 					{
-						QueryString: &model.QueryStringQuery{
-							Query: search.Query,
+						Match: map[string]*model.MatchQuery{
+							"title": {
+								Query: search.Query,
+							},
+						},
+					},
+					{
+						Match: map[string]*model.MatchQuery{
+							"excerpt": {
+								Query: search.Query,
+							},
+						},
+					},
+					{
+						Match: map[string]*model.MatchQuery{
+							"content": {
+								Query: search.Query,
+							},
 						},
 					},
 				},
