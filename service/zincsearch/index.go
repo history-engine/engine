@@ -1,6 +1,8 @@
 package zincsearch
 
 import (
+	"encoding/json"
+	"errors"
 	"fmt"
 	"history-engine/engine/model"
 	"history-engine/engine/setting"
@@ -15,7 +17,17 @@ func CreateIndex(userId int64) error {
 		Settings:    &model.IndexSettings{},
 		Mappings:    &model.Mappings{},
 	}
-	_, err := SendRequest(ApiIndexCreateUpdateList, http.MethodPut, index)
+	content, err := SendRequest(ApiIndexCreateUpdateList, http.MethodPut, index)
+	if err != nil {
+		return err
+	}
+
+	zme := &model.ZincErrResp{}
+	err = json.Unmarshal(content, zme)
+	if zme.Error != "" {
+		return errors.New(zme.Error)
+	}
+
 	return err
 }
 

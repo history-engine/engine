@@ -46,26 +46,30 @@ func runIntegrityCheck(ctx *cli.Context) error {
 				continue
 			}
 
-			if !host.Include(item.UserID, item.URL) {
-				if host.Exclude(item.UserID, item.URL) {
-					logger.Zap().Info("ignore by rule: " + item.URL)
-					x.DeleteOneID(item.ID).Exec(ctx.Context)
-					_ = zincsearch.DelDocument(item.UserID, item.UniqueID, item.Version)
-					continue
+			if !host.Include(item.UserID, item.URL) && host.Exclude(item.UserID, item.URL) {
+				logger.Zap().Info("ignore by rule: " + item.URL)
+				x.DeleteOneID(item.ID).Exec(ctx.Context)
+				if err = zincsearch.DelDocument(item.UserID, item.UniqueID, item.Version); err != nil {
+					logger.Zap().Warn("del doc err", zap.Error(err), zap.Int64("id", item.ID), zap.String("uniqueId", item.UniqueID))
 				}
+				continue
 			}
 
 			if !utils.FileExist(setting.SingleFile.HtmlPath + item.Path) {
 				logger.Zap().Info("HTML file not exist", zap.String("html", setting.SingleFile.HtmlPath+item.Path))
-				x.DeleteOneID(item.ID).Exec(ctx.Context)
-				_ = zincsearch.DelDocument(item.UserID, item.UniqueID, item.Version)
+				if err := x.DeleteOneID(item.ID).Exec(ctx.Context); err != nil {
+
+				}
+				if err = zincsearch.DelDocument(item.UserID, item.UniqueID, item.Version); err != nil {
+					logger.Zap().Warn("del doc err", zap.Error(err), zap.Int64("id", item.ID), zap.String("uniqueId", item.UniqueID))
+				}
 				continue
 			}
 
-			if item.Title == "" || item.IndexedAt.IsZero() {
-				err := page.ParserPageWithId(item.ID)
-				if err != nil {
-					panic(err)
+			if item.IndexedAt.IsZero() {
+				if err := page.ParserPageWithId(item.ID); err != nil {
+					logger.Zap().Warn("parse HTML err", zap.Error(err), zap.Int64("id", item.ID), zap.String("url", item.URL))
+					continue
 				}
 				logger.Zap().Info("HTML file not parse", zap.Int64("id", item.ID), zap.String("url", item.URL))
 			}

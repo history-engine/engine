@@ -31,7 +31,7 @@ func parserPage(ctx context.Context, row model.PageParse) error {
 	x := db.GetEngine()
 
 	var err error
-	var item *ent.Page
+	item := &ent.Page{}
 	if row.Id > 0 {
 		item, err = x.Page.Get(ctx, row.Id)
 	} else {
@@ -43,26 +43,40 @@ func parserPage(ctx context.Context, row model.PageParse) error {
 		return err
 	}
 
-	article, err := readability.Parser().Parse(setting.SingleFile.HtmlPath + item.Path)
-	if err != nil {
-		return err
+	article := &readability.Article{}
+	if item.Excerpt == "" && item.Content == "" {
+		article, err = readability.Parser().Parse(setting.SingleFile.HtmlPath + item.Path)
+		if err != nil {
+			return err
+		}
+
+		_, err = x.Page.Update().
+			SetTitle(article.Title).
+			SetExcerpt(article.Excerpt).
+			SetContent(article.TextContent).
+			Where(page.ID(item.ID)).
+			Save(ctx)
+		if err != nil {
+			return err
+		}
+
+		item.Title = article.Title
+		item.Excerpt = article.Excerpt
+		item.Content = article.TextContent
 	}
 
 	zincId := fmt.Sprintf("%s%d", item.UniqueID, item.Version)
 	zincDoc := &model.ZincDocument{
 		Url:     item.URL,
-		Title:   article.Title,
-		Excerpt: article.Excerpt,
-		Content: article.TextContent,
+		Title:   item.Title,
+		Excerpt: item.Excerpt,
+		Content: item.Content,
 	}
 	if err = zincsearch.PutDocument(item.UserID, zincId, zincDoc); err != nil {
 		return err
 	}
 
-	_, err = x.Page.Update().SetTitle(article.Title).SetIndexedAt(time.Now()).Where(page.ID(item.ID)).Save(ctx)
-	if err != nil {
-		return err
-	}
+	_, err = x.Page.Update().SetIndexedAt(time.Now()).Where(page.ID(item.ID)).Save(ctx)
 
-	return nil
+	return err
 }

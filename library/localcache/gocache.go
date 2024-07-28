@@ -34,6 +34,10 @@ func GetEngine() *cache.Cache {
 }
 
 func persistent() {
+	if client.ItemCount() == 0 {
+		return
+	}
+
 	path := setting.Common.DataPath + "/local-cache.db"
 	if err := client.SaveFile(path); err != nil {
 		logger.Zap().Warn("save local-cache file error:", zap.Error(err))

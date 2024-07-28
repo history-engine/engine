@@ -102,9 +102,18 @@ func checkIndexTemplate() {
 	if err != nil {
 		log.Fatalf("create or update template err: %v\n", err)
 	}
-	_, err = io.ReadAll(resp.Body)
+	res, err := io.ReadAll(resp.Body)
 	if err != nil {
 		log.Fatalf("create or update template err: %v\n", err)
+	}
+
+	var tr struct {
+		Error    string `json:"error"`
+		Message  string `json:"message"`
+		Template string `json:"template"`
+	}
+	if err = json.Unmarshal(res, &tr); err != nil || tr.Error != "" {
+		log.Fatalf("create or update template reason: %s, err: %v\n", tr.Error, err)
 	}
 
 	log.Printf("zincSearch index template: %s, pattern: %s\n", name, pattern)

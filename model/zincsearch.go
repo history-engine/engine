@@ -34,3 +34,9 @@ type ZincResponse struct {
 
 type ZincHits struct {
 }
+
+type ZincErrResp struct {
+	Id      string `json:"id"`
+	Message string `json:"message"`
+	Error   string `json:"error"`
+}

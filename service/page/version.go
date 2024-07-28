@@ -3,6 +3,7 @@ package page
 import (
 	"context"
 	"entgo.io/ent/dialect/sql"
+	"errors"
 	"go.uber.org/zap"
 	"history-engine/engine/ent"
 	"history-engine/engine/ent/page"
@@ -36,10 +37,10 @@ func NextVersion(ctx context.Context, uniqueId string) (int, time.Time) {
 }
 
 // CleanHistory 清除历史版本、HTML文件、ZincSearch索引
-func CleanHistory(ctx context.Context, userId int64, uniqueId string, version int) {
+func CleanHistory(ctx context.Context, userId int64, uniqueId string, version int) error {
 	diff := version - setting.SingleFile.MaxVersion
 	if diff <= 0 {
-		return
+		return nil
 	}
 
 	x := db.GetEngine()
@@ -52,28 +53,26 @@ func CleanHistory(ctx context.Context, userId int64, uniqueId string, version in
 		Where(page.UserID(userId), page.UniqueID(uniqueId), page.VersionLTE(diff)).
 		Select(page.FieldID, page.FieldVersion, page.FieldPath).
 		Scan(ctx, &vs); err != nil {
-		return
+		return err
 	}
 
+	var err error
 	for _, v := range vs {
 		if err := x.Page.DeleteOneID(v.Id).Exec(ctx); err != nil {
 			logger.Zap().Error("delete page err", zap.Int64("id", v.Id))
+			err = errors.Join(err)
 			continue
 		}
 
 		if err := os.Remove(setting.SingleFile.HtmlPath + v.Path); err != nil {
-			logger.Zap().Error("delete html file err", zap.String("path", v.Path))
+			err = errors.Join(err)
 			continue
 		}
 
 		if err := zincsearch.DelDocument(userId, uniqueId, v.Version); err != nil {
-			logger.Zap().Error(
-				"delete zinc search doc err",
-				zap.String("unique_id", uniqueId),
-				zap.Int("version", v.Version),
-			)
+			err = errors.Join(err)
 		}
 	}
 
-	return
+	return err
 }

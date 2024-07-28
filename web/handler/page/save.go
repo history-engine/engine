@@ -101,8 +101,16 @@ func Save(c echo.Context) error {
 	}
 
 	// 后台分析HTML、清理历史版本
-	go page.ParserPageWithId(row.ID)
-	go page.CleanHistory(context.Background(), userId, uniqueId, version)
+	go func() {
+		if err := page.ParserPageWithId(row.ID); err != nil {
+			logger.Zap().Warn("parse page err", zap.Error(err), zap.Any("page", row))
+		}
+	}()
+	go func() {
+		if err := page.CleanHistory(context.Background(), userId, uniqueId, version); err != nil {
+			logger.Zap().Warn("clean history err", zap.Error(err), zap.Any("page", row))
+		}
+	}()
 
 	return c.JSON(http.StatusCreated, nil)
 }
