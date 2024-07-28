@@ -79,8 +79,6 @@ func init() {
 	pageDescExcerpt := pageFields[5].Descriptor()
 	// page.DefaultExcerpt holds the default value on creation for the excerpt field.
 	page.DefaultExcerpt = pageDescExcerpt.Default.(string)
-	// page.ExcerptValidator is a validator for the "excerpt" field. It is called by the builders before save.
-	page.ExcerptValidator = pageDescExcerpt.Validators[0].(func(string) error)
 	// pageDescContent is the schema descriptor for content field.
 	pageDescContent := pageFields[6].Descriptor()
 	// page.DefaultContent holds the default value on creation for the content field.

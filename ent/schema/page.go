@@ -22,7 +22,7 @@ func (Page) Fields() []ent.Field {
 		field.String("unique_id").MaxLen(32).Immutable().Comment("页面唯一id"),
 		field.Int("version").Default(1).Comment("版本"),
 		field.String("title").Default("").MaxLen(500).Comment("页面标题"),
-		field.String("excerpt").Default("").MaxLen(500).Comment("摘要"),
+		field.Text("excerpt").Default("").Comment("摘要"),
 		field.Text("content").Default("").Comment("提取后的内容"),
 		field.String("url").MaxLen(2048).Comment("原始地址"),
 		field.String("path").MaxLen(500).Comment("完整本地文件地址"),

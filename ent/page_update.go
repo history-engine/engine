@@ -229,11 +229,6 @@ func (pu *PageUpdate) check() error {
 			return &ValidationError{Name: "title", err: fmt.Errorf(`ent: validator failed for field "Page.title": %w`, err)}
 		}
 	}
-	if v, ok := pu.mutation.Excerpt(); ok {
-		if err := page.ExcerptValidator(v); err != nil {
-			return &ValidationError{Name: "excerpt", err: fmt.Errorf(`ent: validator failed for field "Page.excerpt": %w`, err)}
-		}
-	}
 	if v, ok := pu.mutation.URL(); ok {
 		if err := page.URLValidator(v); err != nil {
 			return &ValidationError{Name: "url", err: fmt.Errorf(`ent: validator failed for field "Page.url": %w`, err)}
@@ -530,11 +525,6 @@ func (puo *PageUpdateOne) check() error {
 	if v, ok := puo.mutation.Title(); ok {
 		if err := page.TitleValidator(v); err != nil {
 			return &ValidationError{Name: "title", err: fmt.Errorf(`ent: validator failed for field "Page.title": %w`, err)}
-		}
-	}
-	if v, ok := puo.mutation.Excerpt(); ok {
-		if err := page.ExcerptValidator(v); err != nil {
-			return &ValidationError{Name: "excerpt", err: fmt.Errorf(`ent: validator failed for field "Page.excerpt": %w`, err)}
 		}
 	}
 	if v, ok := puo.mutation.URL(); ok {

@@ -258,11 +258,6 @@ func (pc *PageCreate) check() error {
 	if _, ok := pc.mutation.Excerpt(); !ok {
 		return &ValidationError{Name: "excerpt", err: errors.New(`ent: missing required field "Page.excerpt"`)}
 	}
-	if v, ok := pc.mutation.Excerpt(); ok {
-		if err := page.ExcerptValidator(v); err != nil {
-			return &ValidationError{Name: "excerpt", err: fmt.Errorf(`ent: validator failed for field "Page.excerpt": %w`, err)}
-		}
-	}
 	if _, ok := pc.mutation.Content(); !ok {
 		return &ValidationError{Name: "content", err: errors.New(`ent: missing required field "Page.content"`)}
 	}

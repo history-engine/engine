@@ -79,8 +79,6 @@ var (
 	TitleValidator func(string) error
 	// DefaultExcerpt holds the default value on creation for the "excerpt" field.
 	DefaultExcerpt string
-	// ExcerptValidator is a validator for the "excerpt" field. It is called by the builders before save.
-	ExcerptValidator func(string) error
 	// DefaultContent holds the default value on creation for the "content" field.
 	DefaultContent string
 	// URLValidator is a validator for the "url" field. It is called by the builders before save.
