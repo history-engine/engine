@@ -36,6 +36,10 @@ func (m Mozilla) Parse(path string) (*Article, error) {
 		return nil, err
 	}
 
+	if article.Title == "" && article.Excerpt == "" && article.Content == "" {
+		return nil, errors.New("parse html empty " + string(data))
+	}
+
 	article.TextContent = strings.ReplaceAll(article.TextContent, "\n", "")
 
 	return article, nil
