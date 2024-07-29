@@ -21,6 +21,7 @@ var (
 		Ssl      bool
 		Charset  string
 		Timeout  time.Duration
+		PrintSql bool
 	}{
 		Drive:    "sqlite",
 		Path:     "data/sqlite.db",
@@ -31,6 +32,7 @@ var (
 		Ssl:      false,
 		Charset:  "utf8mb4",
 		Timeout:  500 * time.Millisecond,
+		PrintSql: false,
 	}
 )
 
@@ -66,6 +68,9 @@ func loadDatabase() {
 		}
 		if v.IsSet("timeout") {
 			Database.Timeout = v.GetDuration("timeout")
+		}
+		if v.IsSet("print_sql") {
+			Database.PrintSql = v.GetBool("print_sql")
 		}
 	}
 

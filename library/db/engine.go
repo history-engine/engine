@@ -39,7 +39,7 @@ func GetEngine() *ent.Client {
 		panic("db not enable")
 	}
 
-	if setting.Common.Env == "dev" {
+	if setting.Common.Env == "dev" && setting.Database.PrintSql {
 		return client.Debug()
 	}
 

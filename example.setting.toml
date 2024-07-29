@@ -50,6 +50,7 @@ name = "history"
 ssl = "false"
 charset = "utf8mb4"
 timeout = "5s"
+print_sql = false
 
 [redis]
 addr = "127.0.0.1:6379"
