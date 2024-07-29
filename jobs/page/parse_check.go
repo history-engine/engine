@@ -16,19 +16,24 @@ import (
 	"time"
 )
 
-var IntegrityCheck = &cli.Command{
-	Name:    "integrity-check",
-	Aliases: []string{"ic"},
-	Usage:   "Check database, HTML files, ZincSearch Document consistency",
-	Action:  runIntegrityCheck,
+var ParseCheck = &cli.Command{
+	Name:    "parse-check",
+	Aliases: []string{"pc"},
+	Usage:   "Check database, HTML files consistency",
+	Action:  runParseCheck,
 }
 
-func runIntegrityCheck(ctx *cli.Context) error {
+func runParseCheck(ctx *cli.Context) error {
 	start := 0
 	limit := 100
 	x := db.GetEngine().Page
 	for {
-		list, err := x.Query().Order(ent.Desc(entPage.FieldID)).Offset(start).Limit(limit).All(ctx.Context)
+		list, err := x.Query().
+			Where(entPage.And(entPage.ContentEQ(""), entPage.Title(""))).
+			Order(ent.Desc(entPage.FieldID)).
+			Offset(start).
+			Limit(limit).
+			All(ctx.Context)
 		if err != nil {
 			panic(err)
 		}
@@ -58,7 +63,7 @@ func runIntegrityCheck(ctx *cli.Context) error {
 			if !utils.FileExist(setting.SingleFile.HtmlPath + item.Path) {
 				logger.Zap().Info("HTML file not exist", zap.String("html", setting.SingleFile.HtmlPath+item.Path))
 				if err := x.DeleteOneID(item.ID).Exec(ctx.Context); err != nil {
-
+					logger.Zap().Warn("del doc err", zap.Error(err), zap.Int64("id", item.ID), zap.String("uniqueId", item.UniqueID))
 				}
 				if err = zincsearch.DelDocument(item.UserID, item.UniqueID, item.Version); err != nil {
 					logger.Zap().Warn("del doc err", zap.Error(err), zap.Int64("id", item.ID), zap.String("uniqueId", item.UniqueID))
@@ -66,12 +71,11 @@ func runIntegrityCheck(ctx *cli.Context) error {
 				continue
 			}
 
-			if item.IndexedAt.IsZero() {
-				if err := page.ParserPageWithId(item.ID); err != nil {
-					logger.Zap().Warn("parse HTML err", zap.Error(err), zap.Int64("id", item.ID), zap.String("url", item.URL))
-					continue
-				}
-				logger.Zap().Info("HTML file not parse", zap.Int64("id", item.ID), zap.String("url", item.URL))
+			logger.Zap().Info("pend page", zap.Int64("id", item.ID), zap.String("path", item.Path), zap.String("url", item.URL))
+
+			if err := page.ParserPageWithId(item.ID); err != nil {
+				logger.Zap().Warn("parse HTML err", zap.Error(err), zap.Int64("id", item.ID), zap.String("url", item.URL))
+				continue
 			}
 		}
 	}

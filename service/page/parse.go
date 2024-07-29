@@ -2,15 +2,15 @@ package page
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"history-engine/engine/ent"
 	"history-engine/engine/ent/page"
 	"history-engine/engine/library/db"
 	"history-engine/engine/model"
 	"history-engine/engine/service/readability"
-	"history-engine/engine/service/zincsearch"
 	"history-engine/engine/setting"
-	"time"
+	"os"
 )
 
 func ParserPageWithId(id int64) error {
@@ -43,40 +43,31 @@ func parserPage(ctx context.Context, row model.PageParse) error {
 		return err
 	}
 
-	article := &readability.Article{}
-	if item.Excerpt == "" && item.Content == "" {
-		article, err = readability.Parser().Parse(setting.SingleFile.HtmlPath + item.Path)
-		if err != nil {
-			return err
-		}
-
-		_, err = x.Page.Update().
-			SetTitle(article.Title).
-			SetExcerpt(article.Excerpt).
-			SetContent(article.TextContent).
-			Where(page.ID(item.ID)).
-			Save(ctx)
-		if err != nil {
-			return err
-		}
-
-		item.Title = article.Title
-		item.Excerpt = article.Excerpt
-		item.Content = article.TextContent
+	if item.Content != "" {
+		return nil
 	}
 
-	zincId := fmt.Sprintf("%s%d", item.UniqueID, item.Version)
-	zincDoc := &model.ZincDocument{
-		Url:     item.URL,
-		Title:   item.Title,
-		Excerpt: item.Excerpt,
-		Content: item.Content,
+	fullPath := setting.SingleFile.HtmlPath + item.Path
+	if f, err := os.Stat(fullPath); err != nil {
+		return err
+	} else if f.Size() > int64(setting.SingleFile.MaxSize) {
+		return errors.New(fmt.Sprintf("File size exceeds threshold: %d", setting.SingleFile.MaxSize))
 	}
-	if err = zincsearch.PutDocument(item.UserID, zincId, zincDoc); err != nil {
+
+	article, err := readability.Parser().Parse(fullPath)
+	if err != nil {
 		return err
 	}
 
-	_, err = x.Page.Update().SetIndexedAt(time.Now()).Where(page.ID(item.ID)).Save(ctx)
+	_, err = x.Page.Update().
+		SetTitle(article.Title).
+		SetExcerpt(article.Excerpt).
+		SetContent(article.TextContent).
+		Where(page.ID(item.ID)).
+		Save(ctx)
+	if err != nil {
+		return err
+	}
 
-	return err
+	return nil
 }

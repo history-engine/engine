@@ -104,6 +104,10 @@ func Save(c echo.Context) error {
 	go func() {
 		if err := page.ParserPageWithId(row.ID); err != nil {
 			logger.Zap().Warn("parse page err", zap.Error(err), zap.Any("page", row))
+			return
+		}
+		if err := page.PutIndexWithId(row.ID); err != nil {
+			logger.Zap().Warn("put zinc index err", zap.Error(err), zap.Any("page", row))
 		}
 	}()
 	go func() {

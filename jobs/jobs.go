@@ -13,7 +13,7 @@ var Jobs = &cli.Command{
 	Usage:       "start engine jobs server",
 	Description: "run engine jobs server and listen for requests",
 	Before:      before,
-	Subcommands: cli.Commands{page.Analyse, page.IntegrityCheck, page.LostCheck},
+	Subcommands: cli.Commands{page.Analyse, page.ParseCheck, page.LostCheck, page.IndexCheck},
 }
 
 func before(ctx *cli.Context) error {

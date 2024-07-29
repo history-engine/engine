@@ -51,8 +51,6 @@ func runLostCheck(ctx *cli.Context) error {
 		})
 
 		for file, size := range files {
-			logger.Zap().Info("find lost data", zap.String("path", file))
-
 			split := strings.Split(file, "/")
 			name := split[len(split)-1]
 			split = strings.Split(name, ".")
@@ -69,6 +67,8 @@ func runLostCheck(ctx *cli.Context) error {
 			if exist {
 				continue
 			}
+
+			logger.Zap().Info("find lost data", zap.String("path", file))
 
 			head := make([]byte, 2048)
 			f, err := os.Open(file)
