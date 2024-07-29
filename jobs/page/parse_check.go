@@ -29,7 +29,7 @@ func runParseCheck(ctx *cli.Context) error {
 	x := db.GetEngine().Page
 	for {
 		list, err := x.Query().
-			Where(entPage.And(entPage.ContentEQ(""), entPage.Title(""))).
+			Where(entPage.ParsedAtEQ(timeZero)).
 			Order(ent.Desc(entPage.FieldID)).
 			Offset(start).
 			Limit(limit).

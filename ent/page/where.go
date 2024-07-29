@@ -99,6 +99,11 @@ func Size(v int) predicate.Page {
 	return predicate.Page(sql.FieldEQ(FieldSize, v))
 }
 
+// ParsedAt applies equality check predicate on the "parsed_at" field. It's identical to ParsedAtEQ.
+func ParsedAt(v time.Time) predicate.Page {
+	return predicate.Page(sql.FieldEQ(FieldParsedAt, v))
+}
+
 // IndexedAt applies equality check predicate on the "indexed_at" field. It's identical to IndexedAtEQ.
 func IndexedAt(v time.Time) predicate.Page {
 	return predicate.Page(sql.FieldEQ(FieldIndexedAt, v))
@@ -622,6 +627,46 @@ func SizeLT(v int) predicate.Page {
 // SizeLTE applies the LTE predicate on the "size" field.
 func SizeLTE(v int) predicate.Page {
 	return predicate.Page(sql.FieldLTE(FieldSize, v))
+}
+
+// ParsedAtEQ applies the EQ predicate on the "parsed_at" field.
+func ParsedAtEQ(v time.Time) predicate.Page {
+	return predicate.Page(sql.FieldEQ(FieldParsedAt, v))
+}
+
+// ParsedAtNEQ applies the NEQ predicate on the "parsed_at" field.
+func ParsedAtNEQ(v time.Time) predicate.Page {
+	return predicate.Page(sql.FieldNEQ(FieldParsedAt, v))
+}
+
+// ParsedAtIn applies the In predicate on the "parsed_at" field.
+func ParsedAtIn(vs ...time.Time) predicate.Page {
+	return predicate.Page(sql.FieldIn(FieldParsedAt, vs...))
+}
+
+// ParsedAtNotIn applies the NotIn predicate on the "parsed_at" field.
+func ParsedAtNotIn(vs ...time.Time) predicate.Page {
+	return predicate.Page(sql.FieldNotIn(FieldParsedAt, vs...))
+}
+
+// ParsedAtGT applies the GT predicate on the "parsed_at" field.
+func ParsedAtGT(v time.Time) predicate.Page {
+	return predicate.Page(sql.FieldGT(FieldParsedAt, v))
+}
+
+// ParsedAtGTE applies the GTE predicate on the "parsed_at" field.
+func ParsedAtGTE(v time.Time) predicate.Page {
+	return predicate.Page(sql.FieldGTE(FieldParsedAt, v))
+}
+
+// ParsedAtLT applies the LT predicate on the "parsed_at" field.
+func ParsedAtLT(v time.Time) predicate.Page {
+	return predicate.Page(sql.FieldLT(FieldParsedAt, v))
+}
+
+// ParsedAtLTE applies the LTE predicate on the "parsed_at" field.
+func ParsedAtLTE(v time.Time) predicate.Page {
+	return predicate.Page(sql.FieldLTE(FieldParsedAt, v))
 }
 
 // IndexedAtEQ applies the EQ predicate on the "indexed_at" field.

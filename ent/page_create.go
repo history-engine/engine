@@ -114,6 +114,20 @@ func (pc *PageCreate) SetNillableSize(i *int) *PageCreate {
 	return pc
 }
 
+// SetParsedAt sets the "parsed_at" field.
+func (pc *PageCreate) SetParsedAt(t time.Time) *PageCreate {
+	pc.mutation.SetParsedAt(t)
+	return pc
+}
+
+// SetNillableParsedAt sets the "parsed_at" field if the given value is not nil.
+func (pc *PageCreate) SetNillableParsedAt(t *time.Time) *PageCreate {
+	if t != nil {
+		pc.SetParsedAt(*t)
+	}
+	return pc
+}
+
 // SetIndexedAt sets the "indexed_at" field.
 func (pc *PageCreate) SetIndexedAt(t time.Time) *PageCreate {
 	pc.mutation.SetIndexedAt(t)
@@ -217,6 +231,10 @@ func (pc *PageCreate) defaults() {
 		v := page.DefaultSize
 		pc.mutation.SetSize(v)
 	}
+	if _, ok := pc.mutation.ParsedAt(); !ok {
+		v := page.DefaultParsedAt
+		pc.mutation.SetParsedAt(v)
+	}
 	if _, ok := pc.mutation.IndexedAt(); !ok {
 		v := page.DefaultIndexedAt
 		pc.mutation.SetIndexedAt(v)
@@ -279,6 +297,9 @@ func (pc *PageCreate) check() error {
 	}
 	if _, ok := pc.mutation.Size(); !ok {
 		return &ValidationError{Name: "size", err: errors.New(`ent: missing required field "Page.size"`)}
+	}
+	if _, ok := pc.mutation.ParsedAt(); !ok {
+		return &ValidationError{Name: "parsed_at", err: errors.New(`ent: missing required field "Page.parsed_at"`)}
 	}
 	if _, ok := pc.mutation.IndexedAt(); !ok {
 		return &ValidationError{Name: "indexed_at", err: errors.New(`ent: missing required field "Page.indexed_at"`)}
@@ -356,6 +377,10 @@ func (pc *PageCreate) createSpec() (*Page, *sqlgraph.CreateSpec) {
 	if value, ok := pc.mutation.Size(); ok {
 		_spec.SetField(page.FieldSize, field.TypeInt, value)
 		_node.Size = value
+	}
+	if value, ok := pc.mutation.ParsedAt(); ok {
+		_spec.SetField(page.FieldParsedAt, field.TypeTime, value)
+		_node.ParsedAt = value
 	}
 	if value, ok := pc.mutation.IndexedAt(); ok {
 		_spec.SetField(page.FieldIndexedAt, field.TypeTime, value)

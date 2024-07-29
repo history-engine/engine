@@ -11,6 +11,7 @@ import (
 	"history-engine/engine/service/readability"
 	"history-engine/engine/setting"
 	"os"
+	"time"
 )
 
 func ParserPageWithId(id int64) error {
@@ -55,7 +56,10 @@ func parserPage(ctx context.Context, row model.PageParse) error {
 	}
 
 	article, err := readability.Parser().Parse(fullPath)
-	if err != nil {
+	if err != nil && errors.Is(err, readability.ErrContentEmpty) {
+		_, err2 := x.Page.Update().SetParsedAt(time.Now()).Where(page.ID(item.ID)).Save(ctx)
+		return errors.Join(err, err2)
+	} else if err != nil {
 		return err
 	}
 
@@ -63,11 +67,8 @@ func parserPage(ctx context.Context, row model.PageParse) error {
 		SetTitle(article.Title).
 		SetExcerpt(article.Excerpt).
 		SetContent(article.TextContent).
+		SetParsedAt(time.Now()).
 		Where(page.ID(item.ID)).
 		Save(ctx)
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return err
 }

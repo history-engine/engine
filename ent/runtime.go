@@ -95,16 +95,20 @@ func init() {
 	pageDescSize := pageFields[9].Descriptor()
 	// page.DefaultSize holds the default value on creation for the size field.
 	page.DefaultSize = pageDescSize.Default.(int)
+	// pageDescParsedAt is the schema descriptor for parsed_at field.
+	pageDescParsedAt := pageFields[10].Descriptor()
+	// page.DefaultParsedAt holds the default value on creation for the parsed_at field.
+	page.DefaultParsedAt = pageDescParsedAt.Default.(time.Time)
 	// pageDescIndexedAt is the schema descriptor for indexed_at field.
-	pageDescIndexedAt := pageFields[10].Descriptor()
+	pageDescIndexedAt := pageFields[11].Descriptor()
 	// page.DefaultIndexedAt holds the default value on creation for the indexed_at field.
 	page.DefaultIndexedAt = pageDescIndexedAt.Default.(time.Time)
 	// pageDescCreatedAt is the schema descriptor for created_at field.
-	pageDescCreatedAt := pageFields[11].Descriptor()
+	pageDescCreatedAt := pageFields[12].Descriptor()
 	// page.DefaultCreatedAt holds the default value on creation for the created_at field.
 	page.DefaultCreatedAt = pageDescCreatedAt.Default.(func() time.Time)
 	// pageDescUpdatedAt is the schema descriptor for updated_at field.
-	pageDescUpdatedAt := pageFields[12].Descriptor()
+	pageDescUpdatedAt := pageFields[13].Descriptor()
 	// page.DefaultUpdatedAt holds the default value on creation for the updated_at field.
 	page.DefaultUpdatedAt = pageDescUpdatedAt.Default.(func() time.Time)
 	// page.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.

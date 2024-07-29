@@ -161,6 +161,20 @@ func (pu *PageUpdate) AddSize(i int) *PageUpdate {
 	return pu
 }
 
+// SetParsedAt sets the "parsed_at" field.
+func (pu *PageUpdate) SetParsedAt(t time.Time) *PageUpdate {
+	pu.mutation.SetParsedAt(t)
+	return pu
+}
+
+// SetNillableParsedAt sets the "parsed_at" field if the given value is not nil.
+func (pu *PageUpdate) SetNillableParsedAt(t *time.Time) *PageUpdate {
+	if t != nil {
+		pu.SetParsedAt(*t)
+	}
+	return pu
+}
+
 // SetIndexedAt sets the "indexed_at" field.
 func (pu *PageUpdate) SetIndexedAt(t time.Time) *PageUpdate {
 	pu.mutation.SetIndexedAt(t)
@@ -286,6 +300,9 @@ func (pu *PageUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if value, ok := pu.mutation.AddedSize(); ok {
 		_spec.AddField(page.FieldSize, field.TypeInt, value)
+	}
+	if value, ok := pu.mutation.ParsedAt(); ok {
+		_spec.SetField(page.FieldParsedAt, field.TypeTime, value)
 	}
 	if value, ok := pu.mutation.IndexedAt(); ok {
 		_spec.SetField(page.FieldIndexedAt, field.TypeTime, value)
@@ -446,6 +463,20 @@ func (puo *PageUpdateOne) AddSize(i int) *PageUpdateOne {
 	return puo
 }
 
+// SetParsedAt sets the "parsed_at" field.
+func (puo *PageUpdateOne) SetParsedAt(t time.Time) *PageUpdateOne {
+	puo.mutation.SetParsedAt(t)
+	return puo
+}
+
+// SetNillableParsedAt sets the "parsed_at" field if the given value is not nil.
+func (puo *PageUpdateOne) SetNillableParsedAt(t *time.Time) *PageUpdateOne {
+	if t != nil {
+		puo.SetParsedAt(*t)
+	}
+	return puo
+}
+
 // SetIndexedAt sets the "indexed_at" field.
 func (puo *PageUpdateOne) SetIndexedAt(t time.Time) *PageUpdateOne {
 	puo.mutation.SetIndexedAt(t)
@@ -601,6 +632,9 @@ func (puo *PageUpdateOne) sqlSave(ctx context.Context) (_node *Page, err error) 
 	}
 	if value, ok := puo.mutation.AddedSize(); ok {
 		_spec.AddField(page.FieldSize, field.TypeInt, value)
+	}
+	if value, ok := puo.mutation.ParsedAt(); ok {
+		_spec.SetField(page.FieldParsedAt, field.TypeTime, value)
 	}
 	if value, ok := puo.mutation.IndexedAt(); ok {
 		_spec.SetField(page.FieldIndexedAt, field.TypeTime, value)

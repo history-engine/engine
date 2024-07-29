@@ -1285,6 +1285,7 @@ type PageMutation struct {
 	_path         *string
 	size          *int
 	addsize       *int
+	parsed_at     *time.Time
 	indexed_at    *time.Time
 	created_at    *time.Time
 	updated_at    *time.Time
@@ -1782,6 +1783,42 @@ func (m *PageMutation) ResetSize() {
 	m.addsize = nil
 }
 
+// SetParsedAt sets the "parsed_at" field.
+func (m *PageMutation) SetParsedAt(t time.Time) {
+	m.parsed_at = &t
+}
+
+// ParsedAt returns the value of the "parsed_at" field in the mutation.
+func (m *PageMutation) ParsedAt() (r time.Time, exists bool) {
+	v := m.parsed_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldParsedAt returns the old "parsed_at" field's value of the Page entity.
+// If the Page object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *PageMutation) OldParsedAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldParsedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldParsedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldParsedAt: %w", err)
+	}
+	return oldValue.ParsedAt, nil
+}
+
+// ResetParsedAt resets all changes to the "parsed_at" field.
+func (m *PageMutation) ResetParsedAt() {
+	m.parsed_at = nil
+}
+
 // SetIndexedAt sets the "indexed_at" field.
 func (m *PageMutation) SetIndexedAt(t time.Time) {
 	m.indexed_at = &t
@@ -1924,7 +1961,7 @@ func (m *PageMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *PageMutation) Fields() []string {
-	fields := make([]string, 0, 12)
+	fields := make([]string, 0, 13)
 	if m.user_id != nil {
 		fields = append(fields, page.FieldUserID)
 	}
@@ -1951,6 +1988,9 @@ func (m *PageMutation) Fields() []string {
 	}
 	if m.size != nil {
 		fields = append(fields, page.FieldSize)
+	}
+	if m.parsed_at != nil {
+		fields = append(fields, page.FieldParsedAt)
 	}
 	if m.indexed_at != nil {
 		fields = append(fields, page.FieldIndexedAt)
@@ -1987,6 +2027,8 @@ func (m *PageMutation) Field(name string) (ent.Value, bool) {
 		return m.Path()
 	case page.FieldSize:
 		return m.Size()
+	case page.FieldParsedAt:
+		return m.ParsedAt()
 	case page.FieldIndexedAt:
 		return m.IndexedAt()
 	case page.FieldCreatedAt:
@@ -2020,6 +2062,8 @@ func (m *PageMutation) OldField(ctx context.Context, name string) (ent.Value, er
 		return m.OldPath(ctx)
 	case page.FieldSize:
 		return m.OldSize(ctx)
+	case page.FieldParsedAt:
+		return m.OldParsedAt(ctx)
 	case page.FieldIndexedAt:
 		return m.OldIndexedAt(ctx)
 	case page.FieldCreatedAt:
@@ -2097,6 +2141,13 @@ func (m *PageMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetSize(v)
+		return nil
+	case page.FieldParsedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetParsedAt(v)
 		return nil
 	case page.FieldIndexedAt:
 		v, ok := value.(time.Time)
@@ -2233,6 +2284,9 @@ func (m *PageMutation) ResetField(name string) error {
 		return nil
 	case page.FieldSize:
 		m.ResetSize()
+		return nil
+	case page.FieldParsedAt:
+		m.ResetParsedAt()
 		return nil
 	case page.FieldIndexedAt:
 		m.ResetIndexedAt()

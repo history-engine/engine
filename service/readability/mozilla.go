@@ -10,8 +10,9 @@ import (
 )
 
 var (
-	regex *regexp.Regexp
-	_     Readability = Mozilla{}
+	regex           *regexp.Regexp
+	_               Readability = Mozilla{}
+	ErrContentEmpty             = errors.New("parse html empty")
 )
 
 type Mozilla struct{}
@@ -37,7 +38,7 @@ func (m Mozilla) Parse(path string) (*Article, error) {
 	}
 
 	if article.Title == "" && article.Excerpt == "" && article.Content == "" {
-		return nil, errors.New("parse html empty " + string(data))
+		return nil, ErrContentEmpty
 	}
 
 	article.TextContent = strings.ReplaceAll(article.TextContent, "\n", "")

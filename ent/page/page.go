@@ -31,6 +31,8 @@ const (
 	FieldPath = "path"
 	// FieldSize holds the string denoting the size field in the database.
 	FieldSize = "size"
+	// FieldParsedAt holds the string denoting the parsed_at field in the database.
+	FieldParsedAt = "parsed_at"
 	// FieldIndexedAt holds the string denoting the indexed_at field in the database.
 	FieldIndexedAt = "indexed_at"
 	// FieldCreatedAt holds the string denoting the created_at field in the database.
@@ -53,6 +55,7 @@ var Columns = []string{
 	FieldURL,
 	FieldPath,
 	FieldSize,
+	FieldParsedAt,
 	FieldIndexedAt,
 	FieldCreatedAt,
 	FieldUpdatedAt,
@@ -87,6 +90,8 @@ var (
 	PathValidator func(string) error
 	// DefaultSize holds the default value on creation for the "size" field.
 	DefaultSize int
+	// DefaultParsedAt holds the default value on creation for the "parsed_at" field.
+	DefaultParsedAt time.Time
 	// DefaultIndexedAt holds the default value on creation for the "indexed_at" field.
 	DefaultIndexedAt time.Time
 	// DefaultCreatedAt holds the default value on creation for the "created_at" field.
@@ -148,6 +153,11 @@ func ByPath(opts ...sql.OrderTermOption) OrderOption {
 // BySize orders the results by the size field.
 func BySize(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldSize, opts...).ToFunc()
+}
+
+// ByParsedAt orders the results by the parsed_at field.
+func ByParsedAt(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldParsedAt, opts...).ToFunc()
 }
 
 // ByIndexedAt orders the results by the indexed_at field.

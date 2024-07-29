@@ -65,6 +65,7 @@ var (
 		{Name: "url", Type: field.TypeString, Size: 2048},
 		{Name: "path", Type: field.TypeString, Size: 500},
 		{Name: "size", Type: field.TypeInt, Default: 0},
+		{Name: "parsed_at", Type: field.TypeTime},
 		{Name: "indexed_at", Type: field.TypeTime},
 		{Name: "created_at", Type: field.TypeTime},
 		{Name: "updated_at", Type: field.TypeTime},

@@ -35,6 +35,8 @@ type Page struct {
 	Path string `json:"path,omitempty"`
 	// 文件大小
 	Size int `json:"size,omitempty"`
+	// 最后解析时间
+	ParsedAt time.Time `json:"parsed_at,omitempty"`
 	// 最后索引时间
 	IndexedAt time.Time `json:"indexed_at,omitempty"`
 	// 入库时间
@@ -53,7 +55,7 @@ func (*Page) scanValues(columns []string) ([]any, error) {
 			values[i] = new(sql.NullInt64)
 		case page.FieldUniqueID, page.FieldTitle, page.FieldExcerpt, page.FieldContent, page.FieldURL, page.FieldPath:
 			values[i] = new(sql.NullString)
-		case page.FieldIndexedAt, page.FieldCreatedAt, page.FieldUpdatedAt:
+		case page.FieldParsedAt, page.FieldIndexedAt, page.FieldCreatedAt, page.FieldUpdatedAt:
 			values[i] = new(sql.NullTime)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -129,6 +131,12 @@ func (pa *Page) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field size", values[i])
 			} else if value.Valid {
 				pa.Size = int(value.Int64)
+			}
+		case page.FieldParsedAt:
+			if value, ok := values[i].(*sql.NullTime); !ok {
+				return fmt.Errorf("unexpected type %T for field parsed_at", values[i])
+			} else if value.Valid {
+				pa.ParsedAt = value.Time
 			}
 		case page.FieldIndexedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
@@ -210,6 +218,9 @@ func (pa *Page) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("size=")
 	builder.WriteString(fmt.Sprintf("%v", pa.Size))
+	builder.WriteString(", ")
+	builder.WriteString("parsed_at=")
+	builder.WriteString(pa.ParsedAt.Format(time.ANSIC))
 	builder.WriteString(", ")
 	builder.WriteString("indexed_at=")
 	builder.WriteString(pa.IndexedAt.Format(time.ANSIC))

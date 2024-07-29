@@ -27,6 +27,7 @@ func (Page) Fields() []ent.Field {
 		field.String("url").MaxLen(2048).Comment("原始地址"),
 		field.String("path").MaxLen(500).Comment("完整本地文件地址"),
 		field.Int("size").Default(0).Comment("文件大小"),
+		field.Time("parsed_at").Default(time.Time{}).Comment("最后解析时间"),
 		field.Time("indexed_at").Default(time.Time{}).Comment("最后索引时间"),
 		field.Time("created_at").Immutable().Default(time.Now).Comment("入库时间"),
 		field.Time("updated_at").Default(time.Now).UpdateDefault(time.Now).Comment("最后更新时间"),
