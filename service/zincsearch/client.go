@@ -11,6 +11,7 @@ import (
 const (
 	ApiDocCreateWithId       = "/api/%s/_doc/%s"
 	ApiDocDeleteWithId       = "/api/%s/_doc/%s"
+	ApiDocGetWithId          = "/api/%s/_doc/%s"
 	ApiIndexCreateUpdateList = "/api/index"
 	ApiSearchEs              = "/es/%s/_search"
 )

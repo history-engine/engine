@@ -8,8 +8,25 @@ import (
 	"net/http"
 )
 
+func GetDocument(userId int64, uniqueId string, version int) (*model.ZincReadDocument, error) {
+	docId := fmt.Sprintf("%s%d", uniqueId, version)
+	api := fmt.Sprintf(ApiDocGetWithId, IndexName(userId), docId)
+	content, err := SendRequest(api, http.MethodGet, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	zrd := &model.ZincReadDocument{}
+	err = json.Unmarshal(content, zrd)
+	if zrd.Error != "" {
+		return nil, errors.New(zrd.Error)
+	}
+
+	return zrd, err
+}
+
 // PutDocument 添加数据到ZincSearch索引
-func PutDocument(userId int64, docId string, doc *model.ZincDocument) error {
+func PutDocument(userId int64, docId string, doc *model.ZincWriteDocument) error {
 	api := fmt.Sprintf(ApiDocCreateWithId, IndexName(userId), docId)
 	content, err := SendRequest(api, http.MethodPut, doc)
 	if err != nil {

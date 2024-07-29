@@ -2,11 +2,21 @@ package model
 
 import "time"
 
-type ZincDocument struct {
+type ZincWriteDocument struct {
 	Title   string `json:"title"`
 	Excerpt string `json:"excerpt"`
 	Content string `json:"content"`
 	Url     string `json:"url"`
+}
+
+type ZincReadDocument struct {
+	Index     string    `json:"_index"`
+	Type      string    `json:"_type"`
+	Id        string    `json:"_id"`
+	Score     float64   `json:"_score"`
+	Timestamp time.Time `json:"@timestamp"`
+	Source    any       `json:"_source"` // todo
+	Error     string    `json:"error"`
 }
 
 type ZincSearch struct {
