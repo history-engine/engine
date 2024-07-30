@@ -1,6 +1,7 @@
 package zincsearch
 
 import (
+	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -12,7 +13,7 @@ import (
 )
 
 // EsSearch Search V2 ES语法兼容
-func EsSearch(userId int64, search model.SearchPage) (resp model.ZincSearchResponse, err error) {
+func EsSearch(ctx context.Context, userId int64, search model.SearchRequest) (resp model.ZincSearchResponse, err error) {
 	query := model.ZincQuery{
 		Size: search.Limit,
 		From: (search.Page - 1) * search.Limit,
@@ -67,7 +68,7 @@ func EsSearch(userId int64, search model.SearchPage) (resp model.ZincSearchRespo
 	}
 
 	api := fmt.Sprintf(ApiSearchEs, IndexName(userId))
-	body, err := SendRequest(api, http.MethodPost, query)
+	body, err := SendRequest(ctx, api, http.MethodPost, query)
 	if err != nil {
 		return
 	}

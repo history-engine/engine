@@ -8,7 +8,7 @@ import (
 	"history-engine/engine/ent/page"
 	"history-engine/engine/library/db"
 	"history-engine/engine/model"
-	"history-engine/engine/service/zincsearch"
+	"history-engine/engine/service/search"
 	"time"
 )
 
@@ -45,14 +45,15 @@ func putIndex(ctx context.Context, row model.PageParse) error {
 		return errors.New("page not parsed")
 	}
 
-	zincId := fmt.Sprintf("%s%d", item.UniqueID, item.Version)
-	zincDoc := &model.ZincWriteDocument{
+	docId := fmt.Sprintf("%s%d", item.UniqueID, item.Version)
+	doc := &model.SearchEngineDocument{
 		Url:     item.URL,
 		Title:   item.Title,
 		Excerpt: item.Excerpt,
 		Content: item.Content,
 	}
-	if err = zincsearch.PutDocument(item.UserID, zincId, zincDoc); err != nil {
+
+	if err := search.Engine().PutDocument(ctx, item.UserID, docId, doc); err != nil {
 		return err
 	}
 

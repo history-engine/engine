@@ -32,12 +32,19 @@ max_size = 20971520 # 20MB
 parser = "mozilla" # 解析器，目前只支持mozilla
 exec_path = "/usr/lib/readability.js" # readability-parse脚本路径，为空会从系统环境变量PATH下查找
 
+[search]
+engine = "meili" # zinc、meili、es
+prefix = "history_engine_index"
+
 [zincsearch]
-host = "http://localhost"
+host = "http://localhost:4080"
 shared_num = 3
-index_prefix = "history_engine_index"
 user = "admin"
 password = "admin"
+
+[meilisearch]
+host = "http://localhost:7070"
+master_key = "" # https://www.meilisearch.com/docs/learn/configuration/instance_options#master-key
 
 [database]
 drive = "mysql" #取值范围：mysql(tidb、mariadb)、sqlite3、postgres

@@ -1,6 +1,7 @@
 package page
 
 import (
+	"fmt"
 	"github.com/urfave/cli/v2"
 	"go.uber.org/zap"
 	"history-engine/engine/ent"
@@ -8,7 +9,7 @@ import (
 	"history-engine/engine/library/db"
 	"history-engine/engine/library/logger"
 	"history-engine/engine/service/page"
-	"history-engine/engine/service/zincsearch"
+	"history-engine/engine/service/search"
 	"time"
 )
 
@@ -22,7 +23,6 @@ var IndexCheck = &cli.Command{
 }
 
 func runIndexCheck(ctx *cli.Context) error {
-	start := 0
 	limit := 100
 	time.Now().IsZero()
 	x := db.GetEngine().Page
@@ -30,7 +30,6 @@ func runIndexCheck(ctx *cli.Context) error {
 		list, err := x.Query().
 			Where(entPage.And(entPage.ContentNEQ(""), entPage.IndexedAtEQ(timeZero))).
 			Order(ent.Desc(entPage.FieldID)).
-			Offset(start).
 			Limit(limit).
 			All(ctx.Context)
 		if err != nil {
@@ -41,19 +40,17 @@ func runIndexCheck(ctx *cli.Context) error {
 			break
 		}
 
-		start += limit
 		time.Sleep(time.Millisecond * 100)
 
 		for _, item := range list {
-			doc, err := zincsearch.GetDocument(item.UserID, item.UniqueID, item.Version)
-			if err != nil && err.Error() != "id not found" {
-				continue
-			}
+			docId := fmt.Sprintf("%s%d", item.UniqueID, item.Version)
+			doc, _ := search.Engine().GetDocument(ctx.Context, item.UserID, docId)
 
-			if doc != nil {
+			if doc != nil && doc.Id != "" {
 				x.Update().SetIndexedAt(time.Now()).Where(entPage.ID(item.ID)).Save(ctx.Context)
 				continue
 			}
+
 			if err := page.PutIndexWithId(item.ID); err != nil {
 				logger.Zap().Warn("put index err", zap.Error(err), zap.Int64("id", item.ID))
 			}

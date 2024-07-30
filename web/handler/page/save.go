@@ -107,7 +107,7 @@ func Save(c echo.Context) error {
 			return
 		}
 		if err := page.PutIndexWithId(row.ID); err != nil {
-			logger.Zap().Warn("put zinc index err", zap.Error(err), zap.Any("page", row))
+			logger.Zap().Warn("put search index err", zap.Error(err), zap.Any("page", row))
 		}
 	}()
 	go func() {

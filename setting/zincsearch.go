@@ -11,30 +11,23 @@ import (
 	"os"
 )
 
-var (
-	ZincSearch = struct {
-		Host        string
-		IndexPrefix string
-		SharedNum   int
-		User        string
-		Password    string
-	}{
-		Host:        "http://localhost:4080",
-		IndexPrefix: "history_engine_index",
-		SharedNum:   3,
-		User:        "admin",
-		Password:    "",
-	}
-)
+var ZincSearch = struct {
+	Host      string
+	SharedNum int
+	User      string
+	Password  string
+}{
+	Host:      "http://localhost:4080",
+	SharedNum: 3,
+	User:      "admin",
+	Password:  "",
+}
 
 func loadZincSearch() {
 	v := viper.Sub("zincsearch")
 	if v != nil {
 		if v.IsSet("host") {
 			ZincSearch.Host = v.GetString("host")
-		}
-		if v.IsSet("index_prefix") {
-			ZincSearch.IndexPrefix = v.GetString("index_prefix")
 		}
 		if v.IsSet("shared_num") {
 			ZincSearch.SharedNum = v.GetInt("shared_num")
@@ -47,8 +40,10 @@ func loadZincSearch() {
 		}
 	}
 
-	checkZincSearchVersion()
-	checkIndexTemplate()
+	if Search.Engine == "zinc" {
+		checkZincSearchVersion()
+		checkIndexTemplate()
+	}
 }
 
 func checkZincSearchVersion() {
@@ -89,8 +84,8 @@ func checkIndexTemplate() {
 		log.Fatalf("read zinc template err: %v\n", err)
 	}
 
-	name := fmt.Sprintf("%s_%s_%s", ZincSearch.IndexPrefix, Common.Env, "template")
-	pattern := fmt.Sprintf("%s_%s_%s", ZincSearch.IndexPrefix, Common.Env, "*")
+	name := fmt.Sprintf("%s_%s_%s", Search.Prefix, Common.Env, "template")
+	pattern := fmt.Sprintf("%s_%s_%s", Search.Prefix, Common.Env, "*")
 	content = bytes.Replace(content, []byte("__NAME__"), []byte(name), 1)
 	content = bytes.Replace(content, []byte("__PATTERN__"), []byte(pattern), 1)
 

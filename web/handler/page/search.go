@@ -9,7 +9,9 @@ import (
 )
 
 func Search(c echo.Context) error {
-	req := model.SearchPage{}
+	userId := c.Get("uid").(int64)
+
+	req := model.SearchRequest{}
 	if err := c.Bind(&req); err != nil {
 		return c.String(400, err.Error())
 	}
@@ -30,11 +32,10 @@ func Search(c echo.Context) error {
 		req.EndTime = time.Now()
 	}
 
-	userId := c.Get("uid").(int64)
-	list, total, err := page.Search(c.Request().Context(), userId, req)
+	result, err := page.Search(c.Request().Context(), userId, req)
 	if err != nil {
 		panic(err)
 	}
 
-	return utils.ApiSuccess(c, model.SearchResponse{Total: total, Pages: list})
+	return utils.ApiSuccess(c, model.SearchResponse{Total: result.Total, Pages: result.Pages})
 }

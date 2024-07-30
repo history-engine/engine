@@ -1,4 +1,4 @@
-package zincsearch
+package meilisearch
 
 import (
 	"bytes"
@@ -9,14 +9,14 @@ import (
 	"net/http"
 )
 
-// todo ZincSearch 调用封装，可以考虑封装为独立的sdk，search包直接调用sdk
+// todo MeiliSearch 调用封装，理论上整个包都可以删除掉，search包改为调用官方sdk
 
 const (
-	ApiDocCreateWithId       = "/api/%s/_doc/%s"
-	ApiDocDeleteWithId       = "/api/%s/_doc/%s"
-	ApiDocGetWithId          = "/api/%s/_doc/%s"
-	ApiIndexCreateUpdateList = "/api/index"
-	ApiSearchEs              = "/es/%s/_search"
+	ApiDocCreate    = "/indexes/%s/documents"
+	ApiDocDelete    = "/indexes/%s/documents/%s"
+	ApiDocGetWithId = "/indexes/%s/documents/%s"
+	ApiIndexCreate  = "/indexes"
+	ApiSearch       = "/indexes/%s/search"
 )
 
 var client *http.Client
@@ -39,13 +39,13 @@ func SendRequest(ctx context.Context, api, method string, data any) ([]byte, err
 		}
 	}
 
-	req, err := http.NewRequestWithContext(ctx, method, setting.ZincSearch.Host+api, bytes.NewReader(content))
+	req, err := http.NewRequestWithContext(ctx, method, setting.MeiliSearch.Host+api, bytes.NewReader(content))
 	if err != nil {
 		return nil, err
 	}
 
 	req.Header.Set("Content-Type", "application/json")
-	req.SetBasicAuth(setting.ZincSearch.User, setting.ZincSearch.Password)
+	req.Header.Set("Authorization", "Bearer "+setting.MeiliSearch.MasterKey)
 
 	res, err := client.Do(req)
 	if err != nil {

@@ -27,7 +27,7 @@ func ParserPage(userId int64, uniqueId string, version int) error {
 	return parserPage(context.Background(), row)
 }
 
-// ParserPage 调用readability分析HTML文件，添加到ZincSearch、保存数据库
+// ParserPage 调用readability分析HTML文件、保存数据库
 func parserPage(ctx context.Context, row model.PageParse) error {
 	x := db.GetEngine()
 

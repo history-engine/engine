@@ -4,12 +4,13 @@ import (
 	"context"
 	"entgo.io/ent/dialect/sql"
 	"errors"
+	"fmt"
 	"go.uber.org/zap"
 	"history-engine/engine/ent"
 	"history-engine/engine/ent/page"
 	"history-engine/engine/library/db"
 	"history-engine/engine/library/logger"
-	"history-engine/engine/service/zincsearch"
+	"history-engine/engine/service/search"
 	"history-engine/engine/setting"
 	"os"
 	"time"
@@ -58,8 +59,8 @@ func CleanHistory(ctx context.Context, userId int64, uniqueId string, version in
 
 	var err error
 	for _, v := range vs {
-		if err := x.Page.DeleteOneID(v.Id).Exec(ctx); err != nil {
-			logger.Zap().Error("delete page err", zap.Int64("id", v.Id))
+		docId := fmt.Sprintf("%s%d", uniqueId, version)
+		if err := search.Engine().DelDocument(ctx, userId, docId); err != nil {
 			err = errors.Join(err)
 			continue
 		}
@@ -69,8 +70,10 @@ func CleanHistory(ctx context.Context, userId int64, uniqueId string, version in
 			continue
 		}
 
-		if err := zincsearch.DelDocument(userId, uniqueId, v.Version); err != nil {
+		if err := x.Page.DeleteOneID(v.Id).Exec(ctx); err != nil {
+			logger.Zap().Error("delete page err", zap.Int64("id", v.Id))
 			err = errors.Join(err)
+			continue
 		}
 	}
 

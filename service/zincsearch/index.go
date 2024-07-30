@@ -1,6 +1,7 @@
 package zincsearch
 
 import (
+	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -10,14 +11,14 @@ import (
 )
 
 // CreateIndex 创建用户索引
-func CreateIndex(userId int64) error {
+func CreateIndex(ctx context.Context, userId int64) error {
 	index := model.Index{
 		Name:        IndexName(userId),
 		StorageType: "disk",
 		Settings:    &model.IndexSettings{},
 		Mappings:    &model.Mappings{},
 	}
-	content, err := SendRequest(ApiIndexCreateUpdateList, http.MethodPut, index)
+	content, err := SendRequest(ctx, ApiIndexCreateUpdateList, http.MethodPut, index)
 	if err != nil {
 		return err
 	}
@@ -32,5 +33,5 @@ func CreateIndex(userId int64) error {
 }
 
 func IndexName(userId int64) string {
-	return fmt.Sprintf("%s_%s_%d", setting.ZincSearch.IndexPrefix, setting.Common.Env, userId)
+	return fmt.Sprintf("%s_%s_%d", setting.Search.Prefix, setting.Common.Env, userId)
 }

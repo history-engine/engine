@@ -1,51 +1,14 @@
 {
     "name": "__NAME__",
     "index_patterns": ["__PATTERN__"],
-    "priority": 100,
     "template": {
-        "settings": {
-            "number_of_shards": 3,
-            "number_of_replicas": 0,
-            "analysis": {
-                "analyzer": {
-                    "default": {
-                        "type": "standard"
-                    },
-                    "title": {
-                        "tokenizer": "gse_search",
-                        "char_filter": [],
-                        "token_filter": []
-                    },
-                    "excerpt": {
-                        "tokenizer": "gse_search",
-                        "char_filter": [],
-                        "token_filter": []
-                    },
-                    "content": {
-                        "tokenizer": "gse_search",
-                        "char_filter": [],
-                        "token_filter": []
-                    }
-                },
-                "char_filter": {
-                    "my_mappings_char_filter": {
-                        "type": "mapping",
-                        "mappings": [
-                            ":) => _happy_",
-                            ":( => _sad_"
-                        ]
-                    }
-                },
-                "tokenizer": {},
-                "token_filter": {}
-            }
-        },
+        "settings": {},
         "mappings": {
             "properties": {
                 "title": {
                     "type": "text",
-                    "analyzer": "title",
-                    "search_analyzer": "title",
+                    "analyzer": "gse_search",
+                    "search_analyzer": "gse_standard",
                     "index": true,
                     "store": false,
                     "sortable": false,
@@ -54,8 +17,8 @@
                 },
                 "excerpt": {
                     "type": "text",
-                    "analyzer": "excerpt",
-                    "search_analyzer": "excerpt",
+                    "analyzer": "gse_search",
+                    "search_analyzer": "gse_standard",
                     "index": true,
                     "store": false,
                     "sortable": false,
@@ -64,8 +27,8 @@
                 },
                 "content": {
                     "type": "text",
-                    "analyzer": "content",
-                    "search_analyzer": "content",
+                    "analyzer": "gse_search",
+                    "search_analyzer": "gse_standard",
                     "index": true,
                     "store": false,
                     "sortable": false,
@@ -74,8 +37,6 @@
                 },
                 "url": {
                     "type": "text",
-                    "analyzer": "default",
-                    "search_analyzer": "default",
                     "index": true,
                     "store": false,
                     "sortable": false,

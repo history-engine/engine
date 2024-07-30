@@ -9,7 +9,7 @@ import (
 	"history-engine/engine/library/db"
 	"history-engine/engine/library/logger"
 	"history-engine/engine/model"
-	"history-engine/engine/service/zincsearch"
+	"history-engine/engine/service/search"
 	"history-engine/engine/utils"
 )
 
@@ -56,7 +56,7 @@ func Register(ctx context.Context, req *model.UserRegisterReq) (*ent.User, model
 		return nil, model.ErrorEmpty
 	}
 
-	if err := zincsearch.CreateIndex(user.ID); err != nil {
+	if err := search.Engine().CreateIndex(ctx, user.ID); err != nil {
 		return nil, model.ErrorInternal
 	}
 

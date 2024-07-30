@@ -21,6 +21,8 @@ func Load(file string) error {
 	loadWeb()
 	loadRedis()
 	loadDatabase()
+	loadSearch()
+	loadMeiliSearch()
 	loadZincSearch()
 	loadReadability()
 	loadSingleFile()
