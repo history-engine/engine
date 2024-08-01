@@ -4,10 +4,52 @@ import (
 	"context"
 	"fmt"
 	"history-engine/engine/ent"
+	"history-engine/engine/ent/page"
+	"history-engine/engine/library/db"
 	"history-engine/engine/model"
 	"history-engine/engine/service/search"
 	"history-engine/engine/setting"
 )
+
+func LatestList(ctx context.Context, userId int64, request model.SearchRequest) (int, []model.SearchResultPage, error) {
+	x := db.GetEngine()
+
+	total, err := x.Page.Query().Count(ctx)
+	if err != nil {
+		return 0, nil, err
+	}
+
+	source, err := x.Page.
+		Query().
+		Where(page.UserID(userId)).
+		Order(ent.Desc(page.FieldID)).
+		Offset((request.Page - 1) * request.Limit).
+		Limit(request.Limit).
+		All(ctx)
+	if err != nil {
+		return 0, nil, err
+	}
+
+	pages := make([]model.SearchResultPage, 0)
+	for _, item := range source {
+		row := model.SearchResultPage{
+			Avatar:    "https://avatars.akamai.steamstatic.com/6a9ae9c069cd4fff8bf954938727730cdb0fe27b.jpg",
+			Url:       item.URL,
+			Title:     item.Title,
+			Excerpt:   item.Excerpt,
+			Content:   item.Content,
+			Size:      item.Size,
+			Preview:   setting.Web.Domain + "/page/view" + fmt.Sprintf("/%s.%d.html", item.UniqueID, item.Version),
+			DocId:     fmt.Sprintf("%s%d", item.UniqueID, item.Version),
+			UniqueId:  item.UniqueID,
+			Version:   item.Version,
+			CreatedAt: item.CreatedAt,
+		}
+		pages = append(pages, row)
+	}
+
+	return total, pages, err
+}
 
 func Search(ctx context.Context, userId int64, request model.SearchRequest) (int, []model.SearchResultPage, error) {
 	resp, err := search.Engine().Search(ctx, userId, request)

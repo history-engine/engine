@@ -9,6 +9,7 @@ import (
 )
 
 func Search(c echo.Context) error {
+	var err error
 	userId := c.Get("uid").(int64)
 
 	req := model.SearchRequest{}
@@ -32,10 +33,16 @@ func Search(c echo.Context) error {
 		req.EndTime = time.Now()
 	}
 
-	total, pages, err := page.Search(c.Request().Context(), userId, req)
+	resp := model.SearchResponse{}
+	if req.Query == "" {
+		resp.Total, resp.Pages, err = page.LatestList(c.Request().Context(), userId, req)
+
+	} else {
+		resp.Total, resp.Pages, err = page.Search(c.Request().Context(), userId, req)
+	}
 	if err != nil {
 		return c.JSON(200, model.ApiResponse{Code: -1, Message: err.Error()})
 	}
 
-	return utils.ApiSuccess(c, model.SearchResponse{Total: total, Pages: pages})
+	return utils.ApiSuccess(c, resp)
 }
