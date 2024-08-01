@@ -9,10 +9,10 @@ import (
 	"history-engine/engine/setting"
 )
 
-func Search(ctx context.Context, userId int64, request model.SearchRequest) (*model.SearchResponse, error) {
+func Search(ctx context.Context, userId int64, request model.SearchRequest) (int, []model.SearchResultPage, error) {
 	resp, err := search.Engine().Search(ctx, userId, request)
 	if err != nil {
-		return resp, err
+		return 0, nil, err
 	}
 
 	// 提取页面id，忽略版本
@@ -32,6 +32,7 @@ func Search(ctx context.Context, userId int64, request model.SearchRequest) (*mo
 	for k, item := range resp.Pages {
 		page, ok := docMap[item.DocId]
 		if !ok { // 搜索引擎存储，数据库不存在
+			search.Engine().DelDocument(context.Background(), userId, item.DocId)
 			continue
 		}
 
@@ -46,5 +47,5 @@ func Search(ctx context.Context, userId int64, request model.SearchRequest) (*mo
 		resp.Pages[k].CreatedAt = page.CreatedAt
 	}
 
-	return resp, err
+	return resp.Total, resp.Pages, err
 }

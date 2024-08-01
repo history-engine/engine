@@ -32,10 +32,10 @@ func Search(c echo.Context) error {
 		req.EndTime = time.Now()
 	}
 
-	result, err := page.Search(c.Request().Context(), userId, req)
+	total, pages, err := page.Search(c.Request().Context(), userId, req)
 	if err != nil {
-		panic(err)
+		return c.JSON(200, model.ApiResponse{Code: -1, Message: err.Error()})
 	}
 
-	return utils.ApiSuccess(c, model.SearchResponse{Total: result.Total, Pages: result.Pages})
+	return utils.ApiSuccess(c, model.SearchResponse{Total: total, Pages: pages})
 }
