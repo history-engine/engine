@@ -15,6 +15,7 @@ var (
 		MinVersionInterval   int // todo 可针对性配置，可动态
 		VersionCheckInterval int
 		VersionCheckLimit    int
+		MinSize              int
 		MaxSize              int
 	}{
 		HtmlPath:             "data/html",
@@ -22,6 +23,7 @@ var (
 		MinVersionInterval:   86400,
 		VersionCheckInterval: 300,
 		VersionCheckLimit:    100,
+		MinSize:              1024 * 5,
 		MaxSize:              1024 * 1024 * 20,
 	}
 )
@@ -43,6 +45,9 @@ func loadSingleFile() {
 		}
 		if v.IsSet("version_check_limit") {
 			SingleFile.VersionCheckLimit = v.GetInt("version_check_limit")
+		}
+		if v.IsSet("min_size") {
+			SingleFile.MaxSize = v.GetInt("min_size")
 		}
 		if v.IsSet("max_size") {
 			SingleFile.MaxSize = v.GetInt("max_size")
