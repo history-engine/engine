@@ -80,7 +80,7 @@ func save(hi *model.HtmlInfo, c echo.Context) error {
 	ctx := c.Request().Context()
 	version, _ := page.NextVersion(ctx, hi.Sha1)
 
-	logger.Zap().Debug("rest receive singleFile",
+	logger.Zap().Info("rest receive singleFile",
 		zap.String("url", hi.Url),
 		zap.String("uniqueId", hi.Sha1),
 		zap.Int("version", version))
