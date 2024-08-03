@@ -9,6 +9,7 @@ import (
 	"history-engine/engine/ent/predicate"
 	"math"
 
+	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
@@ -60,7 +61,7 @@ func (pq *PageQuery) Order(o ...page.OrderOption) *PageQuery {
 // First returns the first Page entity from the query.
 // Returns a *NotFoundError when no Page was found.
 func (pq *PageQuery) First(ctx context.Context) (*Page, error) {
-	nodes, err := pq.Limit(1).All(setContextOp(ctx, pq.ctx, "First"))
+	nodes, err := pq.Limit(1).All(setContextOp(ctx, pq.ctx, ent.OpQueryFirst))
 	if err != nil {
 		return nil, err
 	}
@@ -83,7 +84,7 @@ func (pq *PageQuery) FirstX(ctx context.Context) *Page {
 // Returns a *NotFoundError when no Page ID was found.
 func (pq *PageQuery) FirstID(ctx context.Context) (id int64, err error) {
 	var ids []int64
-	if ids, err = pq.Limit(1).IDs(setContextOp(ctx, pq.ctx, "FirstID")); err != nil {
+	if ids, err = pq.Limit(1).IDs(setContextOp(ctx, pq.ctx, ent.OpQueryFirstID)); err != nil {
 		return
 	}
 	if len(ids) == 0 {
@@ -106,7 +107,7 @@ func (pq *PageQuery) FirstIDX(ctx context.Context) int64 {
 // Returns a *NotSingularError when more than one Page entity is found.
 // Returns a *NotFoundError when no Page entities are found.
 func (pq *PageQuery) Only(ctx context.Context) (*Page, error) {
-	nodes, err := pq.Limit(2).All(setContextOp(ctx, pq.ctx, "Only"))
+	nodes, err := pq.Limit(2).All(setContextOp(ctx, pq.ctx, ent.OpQueryOnly))
 	if err != nil {
 		return nil, err
 	}
@@ -134,7 +135,7 @@ func (pq *PageQuery) OnlyX(ctx context.Context) *Page {
 // Returns a *NotFoundError when no entities are found.
 func (pq *PageQuery) OnlyID(ctx context.Context) (id int64, err error) {
 	var ids []int64
-	if ids, err = pq.Limit(2).IDs(setContextOp(ctx, pq.ctx, "OnlyID")); err != nil {
+	if ids, err = pq.Limit(2).IDs(setContextOp(ctx, pq.ctx, ent.OpQueryOnlyID)); err != nil {
 		return
 	}
 	switch len(ids) {
@@ -159,7 +160,7 @@ func (pq *PageQuery) OnlyIDX(ctx context.Context) int64 {
 
 // All executes the query and returns a list of Pages.
 func (pq *PageQuery) All(ctx context.Context) ([]*Page, error) {
-	ctx = setContextOp(ctx, pq.ctx, "All")
+	ctx = setContextOp(ctx, pq.ctx, ent.OpQueryAll)
 	if err := pq.prepareQuery(ctx); err != nil {
 		return nil, err
 	}
@@ -181,7 +182,7 @@ func (pq *PageQuery) IDs(ctx context.Context) (ids []int64, err error) {
 	if pq.ctx.Unique == nil && pq.path != nil {
 		pq.Unique(true)
 	}
-	ctx = setContextOp(ctx, pq.ctx, "IDs")
+	ctx = setContextOp(ctx, pq.ctx, ent.OpQueryIDs)
 	if err = pq.Select(page.FieldID).Scan(ctx, &ids); err != nil {
 		return nil, err
 	}
@@ -199,7 +200,7 @@ func (pq *PageQuery) IDsX(ctx context.Context) []int64 {
 
 // Count returns the count of the given query.
 func (pq *PageQuery) Count(ctx context.Context) (int, error) {
-	ctx = setContextOp(ctx, pq.ctx, "Count")
+	ctx = setContextOp(ctx, pq.ctx, ent.OpQueryCount)
 	if err := pq.prepareQuery(ctx); err != nil {
 		return 0, err
 	}
@@ -217,7 +218,7 @@ func (pq *PageQuery) CountX(ctx context.Context) int {
 
 // Exist returns true if the query has elements in the graph.
 func (pq *PageQuery) Exist(ctx context.Context) (bool, error) {
-	ctx = setContextOp(ctx, pq.ctx, "Exist")
+	ctx = setContextOp(ctx, pq.ctx, ent.OpQueryExist)
 	switch _, err := pq.FirstID(ctx); {
 	case IsNotFound(err):
 		return false, nil
@@ -449,7 +450,7 @@ func (pgb *PageGroupBy) Aggregate(fns ...AggregateFunc) *PageGroupBy {
 
 // Scan applies the selector query and scans the result into the given value.
 func (pgb *PageGroupBy) Scan(ctx context.Context, v any) error {
-	ctx = setContextOp(ctx, pgb.build.ctx, "GroupBy")
+	ctx = setContextOp(ctx, pgb.build.ctx, ent.OpQueryGroupBy)
 	if err := pgb.build.prepareQuery(ctx); err != nil {
 		return err
 	}
@@ -497,7 +498,7 @@ func (ps *PageSelect) Aggregate(fns ...AggregateFunc) *PageSelect {
 
 // Scan applies the selector query and scans the result into the given value.
 func (ps *PageSelect) Scan(ctx context.Context, v any) error {
-	ctx = setContextOp(ctx, ps.ctx, "Select")
+	ctx = setContextOp(ctx, ps.ctx, ent.OpQuerySelect)
 	if err := ps.prepareQuery(ctx); err != nil {
 		return err
 	}

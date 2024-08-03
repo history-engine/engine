@@ -64,7 +64,21 @@ func init() {
 	// pageDescUniqueID is the schema descriptor for unique_id field.
 	pageDescUniqueID := pageFields[2].Descriptor()
 	// page.UniqueIDValidator is a validator for the "unique_id" field. It is called by the builders before save.
-	page.UniqueIDValidator = pageDescUniqueID.Validators[0].(func(string) error)
+	page.UniqueIDValidator = func() func(string) error {
+		validators := pageDescUniqueID.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(unique_id string) error {
+			for _, fn := range fns {
+				if err := fn(unique_id); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
 	// pageDescVersion is the schema descriptor for version field.
 	pageDescVersion := pageFields[3].Descriptor()
 	// page.DefaultVersion holds the default value on creation for the version field.
@@ -86,11 +100,39 @@ func init() {
 	// pageDescURL is the schema descriptor for url field.
 	pageDescURL := pageFields[7].Descriptor()
 	// page.URLValidator is a validator for the "url" field. It is called by the builders before save.
-	page.URLValidator = pageDescURL.Validators[0].(func(string) error)
+	page.URLValidator = func() func(string) error {
+		validators := pageDescURL.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(url string) error {
+			for _, fn := range fns {
+				if err := fn(url); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
 	// pageDescPath is the schema descriptor for path field.
 	pageDescPath := pageFields[8].Descriptor()
 	// page.PathValidator is a validator for the "path" field. It is called by the builders before save.
-	page.PathValidator = pageDescPath.Validators[0].(func(string) error)
+	page.PathValidator = func() func(string) error {
+		validators := pageDescPath.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(_path string) error {
+			for _, fn := range fns {
+				if err := fn(_path); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
 	// pageDescSize is the schema descriptor for size field.
 	pageDescSize := pageFields[9].Descriptor()
 	// page.DefaultSize holds the default value on creation for the size field.

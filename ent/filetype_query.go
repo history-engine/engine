@@ -9,6 +9,7 @@ import (
 	"history-engine/engine/ent/predicate"
 	"math"
 
+	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
@@ -60,7 +61,7 @@ func (ftq *FileTypeQuery) Order(o ...filetype.OrderOption) *FileTypeQuery {
 // First returns the first FileType entity from the query.
 // Returns a *NotFoundError when no FileType was found.
 func (ftq *FileTypeQuery) First(ctx context.Context) (*FileType, error) {
-	nodes, err := ftq.Limit(1).All(setContextOp(ctx, ftq.ctx, "First"))
+	nodes, err := ftq.Limit(1).All(setContextOp(ctx, ftq.ctx, ent.OpQueryFirst))
 	if err != nil {
 		return nil, err
 	}
@@ -83,7 +84,7 @@ func (ftq *FileTypeQuery) FirstX(ctx context.Context) *FileType {
 // Returns a *NotFoundError when no FileType ID was found.
 func (ftq *FileTypeQuery) FirstID(ctx context.Context) (id int64, err error) {
 	var ids []int64
-	if ids, err = ftq.Limit(1).IDs(setContextOp(ctx, ftq.ctx, "FirstID")); err != nil {
+	if ids, err = ftq.Limit(1).IDs(setContextOp(ctx, ftq.ctx, ent.OpQueryFirstID)); err != nil {
 		return
 	}
 	if len(ids) == 0 {
@@ -106,7 +107,7 @@ func (ftq *FileTypeQuery) FirstIDX(ctx context.Context) int64 {
 // Returns a *NotSingularError when more than one FileType entity is found.
 // Returns a *NotFoundError when no FileType entities are found.
 func (ftq *FileTypeQuery) Only(ctx context.Context) (*FileType, error) {
-	nodes, err := ftq.Limit(2).All(setContextOp(ctx, ftq.ctx, "Only"))
+	nodes, err := ftq.Limit(2).All(setContextOp(ctx, ftq.ctx, ent.OpQueryOnly))
 	if err != nil {
 		return nil, err
 	}
@@ -134,7 +135,7 @@ func (ftq *FileTypeQuery) OnlyX(ctx context.Context) *FileType {
 // Returns a *NotFoundError when no entities are found.
 func (ftq *FileTypeQuery) OnlyID(ctx context.Context) (id int64, err error) {
 	var ids []int64
-	if ids, err = ftq.Limit(2).IDs(setContextOp(ctx, ftq.ctx, "OnlyID")); err != nil {
+	if ids, err = ftq.Limit(2).IDs(setContextOp(ctx, ftq.ctx, ent.OpQueryOnlyID)); err != nil {
 		return
 	}
 	switch len(ids) {
@@ -159,7 +160,7 @@ func (ftq *FileTypeQuery) OnlyIDX(ctx context.Context) int64 {
 
 // All executes the query and returns a list of FileTypes.
 func (ftq *FileTypeQuery) All(ctx context.Context) ([]*FileType, error) {
-	ctx = setContextOp(ctx, ftq.ctx, "All")
+	ctx = setContextOp(ctx, ftq.ctx, ent.OpQueryAll)
 	if err := ftq.prepareQuery(ctx); err != nil {
 		return nil, err
 	}
@@ -181,7 +182,7 @@ func (ftq *FileTypeQuery) IDs(ctx context.Context) (ids []int64, err error) {
 	if ftq.ctx.Unique == nil && ftq.path != nil {
 		ftq.Unique(true)
 	}
-	ctx = setContextOp(ctx, ftq.ctx, "IDs")
+	ctx = setContextOp(ctx, ftq.ctx, ent.OpQueryIDs)
 	if err = ftq.Select(filetype.FieldID).Scan(ctx, &ids); err != nil {
 		return nil, err
 	}
@@ -199,7 +200,7 @@ func (ftq *FileTypeQuery) IDsX(ctx context.Context) []int64 {
 
 // Count returns the count of the given query.
 func (ftq *FileTypeQuery) Count(ctx context.Context) (int, error) {
-	ctx = setContextOp(ctx, ftq.ctx, "Count")
+	ctx = setContextOp(ctx, ftq.ctx, ent.OpQueryCount)
 	if err := ftq.prepareQuery(ctx); err != nil {
 		return 0, err
 	}
@@ -217,7 +218,7 @@ func (ftq *FileTypeQuery) CountX(ctx context.Context) int {
 
 // Exist returns true if the query has elements in the graph.
 func (ftq *FileTypeQuery) Exist(ctx context.Context) (bool, error) {
-	ctx = setContextOp(ctx, ftq.ctx, "Exist")
+	ctx = setContextOp(ctx, ftq.ctx, ent.OpQueryExist)
 	switch _, err := ftq.FirstID(ctx); {
 	case IsNotFound(err):
 		return false, nil
@@ -449,7 +450,7 @@ func (ftgb *FileTypeGroupBy) Aggregate(fns ...AggregateFunc) *FileTypeGroupBy {
 
 // Scan applies the selector query and scans the result into the given value.
 func (ftgb *FileTypeGroupBy) Scan(ctx context.Context, v any) error {
-	ctx = setContextOp(ctx, ftgb.build.ctx, "GroupBy")
+	ctx = setContextOp(ctx, ftgb.build.ctx, ent.OpQueryGroupBy)
 	if err := ftgb.build.prepareQuery(ctx); err != nil {
 		return err
 	}
@@ -497,7 +498,7 @@ func (fts *FileTypeSelect) Aggregate(fns ...AggregateFunc) *FileTypeSelect {
 
 // Scan applies the selector query and scans the result into the given value.
 func (fts *FileTypeSelect) Scan(ctx context.Context, v any) error {
-	ctx = setContextOp(ctx, fts.ctx, "Select")
+	ctx = setContextOp(ctx, fts.ctx, ent.OpQuerySelect)
 	if err := fts.prepareQuery(ctx); err != nil {
 		return err
 	}

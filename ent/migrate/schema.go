@@ -57,7 +57,7 @@ var (
 	PageColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt64, Increment: true},
 		{Name: "user_id", Type: field.TypeInt64},
-		{Name: "unique_id", Type: field.TypeString, Size: 32},
+		{Name: "unique_id", Type: field.TypeString, Size: 40},
 		{Name: "version", Type: field.TypeInt, Default: 1},
 		{Name: "title", Type: field.TypeString, Size: 500, Default: ""},
 		{Name: "excerpt", Type: field.TypeString, Size: 2147483647, Default: ""},
