@@ -8,8 +8,6 @@ import (
 	"history-engine/engine/ent"
 	"history-engine/engine/library/logger"
 	"history-engine/engine/model"
-	"history-engine/engine/service/filetype"
-	"history-engine/engine/service/host"
 	"history-engine/engine/service/page"
 	"history-engine/engine/service/readability"
 	"history-engine/engine/setting"
@@ -17,7 +15,6 @@ import (
 	"io"
 	"net/http"
 	"os"
-	"strconv"
 )
 
 func RestSave(c echo.Context) error {
@@ -46,8 +43,9 @@ func RestSave(c echo.Context) error {
 		IoReader: src,
 	}
 
-	if !preCheck(hi) {
-		return c.String(http.StatusBadRequest, "")
+	if ok, err := page.Filter(hi); !ok {
+		logger.Zap().Info(err.Error())
+		return c.String(http.StatusBadRequest, err.Error())
 	}
 
 	return save(hi, c)
@@ -57,8 +55,9 @@ func WebDavPreSave(c echo.Context) error {
 	hi := page.ParseHtmlInfo(c.Param("file"))
 	hi.UserId = c.Get("uid").(int64)
 
-	if !preCheck(hi) {
-		return c.String(http.StatusBadRequest, "")
+	if ok, err := page.Filter(hi); !ok {
+		logger.Zap().Info(err.Error())
+		return c.JSON(http.StatusBadRequest, err.Error())
 	}
 
 	return c.JSON(http.StatusNotFound, nil)
@@ -75,36 +74,6 @@ func WebDavSave(c echo.Context) error {
 	hi.IoReader = c.Request().Body
 
 	return save(hi, c)
-}
-
-func preCheck(hi *model.HtmlInfo) bool {
-	if hi.Host != "" && !host.Include(hi.UserId, hi.Host) && host.Exclude(hi.UserId, hi.Host) {
-		logger.Zap().Info("ignore by rule: " + hi.Host)
-		return false
-	}
-
-	if hi.Url != "" && !host.Include(hi.UserId, hi.Url) && host.Exclude(hi.UserId, hi.Url) {
-		logger.Zap().Info("ignore by rule: " + hi.Url)
-		return false
-	}
-
-	if hi.Suffix != "" && !filetype.Include(hi.UserId, hi.Suffix) && filetype.Exclude(hi.UserId, hi.Suffix) {
-		logger.Zap().Info("ignore by suffix: " + hi.Suffix)
-		return false
-	}
-
-	if hi.Size > 0 && (hi.Size < 2048 || hi.Size > setting.SingleFile.MaxSize) {
-		logger.Zap().Info("ignore by size: " + strconv.Itoa(hi.Size))
-		return false
-	}
-
-	_, created := page.NextVersion(context.Background(), hi.Sha1)
-	if utils.CheckVersionInterval(setting.SingleFile.MinVersionInterval, created) {
-		logger.Zap().Info("ignore by interval: " + hi.Sha1)
-		return false
-	}
-
-	return true
 }
 
 func save(hi *model.HtmlInfo, c echo.Context) error {

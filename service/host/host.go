@@ -28,6 +28,10 @@ func hostMatch(userId int64, address string, Type int) bool {
 		return false
 	}
 
+	if address[0:4] != "http" {
+		address = "https://" + address
+	}
+
 	parse, err := url.Parse(address)
 	if err != nil {
 		logger.Zap().Warn("parse host err", zap.Error(err))

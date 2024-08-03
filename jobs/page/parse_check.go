@@ -8,11 +8,9 @@ import (
 	entPage "history-engine/engine/ent/page"
 	"history-engine/engine/library/db"
 	"history-engine/engine/library/logger"
-	"history-engine/engine/service/filetype"
-	"history-engine/engine/service/host"
+	"history-engine/engine/model"
 	"history-engine/engine/service/page"
 	"history-engine/engine/service/search"
-	"history-engine/engine/setting"
 	"history-engine/engine/utils"
 	"time"
 )
@@ -46,24 +44,15 @@ func runParseCheck(ctx *cli.Context) error {
 		time.Sleep(time.Millisecond * 100)
 
 		for _, item := range list {
-			ignore := false
-
-			if !filetype.Include(item.UserID, item.URL) && filetype.Exclude(item.UserID, item.URL) {
-				logger.Zap().Info("ignore by suffix: " + item.URL)
-				ignore = true
+			hi := &model.HtmlInfo{
+				Url:    item.URL,
+				Suffix: utils.FileSuffix(item.URL),
+				Size:   item.Size,
+				UserId: item.UserID,
+				Path:   item.Path,
 			}
-
-			if !ignore && !host.Include(item.UserID, item.URL) && host.Exclude(item.UserID, item.URL) {
-				logger.Zap().Info("ignore by rule: " + item.URL)
-				ignore = true
-			}
-
-			if !ignore && !utils.FileExist(setting.SingleFile.HtmlPath+item.Path) {
-				logger.Zap().Info("HTML file not exist", zap.String("html", setting.SingleFile.HtmlPath+item.Path))
-				ignore = true
-			}
-
-			if ignore {
+			if ok, err := page.Filter(hi); !ok {
+				logger.Zap().Info(err.Error())
 				x.DeleteOneID(item.ID).Exec(ctx.Context)
 				docId := fmt.Sprintf("%s%d", item.UniqueID, item.Version)
 				search.Engine().DelDocument(ctx.Context, item.UserID, docId)

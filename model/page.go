@@ -49,5 +49,6 @@ type HtmlInfo struct {
 	Sha1     string
 	Size     int
 	UserId   int64
+	Path     string
 	IoReader io.ReadCloser
 }
