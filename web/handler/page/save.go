@@ -7,20 +7,20 @@ import (
 	"go.uber.org/zap"
 	"history-engine/engine/ent"
 	"history-engine/engine/library/logger"
+	"history-engine/engine/model"
 	"history-engine/engine/service/filetype"
 	"history-engine/engine/service/host"
 	"history-engine/engine/service/page"
+	"history-engine/engine/service/readability"
 	"history-engine/engine/setting"
 	"history-engine/engine/utils"
 	"io"
 	"net/http"
 	"os"
+	"strconv"
 )
 
-func Save(c echo.Context) error {
-	ctx := c.Request().Context()
-	userId := c.Get("uid").(int64)
-
+func RestSave(c echo.Context) error {
 	err := c.Request().ParseMultipartForm(10 << 20)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, nil)
@@ -31,40 +31,94 @@ func Save(c echo.Context) error {
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, nil)
 	}
+
 	src, err := html.Open()
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, nil)
 	}
 
-	if html.Size < 2048 { // todo 可配置
+	hi := &model.HtmlInfo{
+		Url:      url,
+		Suffix:   utils.FileSuffix(url),
+		Size:     int(html.Size),
+		Sha1:     utils.Sha1Str(url),
+		UserId:   c.Get("uid").(int64),
+		IoReader: src,
+	}
+
+	if !preCheck(hi) {
+		return c.String(http.StatusBadRequest, "")
+	}
+
+	return save(hi, c)
+}
+
+func WebDavPreSave(c echo.Context) error {
+	hi := page.ParseHtmlInfo(c.Param("file"))
+	hi.UserId = c.Get("uid").(int64)
+
+	if !preCheck(hi) {
+		return c.String(http.StatusBadRequest, "")
+	}
+
+	return c.JSON(http.StatusNotFound, nil)
+}
+
+func WebDavSave(c echo.Context) error {
+	hi := page.ParseHtmlInfo(c.Param("file"))
+	if hi == nil {
 		return c.JSON(http.StatusBadRequest, nil)
 	}
 
-	if !filetype.Include(userId, url) && filetype.Exclude(userId, url) {
-		logger.Zap().Info("ignore by suffix: " + url)
-		return c.JSON(http.StatusOK, nil)
+	hi.UserId = c.Get("uid").(int64)
+	hi.Size = int(c.Request().ContentLength)
+	hi.IoReader = c.Request().Body
+
+	return save(hi, c)
+}
+
+func preCheck(hi *model.HtmlInfo) bool {
+	if hi.Host != "" && !host.Include(hi.UserId, hi.Host) && host.Exclude(hi.UserId, hi.Host) {
+		logger.Zap().Info("ignore by rule: " + hi.Host)
+		return false
 	}
 
-	if !host.Include(userId, url) && host.Exclude(userId, url) {
-		logger.Zap().Info("ignore by rule: " + url)
-		return c.JSON(http.StatusOK, nil)
+	if hi.Url != "" && !host.Include(hi.UserId, hi.Url) && host.Exclude(hi.UserId, hi.Url) {
+		logger.Zap().Info("ignore by rule: " + hi.Url)
+		return false
 	}
 
-	uniqueId := utils.Md5str(url) // todo 自定义
-	version, created := page.NextVersion(ctx, uniqueId)
+	if hi.Suffix != "" && !filetype.Include(hi.UserId, hi.Suffix) && filetype.Exclude(hi.UserId, hi.Suffix) {
+		logger.Zap().Info("ignore by suffix: " + hi.Suffix)
+		return false
+	}
+
+	if hi.Size > 0 && (hi.Size < 2048 || hi.Size > setting.SingleFile.MaxSize) {
+		logger.Zap().Info("ignore by size: " + strconv.Itoa(hi.Size))
+		return false
+	}
+
+	_, created := page.NextVersion(context.Background(), hi.Sha1)
 	if utils.CheckVersionInterval(setting.SingleFile.MinVersionInterval, created) {
-		logger.Zap().Info("ignore by interval: " + url)
-		return c.JSON(http.StatusOK, nil)
+		logger.Zap().Info("ignore by interval: " + hi.Sha1)
+		return false
 	}
+
+	return true
+}
+
+func save(hi *model.HtmlInfo, c echo.Context) error {
+	ctx := c.Request().Context()
+	version, _ := page.NextVersion(ctx, hi.Sha1)
 
 	logger.Zap().Debug("rest receive singleFile",
-		zap.String("url", url),
-		zap.String("uniqueId", uniqueId),
+		zap.String("url", hi.Url),
+		zap.String("uniqueId", hi.Sha1),
 		zap.Int("version", version))
 
 	// 检查并创建目录
-	storagePath := fmt.Sprintf("/%d/%s/%s", userId, uniqueId[:2], uniqueId[2:4])
-	if _, err = os.Stat(setting.SingleFile.HtmlPath + storagePath); err != nil {
+	storagePath := fmt.Sprintf("/%d/%s/%s", hi.UserId, hi.Sha1[:2], hi.Sha1[2:4])
+	if _, err := os.Stat(setting.SingleFile.HtmlPath + storagePath); err != nil {
 		if !os.IsNotExist(err) { // TODO 未知错误,记录日志
 			return c.JSON(http.StatusInternalServerError, nil)
 		}
@@ -75,28 +129,43 @@ func Save(c echo.Context) error {
 	}
 
 	// 文件写入
-	storageFile := fmt.Sprintf("%s/%s.%d.html", storagePath, uniqueId, version)
+	storageFile := fmt.Sprintf("%s/%s.%d.html", storagePath, hi.Sha1, version)
 	f, err := os.OpenFile(setting.SingleFile.HtmlPath+storageFile, os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0644)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, nil)
 	}
-	_, err = io.Copy(f, src)
-	_ = f.Close()
+	_, err = io.Copy(f, hi.IoReader)
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, nil)
+		logger.Zap().Error("write html err", zap.Error(err), zap.Any("hi", hi))
+		return c.JSON(http.StatusInternalServerError, err.Error())
 	}
+
+	// 补全Url，WebDav下可能为空
+	if hi.Url == "" {
+		_, err = f.Seek(0, io.SeekStart)
+		if err == nil {
+			comment := make([]byte, 2048)
+			_, err = f.Read(comment)
+			if err == nil {
+				hi.Url = readability.Parser().ExtractSingleFileUrl(comment)
+			}
+		}
+	}
+
+	_ = f.Close()
+	_ = hi.IoReader.Close()
 
 	// 入库
 	row, err := page.SavePage(ctx, &ent.Page{
-		UserID:   userId,
-		UniqueID: uniqueId,
+		UserID:   hi.UserId,
+		UniqueID: hi.Sha1,
 		Version:  version,
-		URL:      url,
-		Size:     int(html.Size),
+		URL:      hi.Url,
+		Size:     hi.Size,
 		Path:     storageFile,
 	})
 	if err != nil {
-		logger.Zap().Fatal("save page error", zap.Error(err), zap.String("url", url))
+		logger.Zap().Fatal("save page error", zap.Error(err), zap.String("url", hi.Url))
 		return c.JSON(http.StatusInternalServerError, nil)
 	}
 
@@ -111,7 +180,7 @@ func Save(c echo.Context) error {
 		}
 	}()
 	go func() {
-		if err := page.CleanHistory(context.Background(), userId, uniqueId, version); err != nil {
+		if err := page.CleanHistory(context.Background(), hi.UserId, hi.Sha1, version); err != nil {
 			logger.Zap().Warn("clean history err", zap.Error(err), zap.Any("page", row))
 		}
 	}()

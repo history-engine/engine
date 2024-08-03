@@ -1,6 +1,9 @@
 package model
 
-import "time"
+import (
+	"io"
+	"time"
+)
 
 // SearchRequest WebUI搜索请求参数
 type SearchRequest struct {
@@ -37,4 +40,14 @@ type PageParse struct {
 	UserId   int64
 	UniqueId string
 	Version  int
+}
+
+type HtmlInfo struct {
+	Host     string
+	Url      string
+	Suffix   string
+	Sha1     string
+	Size     int
+	UserId   int64
+	IoReader io.ReadCloser
 }

@@ -9,5 +9,7 @@ import (
 func pageRouteRegister(r *echo.Group) {
 	r.GET("/search", page.Search, middleware.JwtAuth)
 	r.GET("/view/:path", page.View, middleware.JwtAuth)
-	r.POST("/save", page.Save, middleware.Token)
+	r.POST("/save", page.RestSave, middleware.Token)
+	r.HEAD("/save/:file", page.WebDavPreSave, middleware.BasicAuth())
+	r.PUT("/save/:file", page.WebDavSave, middleware.BasicAuth())
 }

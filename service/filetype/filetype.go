@@ -3,14 +3,11 @@ package filetype
 import (
 	"context"
 	"fmt"
-	"go.uber.org/zap"
 	"history-engine/engine/ent"
 	"history-engine/engine/ent/filetype"
 	"history-engine/engine/library/db"
 	"history-engine/engine/library/localcache"
-	"history-engine/engine/library/logger"
-	"net/url"
-	"strings"
+	"history-engine/engine/utils"
 	"time"
 )
 
@@ -27,19 +24,8 @@ func suffixMatch(userId int64, filename string, Type int) bool {
 		return false
 	}
 
-	parse, err := url.Parse(filename)
-	if err != nil {
-		logger.Zap().Warn("parse filename err", zap.Error(err))
-		return false
-	}
-
-	split := strings.Split(parse.Path, ".")
-	if len(split) < 2 {
-		return false
-	}
-	suffix := split[len(split)-1]
-
 	filetypes, _ := All(context.Background(), userId, Type)
+	suffix := utils.FileSuffix(filename)
 	if _, ok := filetypes[suffix]; ok {
 		return true
 	}

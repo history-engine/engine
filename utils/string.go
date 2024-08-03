@@ -2,11 +2,17 @@ package utils
 
 import (
 	"crypto/md5"
+	"crypto/sha1"
 	"encoding/hex"
 )
 
 func Md5str(s string) string {
 	sum := md5.Sum([]byte(s))
+	return hex.EncodeToString(sum[:])
+}
+
+func Sha1Str(s string) string {
+	sum := sha1.Sum([]byte(s))
 	return hex.EncodeToString(sum[:])
 }
 
