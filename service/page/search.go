@@ -7,8 +7,10 @@ import (
 	"history-engine/engine/ent/page"
 	"history-engine/engine/library/db"
 	"history-engine/engine/model"
+	"history-engine/engine/service/icon"
 	"history-engine/engine/service/search"
 	"history-engine/engine/setting"
+	"history-engine/engine/utils"
 )
 
 func LatestList(ctx context.Context, userId int64, request model.SearchRequest) (int, []model.SearchResultPage, error) {
@@ -33,9 +35,9 @@ func LatestList(ctx context.Context, userId int64, request model.SearchRequest) 
 	pages := make([]model.SearchResultPage, 0)
 	for _, item := range source {
 		row := model.SearchResultPage{
-			Avatar:    "https://avatars.akamai.steamstatic.com/6a9ae9c069cd4fff8bf954938727730cdb0fe27b.jpg",
+			Avatar:    icon.PublicUrl(ctx, item),
 			Url:       item.URL,
-			Title:     item.Title,
+			Title:     utils.Ternary(item.Title != "", item.Title, "无标题"),
 			Excerpt:   item.Excerpt,
 			Content:   item.Content,
 			Size:      item.Size,
@@ -74,13 +76,13 @@ func Search(ctx context.Context, userId int64, request model.SearchRequest) (int
 	for k, item := range resp.Pages {
 		page, ok := docMap[item.DocId]
 		if !ok { // 搜索引擎存储，数据库不存在
-			search.Engine().DelDocument(context.Background(), userId, item.DocId)
+			go search.Engine().DelDocument(context.Background(), userId, item.DocId)
 			continue
 		}
 
-		resp.Pages[k].Avatar = "https://avatars.akamai.steamstatic.com/6a9ae9c069cd4fff8bf954938727730cdb0fe27b.jpg"
+		resp.Pages[k].Avatar = icon.PublicUrl(ctx, page)
 		resp.Pages[k].Url = page.URL
-		resp.Pages[k].Title = page.Title
+		resp.Pages[k].Title = utils.Ternary(page.Title != "", page.Title, "无标题")
 		resp.Pages[k].Excerpt = page.Excerpt
 		resp.Pages[k].Content = page.Content
 		resp.Pages[k].Size = page.Size

@@ -2,6 +2,7 @@ package jobs
 
 import (
 	"github.com/urfave/cli/v2"
+	"history-engine/engine/jobs/icon"
 	"history-engine/engine/jobs/page"
 	"history-engine/engine/library/db"
 	"history-engine/engine/library/localcache"
@@ -19,6 +20,7 @@ var Jobs = &cli.Command{
 		page.LostCheck,
 		page.IndexCheck,
 		page.ExcludeCheck,
+		icon.DownloadIcon,
 	},
 }
 

@@ -14,8 +14,8 @@ import (
 	"time"
 )
 
-func ParserPageWithId(id int64) error {
-	return parserPage(context.Background(), model.PageParse{Id: id})
+func ParserPageWithId(ctx context.Context, id int64) error {
+	return parserPage(ctx, model.PageParse{Id: id})
 }
 
 func ParserPage(userId int64, uniqueId string, version int) error {

@@ -4,6 +4,7 @@ enable_register = true
 lang="zh-CN"
 data_path = "data"
 time_zone = "Asia/Shanghai"
+icon_path = "data/icon"
 
 [log]
 file = "data/runtime.log"

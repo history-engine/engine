@@ -51,7 +51,7 @@ func runIndexCheck(ctx *cli.Context) error {
 				continue
 			}
 
-			if err := page.PutIndexWithId(item.ID); err != nil {
+			if err := page.PutIndexWithId(ctx.Context, item.ID); err != nil {
 				logger.Zap().Warn("put index err", zap.Error(err), zap.Int64("id", item.ID))
 			}
 		}

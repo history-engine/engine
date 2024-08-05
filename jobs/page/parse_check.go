@@ -60,7 +60,7 @@ func runParseCheck(ctx *cli.Context) error {
 			}
 
 			logger.Zap().Info("pend page", zap.Int64("id", item.ID), zap.String("path", item.Path), zap.String("url", item.URL))
-			if err := page.ParserPageWithId(item.ID); err != nil {
+			if err := page.ParserPageWithId(ctx.Context, item.ID); err != nil {
 				logger.Zap().Warn("parse HTML err", zap.Error(err), zap.Int64("id", item.ID), zap.String("url", item.URL))
 				continue
 			}

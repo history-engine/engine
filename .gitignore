@@ -20,6 +20,7 @@ data/*.log
 data/*.db
 data/*sqlite*
 data/html/
+data/icon/
 
 setting.toml
 release/

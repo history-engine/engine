@@ -8,6 +8,7 @@ import (
 	"history-engine/engine/ent"
 	"history-engine/engine/library/logger"
 	"history-engine/engine/model"
+	"history-engine/engine/service/icon"
 	"history-engine/engine/service/page"
 	"history-engine/engine/service/readability"
 	"history-engine/engine/setting"
@@ -80,11 +81,6 @@ func save(hi *model.HtmlInfo, c echo.Context) error {
 	ctx := c.Request().Context()
 	version, _ := page.NextVersion(ctx, hi.Sha1)
 
-	logger.Zap().Info("rest receive singleFile",
-		zap.String("url", hi.Url),
-		zap.String("uniqueId", hi.Sha1),
-		zap.Int("version", version))
-
 	// 检查并创建目录
 	storagePath := fmt.Sprintf("/%d/%s/%s", hi.UserId, hi.Sha1[:2], hi.Sha1[2:4])
 	if _, err := os.Stat(setting.SingleFile.HtmlPath + storagePath); err != nil {
@@ -121,6 +117,12 @@ func save(hi *model.HtmlInfo, c echo.Context) error {
 		}
 	}
 
+	logger.Zap().Info("rest receive singleFile",
+		zap.String("url", utils.Ternary[string](hi.Url == "", hi.Host, hi.Url)),
+		zap.String("path", setting.SingleFile.HtmlPath+storageFile),
+		zap.String("uniqueId", hi.Sha1),
+		zap.Int("version", version))
+
 	_ = f.Close()
 	_ = hi.IoReader.Close()
 
@@ -140,12 +142,15 @@ func save(hi *model.HtmlInfo, c echo.Context) error {
 
 	// 后台分析HTML、清理历史版本
 	go func() {
-		if err := page.ParserPageWithId(row.ID); err != nil {
+		if err := page.ParserPageWithId(context.Background(), row.ID); err != nil {
 			logger.Zap().Warn("parse page err", zap.Error(err), zap.Any("page", row))
 			return
 		}
-		if err := page.PutIndexWithId(row.ID); err != nil {
+		if err := page.PutIndexWithId(context.Background(), row.ID); err != nil {
 			logger.Zap().Warn("put search index err", zap.Error(err), zap.Any("page", row))
+		}
+		if err := icon.DownloadIcon(context.Background(), row.URL, row.Path); err != nil {
+			logger.Zap().Warn("download icon err", zap.Error(err), zap.Any("page", row))
 		}
 	}()
 	go func() {

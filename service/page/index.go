@@ -12,8 +12,8 @@ import (
 	"time"
 )
 
-func PutIndexWithId(id int64) error {
-	return putIndex(context.Background(), model.PageParse{Id: id})
+func PutIndexWithId(ctx context.Context, id int64) error {
+	return putIndex(ctx, model.PageParse{Id: id})
 }
 
 func PutIndex(userId int64, uniqueId string, version int) error {

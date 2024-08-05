@@ -36,7 +36,6 @@ func Search(c echo.Context) error {
 	resp := model.SearchResponse{}
 	if req.Query == "" {
 		resp.Total, resp.Pages, err = page.LatestList(c.Request().Context(), userId, req)
-
 	} else {
 		resp.Total, resp.Pages, err = page.Search(c.Request().Context(), userId, req)
 	}

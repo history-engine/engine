@@ -5,10 +5,10 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/spf13/viper"
+	"history-engine/engine/data"
 	"io"
 	"log"
 	"net/http"
-	"os"
 )
 
 var ZincSearch = struct {
@@ -79,14 +79,9 @@ func checkZincSearchVersion() {
 // https://github.com/zincsearch/zincsearch/blob/main/pkg/meta/template.go
 // https://github.com/zincsearch/zincsearch/blob/main/pkg/meta/index.go
 func checkIndexTemplate() {
-	content, err := os.ReadFile(Common.DataPath + "/zinc_template.json")
-	if err != nil {
-		log.Fatalf("read zinc template err: %v\n", err)
-	}
-
 	name := fmt.Sprintf("%s_%s_%s", Search.Prefix, Common.Env, "template")
 	pattern := fmt.Sprintf("%s_%s_%s", Search.Prefix, Common.Env, "*")
-	content = bytes.Replace(content, []byte("__NAME__"), []byte(name), 1)
+	content := bytes.Replace(data.ZincTemplate, []byte("__NAME__"), []byte(name), 1)
 	content = bytes.Replace(content, []byte("__PATTERN__"), []byte(pattern), 1)
 
 	req, err := http.NewRequest(http.MethodPost, ZincSearch.Host+"/es/_index_template", bytes.NewReader(content))

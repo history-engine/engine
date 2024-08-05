@@ -66,8 +66,13 @@ func (m MeiliSearch) Search(ctx context.Context, userId int64, request model.Sea
 		Pages: make([]model.SearchResultPage, 0),
 	}
 
+	var version int
 	for _, item := range ms.Hits {
-		version, err := strconv.Atoi(item.Id[32:])
+		if len(item.Id) > 40 {
+			version, err = strconv.Atoi(item.Id[40:])
+		} else {
+			version, err = strconv.Atoi(item.Id[32:])
+		}
 		if err != nil {
 			return nil, err
 		}
