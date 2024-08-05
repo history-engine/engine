@@ -10,6 +10,7 @@ import (
 	"history-engine/engine/library/logger"
 	"history-engine/engine/model"
 	"history-engine/engine/service/search"
+	"history-engine/engine/setting"
 	"history-engine/engine/utils"
 )
 
@@ -21,6 +22,8 @@ func Info(ctx context.Context, uid int64) *ent.User {
 		logger.Zap().Error("get user info err", zap.Error(err), zap.Int64("uid", uid))
 		return nil
 	}
+
+	user.Avatar = setting.Web.Domain + "/user/avatar" + user.Avatar
 
 	return user
 }
