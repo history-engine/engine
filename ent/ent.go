@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"history-engine/engine/ent/filetype"
 	"history-engine/engine/ent/host"
+	"history-engine/engine/ent/icon"
 	"history-engine/engine/ent/page"
 	"history-engine/engine/ent/user"
 	"reflect"
@@ -78,6 +79,7 @@ func checkColumn(table, column string) error {
 		columnCheck = sql.NewColumnCheck(map[string]func(string) bool{
 			filetype.Table: filetype.ValidColumn,
 			host.Table:     host.ValidColumn,
+			icon.Table:     icon.ValidColumn,
 			page.Table:     page.ValidColumn,
 			user.Table:     user.ValidColumn,
 		})

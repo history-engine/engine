@@ -12,6 +12,9 @@ type FileType func(*sql.Selector)
 // Host is the predicate function for host builders.
 type Host func(*sql.Selector)
 
+// Icon is the predicate function for icon builders.
+type Icon func(*sql.Selector)
+
 // Page is the predicate function for page builders.
 type Page func(*sql.Selector)
 

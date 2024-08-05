@@ -16,6 +16,8 @@ type Tx struct {
 	FileType *FileTypeClient
 	// Host is the client for interacting with the Host builders.
 	Host *HostClient
+	// Icon is the client for interacting with the Icon builders.
+	Icon *IconClient
 	// Page is the client for interacting with the Page builders.
 	Page *PageClient
 	// User is the client for interacting with the User builders.
@@ -153,6 +155,7 @@ func (tx *Tx) Client() *Client {
 func (tx *Tx) init() {
 	tx.FileType = NewFileTypeClient(tx.config)
 	tx.Host = NewHostClient(tx.config)
+	tx.Icon = NewIconClient(tx.config)
 	tx.Page = NewPageClient(tx.config)
 	tx.User = NewUserClient(tx.config)
 }

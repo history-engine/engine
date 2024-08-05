@@ -9,8 +9,8 @@ import (
 )
 
 var (
-	// FileTypeColumns holds the columns for the "file_type" table.
-	FileTypeColumns = []*schema.Column{
+	// FiletypeColumns holds the columns for the "filetype" table.
+	FiletypeColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt64, Increment: true},
 		{Name: "user_id", Type: field.TypeInt64},
 		{Name: "suffix", Type: field.TypeString, Size: 100},
@@ -18,16 +18,16 @@ var (
 		{Name: "created_at", Type: field.TypeTime},
 		{Name: "updated_at", Type: field.TypeTime},
 	}
-	// FileTypeTable holds the schema information for the "file_type" table.
-	FileTypeTable = &schema.Table{
-		Name:       "file_type",
-		Columns:    FileTypeColumns,
-		PrimaryKey: []*schema.Column{FileTypeColumns[0]},
+	// FiletypeTable holds the schema information for the "filetype" table.
+	FiletypeTable = &schema.Table{
+		Name:       "filetype",
+		Columns:    FiletypeColumns,
+		PrimaryKey: []*schema.Column{FiletypeColumns[0]},
 		Indexes: []*schema.Index{
 			{
 				Name:    "filetype_user_id_suffix",
 				Unique:  true,
-				Columns: []*schema.Column{FileTypeColumns[1], FileTypeColumns[2]},
+				Columns: []*schema.Column{FiletypeColumns[1], FiletypeColumns[2]},
 			},
 		},
 	}
@@ -50,6 +50,27 @@ var (
 				Name:    "host_user_id_host_type",
 				Unique:  true,
 				Columns: []*schema.Column{HostColumns[1], HostColumns[2], HostColumns[3]},
+			},
+		},
+	}
+	// IconColumns holds the columns for the "icon" table.
+	IconColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt64, Increment: true},
+		{Name: "host", Type: field.TypeString, Size: 100},
+		{Name: "path", Type: field.TypeString, Size: 500},
+		{Name: "created_at", Type: field.TypeTime},
+		{Name: "updated_at", Type: field.TypeTime},
+	}
+	// IconTable holds the schema information for the "icon" table.
+	IconTable = &schema.Table{
+		Name:       "icon",
+		Columns:    IconColumns,
+		PrimaryKey: []*schema.Column{IconColumns[0]},
+		Indexes: []*schema.Index{
+			{
+				Name:    "icon_host",
+				Unique:  true,
+				Columns: []*schema.Column{IconColumns[1]},
 			},
 		},
 	}
@@ -102,19 +123,23 @@ var (
 	}
 	// Tables holds all the tables in the schema.
 	Tables = []*schema.Table{
-		FileTypeTable,
+		FiletypeTable,
 		HostTable,
+		IconTable,
 		PageTable,
 		UserTable,
 	}
 )
 
 func init() {
-	FileTypeTable.Annotation = &entsql.Annotation{
-		Table: "file_type",
+	FiletypeTable.Annotation = &entsql.Annotation{
+		Table: "filetype",
 	}
 	HostTable.Annotation = &entsql.Annotation{
 		Table: "host",
+	}
+	IconTable.Annotation = &entsql.Annotation{
+		Table: "icon",
 	}
 	PageTable.Annotation = &entsql.Annotation{
 		Table: "page",

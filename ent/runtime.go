@@ -5,6 +5,7 @@ package ent
 import (
 	"history-engine/engine/ent/filetype"
 	"history-engine/engine/ent/host"
+	"history-engine/engine/ent/icon"
 	"history-engine/engine/ent/page"
 	"history-engine/engine/ent/schema"
 	"history-engine/engine/ent/user"
@@ -59,6 +60,26 @@ func init() {
 	host.DefaultUpdatedAt = hostDescUpdatedAt.Default.(func() time.Time)
 	// host.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
 	host.UpdateDefaultUpdatedAt = hostDescUpdatedAt.UpdateDefault.(func() time.Time)
+	iconFields := schema.Icon{}.Fields()
+	_ = iconFields
+	// iconDescHost is the schema descriptor for host field.
+	iconDescHost := iconFields[1].Descriptor()
+	// icon.HostValidator is a validator for the "host" field. It is called by the builders before save.
+	icon.HostValidator = iconDescHost.Validators[0].(func(string) error)
+	// iconDescPath is the schema descriptor for path field.
+	iconDescPath := iconFields[2].Descriptor()
+	// icon.PathValidator is a validator for the "path" field. It is called by the builders before save.
+	icon.PathValidator = iconDescPath.Validators[0].(func(string) error)
+	// iconDescCreatedAt is the schema descriptor for created_at field.
+	iconDescCreatedAt := iconFields[3].Descriptor()
+	// icon.DefaultCreatedAt holds the default value on creation for the created_at field.
+	icon.DefaultCreatedAt = iconDescCreatedAt.Default.(func() time.Time)
+	// iconDescUpdatedAt is the schema descriptor for updated_at field.
+	iconDescUpdatedAt := iconFields[4].Descriptor()
+	// icon.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	icon.DefaultUpdatedAt = iconDescUpdatedAt.Default.(func() time.Time)
+	// icon.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	icon.UpdateDefaultUpdatedAt = iconDescUpdatedAt.UpdateDefault.(func() time.Time)
 	pageFields := schema.Page{}.Fields()
 	_ = pageFields
 	// pageDescUniqueID is the schema descriptor for unique_id field.

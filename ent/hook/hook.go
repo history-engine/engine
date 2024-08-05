@@ -32,6 +32,18 @@ func (f HostFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error)
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.HostMutation", m)
 }
 
+// The IconFunc type is an adapter to allow the use of ordinary
+// function as Icon mutator.
+type IconFunc func(context.Context, *ent.IconMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f IconFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.IconMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.IconMutation", m)
+}
+
 // The PageFunc type is an adapter to allow the use of ordinary
 // function as Page mutator.
 type PageFunc func(context.Context, *ent.PageMutation) (ent.Value, error)
