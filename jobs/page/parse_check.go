@@ -6,6 +6,7 @@ import (
 	"go.uber.org/zap"
 	"history-engine/engine/ent"
 	entPage "history-engine/engine/ent/page"
+	"history-engine/engine/ent/predicate"
 	"history-engine/engine/library/db"
 	"history-engine/engine/library/logger"
 	"history-engine/engine/model"
@@ -20,6 +21,14 @@ var ParseCheck = &cli.Command{
 	Aliases: []string{"pc"},
 	Usage:   "Check database, HTML files consistency",
 	Action:  runParseCheck,
+	Flags: []cli.Flag{
+		&cli.BoolFlag{
+			Name:    "empty",
+			Aliases: []string{"e"},
+			Usage:   "repeat process empty",
+			Value:   false,
+		},
+	},
 }
 
 func runParseCheck(ctx *cli.Context) error {
@@ -27,8 +36,14 @@ func runParseCheck(ctx *cli.Context) error {
 	limit := 100
 	x := db.GetEngine().Page
 	for {
+		where := []predicate.Page{entPage.ParsedAtEQ(timeZero)}
+		if ctx.Bool("empty") {
+			where = append(where, entPage.Title(""))
+			where = append(where, entPage.Content(""))
+		}
+
 		list, err := x.Query().
-			Where(entPage.And(entPage.IDGT(maxId), entPage.ParsedAtEQ(timeZero))).
+			Where(entPage.And(entPage.IDGT(maxId), entPage.Or(where...))).
 			Order(ent.Asc(entPage.FieldID)).
 			Limit(limit).
 			All(ctx.Context)
