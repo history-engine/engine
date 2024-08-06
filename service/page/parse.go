@@ -3,23 +3,21 @@ package page
 import (
 	"context"
 	"errors"
-	"fmt"
 	"history-engine/engine/ent"
 	"history-engine/engine/ent/page"
 	"history-engine/engine/library/db"
 	"history-engine/engine/model"
 	"history-engine/engine/service/readability"
 	"history-engine/engine/setting"
-	"os"
 	"time"
 )
 
 func ParserPageWithId(ctx context.Context, id int64) error {
-	return parserPage(ctx, model.PageParse{Id: id})
+	return parserPage(ctx, model.PageIdent{Id: id})
 }
 
 func ParserPage(userId int64, uniqueId string, version int) error {
-	row := model.PageParse{
+	row := model.PageIdent{
 		UserId:   userId,
 		UniqueId: uniqueId,
 		Version:  version,
@@ -28,7 +26,7 @@ func ParserPage(userId int64, uniqueId string, version int) error {
 }
 
 // ParserPage 调用readability分析HTML文件、保存数据库
-func parserPage(ctx context.Context, row model.PageParse) error {
+func parserPage(ctx context.Context, row model.PageIdent) error {
 	x := db.GetEngine()
 
 	var err error
@@ -44,17 +42,7 @@ func parserPage(ctx context.Context, row model.PageParse) error {
 		return err
 	}
 
-	if item.Content != "" {
-		return nil
-	}
-
 	fullPath := setting.SingleFile.HtmlPath + item.Path
-	if f, err := os.Stat(fullPath); err != nil {
-		return err
-	} else if f.Size() > int64(setting.SingleFile.MaxSize) {
-		return errors.New(fmt.Sprintf("File size exceeds threshold: %d", setting.SingleFile.MaxSize))
-	}
-
 	article, err := readability.Parser().Parse(fullPath)
 	if err != nil && errors.Is(err, readability.ErrContentEmpty) {
 		_, err2 := x.Page.Update().SetParsedAt(time.Now()).Where(page.ID(item.ID)).Save(ctx)
