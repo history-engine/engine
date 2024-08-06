@@ -5,6 +5,14 @@ import (
 	"history-engine/engine/model"
 )
 
+func ApiResponse(ctx echo.Context, code int, msg string, data any) error {
+	return ctx.JSON(200, model.ApiResponse{
+		Code:    0,
+		Message: "ok",
+		Data:    data,
+	})
+}
+
 func ApiSuccess(ctx echo.Context, data any) error {
 	return ctx.JSON(200, model.ApiResponse{
 		Code:    0,

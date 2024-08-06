@@ -47,7 +47,7 @@ func loadSingleFile() {
 			SingleFile.VersionCheckLimit = v.GetInt("version_check_limit")
 		}
 		if v.IsSet("min_size") {
-			SingleFile.MaxSize = v.GetInt("min_size")
+			SingleFile.MinSize = v.GetInt("min_size")
 		}
 		if v.IsSet("max_size") {
 			SingleFile.MaxSize = v.GetInt("max_size")

@@ -1,13 +1,11 @@
 package page
 
 import (
-	"fmt"
 	"github.com/urfave/cli/v2"
 	"history-engine/engine/library/db"
 	"history-engine/engine/library/logger"
 	"history-engine/engine/model"
 	"history-engine/engine/service/page"
-	"history-engine/engine/service/search"
 	"history-engine/engine/utils"
 	"time"
 )
@@ -42,9 +40,7 @@ func runExcludeCheck(ctx *cli.Context) error {
 			}
 			if ok, err := page.Filter(hi); !ok {
 				logger.Zap().Info(err.Error())
-				x.DeleteOneID(item.ID).Exec(ctx.Context)
-				docId := fmt.Sprintf("%s%d", item.UniqueID, item.Version)
-				search.Engine().DelDocument(ctx.Context, item.UserID, docId)
+				page.Delete(ctx.Context, item)
 				continue
 			}
 		}

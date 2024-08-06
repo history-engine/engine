@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 	"history-engine/engine/ent"
-	"history-engine/engine/ent/page"
+	entPage "history-engine/engine/ent/page"
 	"history-engine/engine/library/db"
 	"history-engine/engine/model"
 	"history-engine/engine/service/icon"
@@ -23,8 +23,8 @@ func LatestList(ctx context.Context, userId int64, request model.SearchRequest) 
 
 	source, err := x.Page.
 		Query().
-		Where(page.UserID(userId)).
-		Order(ent.Desc(page.FieldID)).
+		Where(entPage.UserID(userId)).
+		Order(ent.Desc(entPage.FieldID)).
 		Offset((request.Page - 1) * request.Limit).
 		Limit(request.Limit).
 		All(ctx)
@@ -34,18 +34,31 @@ func LatestList(ctx context.Context, userId int64, request model.SearchRequest) 
 
 	pages := make([]model.SearchResultPage, 0)
 	for _, item := range source {
+		//hi := &model.HtmlInfo{
+		//	UserId: userId,
+		//	Size:   item.Size,
+		//	Url:    item.URL,
+		//	Path:   item.Path,
+		//	Suffix: utils.FileSuffix(item.URL),
+		//}
+		//if ok, _ := Filter(hi); !ok { // 这里再次实时过滤可能会有性能问题
+		//	Delete(ctx, item)
+		//	continue
+		//}
+
 		row := model.SearchResultPage{
-			Avatar:    icon.PublicUrl(ctx, item),
-			Url:       item.URL,
-			Title:     utils.Ternary(item.Title != "", item.Title, "无标题"),
-			Excerpt:   item.Excerpt,
-			Content:   item.Content,
-			Size:      item.Size,
-			Preview:   setting.Web.Domain + "/page/view" + fmt.Sprintf("/%s.%d.html", item.UniqueID, item.Version),
-			DocId:     fmt.Sprintf("%s%d", item.UniqueID, item.Version),
-			UniqueId:  item.UniqueID,
-			Version:   item.Version,
-			CreatedAt: item.CreatedAt,
+			Id:       item.ID,
+			Avatar:   icon.PublicUrl(ctx, item),
+			Url:      item.URL,
+			Title:    utils.Ternary(item.Title != "", item.Title, "无标题"),
+			Excerpt:  item.Excerpt,
+			Content:  item.Content,
+			Size:     item.Size,
+			Preview:  setting.Web.Domain + "/page/view" + fmt.Sprintf("/%s.%d.html", item.UniqueID, item.Version),
+			DocId:    fmt.Sprintf("%s%d", item.UniqueID, item.Version),
+			UniqueId: item.UniqueID,
+			Version:  item.Version,
+			Time:     item.CreatedAt.Format("2006-01-02 15:05"),
 		}
 		pages = append(pages, row)
 	}
@@ -74,21 +87,34 @@ func Search(ctx context.Context, userId int64, request model.SearchRequest) (int
 
 	// 保持搜索引擎的顺序，并从数据库补全剩余信息
 	for k, item := range resp.Pages {
-		page, ok := docMap[item.DocId]
+		row, ok := docMap[item.DocId]
 		if !ok { // 搜索引擎存储，数据库不存在
 			go search.Engine().DelDocument(context.Background(), userId, item.DocId)
 			continue
 		}
 
-		resp.Pages[k].Avatar = icon.PublicUrl(ctx, page)
-		resp.Pages[k].Url = page.URL
-		resp.Pages[k].Title = utils.Ternary(page.Title != "", page.Title, "无标题")
-		resp.Pages[k].Excerpt = page.Excerpt
-		resp.Pages[k].Content = page.Content
-		resp.Pages[k].Size = page.Size
-		resp.Pages[k].Preview = setting.Web.Domain + "/page/view" + fmt.Sprintf("/%s.%d.html", page.UniqueID, page.Version)
-		resp.Pages[k].Version = page.Version
-		resp.Pages[k].CreatedAt = page.CreatedAt
+		//hi := &model.HtmlInfo{
+		//	UserId: userId,
+		//	Size:   row.Size,
+		//	Url:    row.URL,
+		//	Path:   row.Path,
+		//	Suffix: utils.FileSuffix(row.URL),
+		//}
+		//if ok, _ := Filter(hi); !ok { // 这里再次实时过滤可能会有性能问题
+		//	Delete(ctx, row)
+		//	continue
+		//}
+
+		resp.Pages[k].Id = row.ID
+		resp.Pages[k].Avatar = icon.PublicUrl(ctx, row)
+		resp.Pages[k].Url = row.URL
+		resp.Pages[k].Title = utils.Ternary(row.Title != "", row.Title, "无标题")
+		resp.Pages[k].Excerpt = row.Excerpt
+		resp.Pages[k].Content = row.Content
+		resp.Pages[k].Size = row.Size
+		resp.Pages[k].Preview = setting.Web.Domain + "/page/view" + fmt.Sprintf("/%s.%d.html", row.UniqueID, row.Version)
+		resp.Pages[k].Version = row.Version
+		resp.Pages[k].Time = row.CreatedAt.Format("2006-01-02 15:05")
 	}
 
 	return resp.Total, resp.Pages, err

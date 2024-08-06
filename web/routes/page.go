@@ -14,4 +14,6 @@ func pageRouteRegister(r *echo.Group) {
 	r.POST("/save", page.RestSave, middleware.Token)
 	r.HEAD("/save/:file", page.WebDavPreSave, middleware.BasicAuth())
 	r.PUT("/save/:file", page.WebDavSave, middleware.BasicAuth())
+	r.DELETE("/delete", page.Delete, middleware.JwtAuth)
+	r.POST("/exclude", page.Exclude, middleware.JwtAuth)
 }

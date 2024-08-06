@@ -13,11 +13,11 @@ import (
 )
 
 func PutIndexWithId(ctx context.Context, id int64) error {
-	return putIndex(ctx, model.PageParse{Id: id})
+	return putIndex(ctx, model.PageIdent{Id: id})
 }
 
 func PutIndex(userId int64, uniqueId string, version int) error {
-	row := model.PageParse{
+	row := model.PageIdent{
 		UserId:   userId,
 		UniqueId: uniqueId,
 		Version:  version,
@@ -25,7 +25,7 @@ func PutIndex(userId int64, uniqueId string, version int) error {
 	return putIndex(context.Background(), row)
 }
 
-func putIndex(ctx context.Context, row model.PageParse) error {
+func putIndex(ctx context.Context, row model.PageIdent) error {
 	x := db.GetEngine()
 
 	var err error
