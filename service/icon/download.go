@@ -9,6 +9,7 @@ import (
 	"golang.org/x/net/html"
 	"history-engine/engine/ent/icon"
 	"history-engine/engine/library/db"
+	"history-engine/engine/library/localcache"
 	"history-engine/engine/library/logger"
 	"history-engine/engine/setting"
 	"history-engine/engine/utils"
@@ -18,6 +19,15 @@ import (
 	"os"
 	"strings"
 )
+
+var httpClient *http.Client
+
+func init() {
+	httpClient = http.DefaultClient
+	httpClient.CheckRedirect = func(req *http.Request, via []*http.Request) error {
+		return http.ErrUseLastResponse
+	}
+}
 
 func DownloadIcon(ctx context.Context, pageUrl, pagePath string) error {
 	parsed, err := url.Parse(pageUrl)
@@ -53,6 +63,7 @@ func DownloadIcon(ctx context.Context, pageUrl, pagePath string) error {
 
 	if iconPath != "" {
 		_, err = x.Icon.Create().SetHost(parsed.Host).SetPath(iconPath).Save(ctx)
+		localcache.GetEngine().Delete("icon:all")
 		logger.Zap().Info("save host icon", zap.String("host", parsed.Host), zap.String("path", iconPath))
 	}
 
@@ -74,13 +85,13 @@ func favicon(scheme, host, origin string) (string, bool) {
 	iconUrl := scheme + "://" + host + "/favicon.ico"
 	req, err := http.NewRequest(http.MethodGet, iconUrl, nil)
 	req.Header.Set("User-Agent", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/127.0.0.0 Safari/537.36")
-	resp, err := http.DefaultClient.Do(req)
+	resp, err := httpClient.Do(req)
 	if err != nil {
 		logger.Zap().Error("download icon err", zap.Error(err), zap.String("url", iconUrl))
 		return "", false
 	}
 
-	if resp.StatusCode == 404 {
+	if resp.StatusCode != http.StatusOK {
 		return "", false
 	}
 
@@ -177,6 +188,8 @@ func SaveBase64Image(host, base64Data string) string {
 	case "image/gif":
 		fileExtension = "gif"
 	case "image/x-icon":
+		fileExtension = "ico"
+	case "image/vnd.microsoft.icon":
 		fileExtension = "ico"
 	case "image/svg+xml":
 		fileExtension = "svg"
