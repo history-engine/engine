@@ -107,6 +107,7 @@ func favicon(scheme, host, origin string) (string, bool) {
 }
 
 // 从HTML文件的header标签里分析icon
+// todo 没必要分析整个HTML文件
 func headerIcon(host, htmlPath string) (string, bool) {
 	fi, err := os.Open(htmlPath)
 	if err != nil {
