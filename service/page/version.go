@@ -7,22 +7,63 @@ import (
 	"fmt"
 	"go.uber.org/zap"
 	"history-engine/engine/ent"
-	"history-engine/engine/ent/page"
+	entPage "history-engine/engine/ent/page"
 	"history-engine/engine/library/db"
 	"history-engine/engine/library/logger"
+	"history-engine/engine/model"
+	"history-engine/engine/service/icon"
 	"history-engine/engine/service/search"
 	"history-engine/engine/setting"
+	"history-engine/engine/utils"
 	"os"
 	"time"
 )
+
+func Versions(ctx context.Context, userId int64, uniqueId string, page, limit int) (int, []model.SearchResultPage, error) {
+	x := db.GetEngine()
+
+	pageQuery := x.Page.Query().Where(entPage.UserID(userId), entPage.UniqueID(uniqueId))
+
+	total, err := pageQuery.Count(ctx)
+	if err != nil {
+		return 0, nil, err
+	}
+
+	source, err := pageQuery.
+		Order(ent.Desc(entPage.FieldID)).
+		Offset((page - 1) * limit).
+		Limit(limit).
+		All(ctx)
+
+	pages := make([]model.SearchResultPage, 0)
+	for _, item := range source {
+		row := model.SearchResultPage{ // todo 这段转换代码考虑封装复用
+			Id:       item.ID,
+			Avatar:   icon.PublicUrl(ctx, item),
+			Url:      item.URL,
+			Title:    utils.Ternary(item.Title != "", item.Title, "无标题"),
+			Excerpt:  item.Excerpt,
+			Content:  item.Content,
+			Size:     item.Size,
+			Preview:  setting.Web.Domain + "/page/view" + fmt.Sprintf("/%s.%d.html", item.UniqueID, item.Version),
+			DocId:    fmt.Sprintf("%s%d", item.UniqueID, item.Version),
+			UniqueId: item.UniqueID,
+			Version:  item.Version,
+			Time:     item.CreatedAt.Format("2006-01-02 15:05"),
+		}
+		pages = append(pages, row)
+	}
+
+	return total, pages, err
+}
 
 // NextVersion 获取下一个版本号
 func NextVersion(ctx context.Context, uniqueId string) (int, time.Time) {
 	x := db.GetEngine()
 	page, err := x.Page.Query().
-		Select(page.FieldID, page.FieldVersion, page.FieldCreatedAt).
-		Where(page.UniqueID(uniqueId)).
-		Order(page.ByVersion(sql.OrderDesc())).
+		Select(entPage.FieldID, entPage.FieldVersion, entPage.FieldCreatedAt).
+		Where(entPage.UniqueID(uniqueId)).
+		Order(entPage.ByVersion(sql.OrderDesc())).
 		First(ctx)
 
 	if err != nil {
@@ -51,8 +92,8 @@ func CleanHistory(ctx context.Context, userId int64, uniqueId string, version in
 		Path    string
 	}
 	if err := x.Page.Query().
-		Where(page.UserID(userId), page.UniqueID(uniqueId), page.VersionLTE(diff)).
-		Select(page.FieldID, page.FieldVersion, page.FieldPath).
+		Where(entPage.UserID(userId), entPage.UniqueID(uniqueId), entPage.VersionLTE(diff)).
+		Select(entPage.FieldID, entPage.FieldVersion, entPage.FieldPath).
 		Scan(ctx, &vs); err != nil {
 		return err
 	}
