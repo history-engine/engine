@@ -7,10 +7,7 @@ import (
 	entPage "history-engine/engine/ent/page"
 	"history-engine/engine/library/db"
 	"history-engine/engine/model"
-	"history-engine/engine/service/icon"
 	"history-engine/engine/service/search"
-	"history-engine/engine/setting"
-	"history-engine/engine/utils"
 )
 
 func LatestList(ctx context.Context, userId int64, request model.SearchRequest) (int, []model.SearchResultPage, error) {
@@ -46,21 +43,7 @@ func LatestList(ctx context.Context, userId int64, request model.SearchRequest) 
 		//	continue
 		//}
 
-		row := model.SearchResultPage{
-			Id:       item.ID,
-			Avatar:   icon.PublicUrl(ctx, item),
-			Url:      item.URL,
-			Title:    utils.Ternary(item.Title != "", item.Title, "无标题"),
-			Excerpt:  item.Excerpt,
-			Content:  item.Content,
-			Size:     item.Size,
-			Preview:  setting.Web.Domain + "/page/view" + fmt.Sprintf("/%s.%d.html", item.UniqueID, item.Version),
-			DocId:    fmt.Sprintf("%s%d", item.UniqueID, item.Version),
-			UniqueId: item.UniqueID,
-			Version:  item.Version,
-			Time:     item.CreatedAt.Format("2006-01-02 15:05"),
-		}
-		pages = append(pages, row)
+		pages = append(pages, EntPage2SearchResultPage(ctx, item))
 	}
 
 	return total, pages, err
@@ -105,16 +88,7 @@ func Search(ctx context.Context, userId int64, request model.SearchRequest) (int
 		//	continue
 		//}
 
-		resp.Pages[k].Id = row.ID
-		resp.Pages[k].Avatar = icon.PublicUrl(ctx, row)
-		resp.Pages[k].Url = row.URL
-		resp.Pages[k].Title = utils.Ternary(row.Title != "", row.Title, "无标题")
-		resp.Pages[k].Excerpt = row.Excerpt
-		resp.Pages[k].Content = row.Content
-		resp.Pages[k].Size = row.Size
-		resp.Pages[k].Preview = setting.Web.Domain + "/page/view" + fmt.Sprintf("/%s.%d.html", row.UniqueID, row.Version)
-		resp.Pages[k].Version = row.Version
-		resp.Pages[k].Time = row.CreatedAt.Format("2006-01-02 15:05")
+		resp.Pages[k] = EntPage2SearchResultPage(ctx, row)
 	}
 
 	return resp.Total, resp.Pages, err

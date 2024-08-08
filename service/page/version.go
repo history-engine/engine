@@ -11,10 +11,8 @@ import (
 	"history-engine/engine/library/db"
 	"history-engine/engine/library/logger"
 	"history-engine/engine/model"
-	"history-engine/engine/service/icon"
 	"history-engine/engine/service/search"
 	"history-engine/engine/setting"
-	"history-engine/engine/utils"
 	"os"
 	"time"
 )
@@ -37,21 +35,7 @@ func Versions(ctx context.Context, userId int64, uniqueId string, page, limit in
 
 	pages := make([]model.SearchResultPage, 0)
 	for _, item := range source {
-		row := model.SearchResultPage{ // todo 这段转换代码考虑封装复用
-			Id:       item.ID,
-			Avatar:   icon.PublicUrl(ctx, item),
-			Url:      item.URL,
-			Title:    utils.Ternary(item.Title != "", item.Title, "无标题"),
-			Excerpt:  item.Excerpt,
-			Content:  item.Content,
-			Size:     item.Size,
-			Preview:  setting.Web.Domain + "/page/view" + fmt.Sprintf("/%s.%d.html", item.UniqueID, item.Version),
-			DocId:    fmt.Sprintf("%s%d", item.UniqueID, item.Version),
-			UniqueId: item.UniqueID,
-			Version:  item.Version,
-			Time:     item.CreatedAt.Format("2006-01-02 15:05"),
-		}
-		pages = append(pages, row)
+		pages = append(pages, EntPage2SearchResultPage(ctx, item))
 	}
 
 	return total, pages, err
