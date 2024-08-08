@@ -22,6 +22,5 @@ data/*sqlite*
 data/html/
 data/icon/
 data/avatar/
-
 setting.toml
 release/

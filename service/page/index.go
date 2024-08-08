@@ -16,13 +16,13 @@ func PutIndexWithId(ctx context.Context, id int64) error {
 	return putIndex(ctx, model.PageIdent{Id: id})
 }
 
-func PutIndex(userId int64, uniqueId string, version int) error {
+func PutIndex(ctx context.Context, userId int64, uniqueId string, version int) error {
 	row := model.PageIdent{
 		UserId:   userId,
 		UniqueId: uniqueId,
 		Version:  version,
 	}
-	return putIndex(context.Background(), row)
+	return putIndex(ctx, row)
 }
 
 func putIndex(ctx context.Context, row model.PageIdent) error {

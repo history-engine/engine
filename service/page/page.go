@@ -8,22 +8,6 @@ import (
 	"history-engine/engine/library/db"
 )
 
-// SavePage 保存页面 todo 这里有点繁琐和多余
-func SavePage(ctx context.Context, page *ent.Page) (*ent.Page, error) {
-	return db.GetEngine().
-		Page.Create().
-		SetUserID(page.UserID).
-		SetUniqueID(page.UniqueID).
-		SetVersion(page.Version).
-		SetTitle(page.Title).
-		SetExcerpt(page.Excerpt).
-		SetContent(page.Content).
-		SetURL(page.URL).
-		SetPath(page.Path).
-		SetSize(page.Size).
-		Save(ctx)
-}
-
 // BatchGetPage TODO 少获取几个字段
 func BatchGetPage(ctx context.Context, uniqueId []string) ([]*ent.Page, error) {
 	if len(uniqueId) == 0 {
