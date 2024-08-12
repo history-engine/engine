@@ -11,6 +11,7 @@ import (
 
 	"history-engine/engine/ent/migrate"
 
+	"history-engine/engine/ent/alias"
 	"history-engine/engine/ent/filetype"
 	"history-engine/engine/ent/host"
 	"history-engine/engine/ent/icon"
@@ -27,6 +28,8 @@ type Client struct {
 	config
 	// Schema is the client for creating, migrating and dropping schema.
 	Schema *migrate.Schema
+	// Alias is the client for interacting with the Alias builders.
+	Alias *AliasClient
 	// FileType is the client for interacting with the FileType builders.
 	FileType *FileTypeClient
 	// Host is the client for interacting with the Host builders.
@@ -48,6 +51,7 @@ func NewClient(opts ...Option) *Client {
 
 func (c *Client) init() {
 	c.Schema = migrate.NewSchema(c.driver)
+	c.Alias = NewAliasClient(c.config)
 	c.FileType = NewFileTypeClient(c.config)
 	c.Host = NewHostClient(c.config)
 	c.Icon = NewIconClient(c.config)
@@ -145,6 +149,7 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 	return &Tx{
 		ctx:      ctx,
 		config:   cfg,
+		Alias:    NewAliasClient(cfg),
 		FileType: NewFileTypeClient(cfg),
 		Host:     NewHostClient(cfg),
 		Icon:     NewIconClient(cfg),
@@ -169,6 +174,7 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 	return &Tx{
 		ctx:      ctx,
 		config:   cfg,
+		Alias:    NewAliasClient(cfg),
 		FileType: NewFileTypeClient(cfg),
 		Host:     NewHostClient(cfg),
 		Icon:     NewIconClient(cfg),
@@ -180,7 +186,7 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 // Debug returns a new debug-client. It's used to get verbose logging on specific operations.
 //
 //	client.Debug().
-//		FileType.
+//		Alias.
 //		Query().
 //		Count(ctx)
 func (c *Client) Debug() *Client {
@@ -202,26 +208,28 @@ func (c *Client) Close() error {
 // Use adds the mutation hooks to all the entity clients.
 // In order to add hooks to a specific client, call: `client.Node.Use(...)`.
 func (c *Client) Use(hooks ...Hook) {
-	c.FileType.Use(hooks...)
-	c.Host.Use(hooks...)
-	c.Icon.Use(hooks...)
-	c.Page.Use(hooks...)
-	c.User.Use(hooks...)
+	for _, n := range []interface{ Use(...Hook) }{
+		c.Alias, c.FileType, c.Host, c.Icon, c.Page, c.User,
+	} {
+		n.Use(hooks...)
+	}
 }
 
 // Intercept adds the query interceptors to all the entity clients.
 // In order to add interceptors to a specific client, call: `client.Node.Intercept(...)`.
 func (c *Client) Intercept(interceptors ...Interceptor) {
-	c.FileType.Intercept(interceptors...)
-	c.Host.Intercept(interceptors...)
-	c.Icon.Intercept(interceptors...)
-	c.Page.Intercept(interceptors...)
-	c.User.Intercept(interceptors...)
+	for _, n := range []interface{ Intercept(...Interceptor) }{
+		c.Alias, c.FileType, c.Host, c.Icon, c.Page, c.User,
+	} {
+		n.Intercept(interceptors...)
+	}
 }
 
 // Mutate implements the ent.Mutator interface.
 func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 	switch m := m.(type) {
+	case *AliasMutation:
+		return c.Alias.mutate(ctx, m)
 	case *FileTypeMutation:
 		return c.FileType.mutate(ctx, m)
 	case *HostMutation:
@@ -234,6 +242,139 @@ func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 		return c.User.mutate(ctx, m)
 	default:
 		return nil, fmt.Errorf("ent: unknown mutation type %T", m)
+	}
+}
+
+// AliasClient is a client for the Alias schema.
+type AliasClient struct {
+	config
+}
+
+// NewAliasClient returns a client for the Alias from the given config.
+func NewAliasClient(c config) *AliasClient {
+	return &AliasClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `alias.Hooks(f(g(h())))`.
+func (c *AliasClient) Use(hooks ...Hook) {
+	c.hooks.Alias = append(c.hooks.Alias, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `alias.Intercept(f(g(h())))`.
+func (c *AliasClient) Intercept(interceptors ...Interceptor) {
+	c.inters.Alias = append(c.inters.Alias, interceptors...)
+}
+
+// Create returns a builder for creating a Alias entity.
+func (c *AliasClient) Create() *AliasCreate {
+	mutation := newAliasMutation(c.config, OpCreate)
+	return &AliasCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of Alias entities.
+func (c *AliasClient) CreateBulk(builders ...*AliasCreate) *AliasCreateBulk {
+	return &AliasCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *AliasClient) MapCreateBulk(slice any, setFunc func(*AliasCreate, int)) *AliasCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &AliasCreateBulk{err: fmt.Errorf("calling to AliasClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*AliasCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &AliasCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for Alias.
+func (c *AliasClient) Update() *AliasUpdate {
+	mutation := newAliasMutation(c.config, OpUpdate)
+	return &AliasUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *AliasClient) UpdateOne(a *Alias) *AliasUpdateOne {
+	mutation := newAliasMutation(c.config, OpUpdateOne, withAlias(a))
+	return &AliasUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *AliasClient) UpdateOneID(id int64) *AliasUpdateOne {
+	mutation := newAliasMutation(c.config, OpUpdateOne, withAliasID(id))
+	return &AliasUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for Alias.
+func (c *AliasClient) Delete() *AliasDelete {
+	mutation := newAliasMutation(c.config, OpDelete)
+	return &AliasDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *AliasClient) DeleteOne(a *Alias) *AliasDeleteOne {
+	return c.DeleteOneID(a.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *AliasClient) DeleteOneID(id int64) *AliasDeleteOne {
+	builder := c.Delete().Where(alias.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &AliasDeleteOne{builder}
+}
+
+// Query returns a query builder for Alias.
+func (c *AliasClient) Query() *AliasQuery {
+	return &AliasQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeAlias},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a Alias entity by its id.
+func (c *AliasClient) Get(ctx context.Context, id int64) (*Alias, error) {
+	return c.Query().Where(alias.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *AliasClient) GetX(ctx context.Context, id int64) *Alias {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// Hooks returns the client hooks.
+func (c *AliasClient) Hooks() []Hook {
+	return c.hooks.Alias
+}
+
+// Interceptors returns the client interceptors.
+func (c *AliasClient) Interceptors() []Interceptor {
+	return c.inters.Alias
+}
+
+func (c *AliasClient) mutate(ctx context.Context, m *AliasMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&AliasCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&AliasUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&AliasUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&AliasDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown Alias mutation op: %q", m.Op())
 	}
 }
 
@@ -905,9 +1046,9 @@ func (c *UserClient) mutate(ctx context.Context, m *UserMutation) (Value, error)
 // hooks and interceptors per client, for fast access.
 type (
 	hooks struct {
-		FileType, Host, Icon, Page, User []ent.Hook
+		Alias, FileType, Host, Icon, Page, User []ent.Hook
 	}
 	inters struct {
-		FileType, Host, Icon, Page, User []ent.Interceptor
+		Alias, FileType, Host, Icon, Page, User []ent.Interceptor
 	}
 )

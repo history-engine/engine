@@ -3,6 +3,7 @@
 package ent
 
 import (
+	"history-engine/engine/ent/alias"
 	"history-engine/engine/ent/filetype"
 	"history-engine/engine/ent/host"
 	"history-engine/engine/ent/icon"
@@ -16,6 +17,26 @@ import (
 // (default values, validators, hooks and policies) and stitches it
 // to their package variables.
 func init() {
+	aliasFields := schema.Alias{}.Fields()
+	_ = aliasFields
+	// aliasDescDomain is the schema descriptor for domain field.
+	aliasDescDomain := aliasFields[2].Descriptor()
+	// alias.DomainValidator is a validator for the "domain" field. It is called by the builders before save.
+	alias.DomainValidator = aliasDescDomain.Validators[0].(func(string) error)
+	// aliasDescAlias is the schema descriptor for alias field.
+	aliasDescAlias := aliasFields[3].Descriptor()
+	// alias.AliasValidator is a validator for the "alias" field. It is called by the builders before save.
+	alias.AliasValidator = aliasDescAlias.Validators[0].(func(string) error)
+	// aliasDescCreatedAt is the schema descriptor for created_at field.
+	aliasDescCreatedAt := aliasFields[4].Descriptor()
+	// alias.DefaultCreatedAt holds the default value on creation for the created_at field.
+	alias.DefaultCreatedAt = aliasDescCreatedAt.Default.(func() time.Time)
+	// aliasDescUpdatedAt is the schema descriptor for updated_at field.
+	aliasDescUpdatedAt := aliasFields[5].Descriptor()
+	// alias.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	alias.DefaultUpdatedAt = aliasDescUpdatedAt.Default.(func() time.Time)
+	// alias.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	alias.UpdateDefaultUpdatedAt = aliasDescUpdatedAt.UpdateDefault.(func() time.Time)
 	filetypeFields := schema.FileType{}.Fields()
 	_ = filetypeFields
 	// filetypeDescSuffix is the schema descriptor for suffix field.

@@ -6,6 +6,9 @@ import (
 	"entgo.io/ent/dialect/sql"
 )
 
+// Alias is the predicate function for alias builders.
+type Alias func(*sql.Selector)
+
 // FileType is the predicate function for filetype builders.
 type FileType func(*sql.Selector)
 

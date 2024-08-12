@@ -6,6 +6,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"history-engine/engine/ent/alias"
 	"history-engine/engine/ent/filetype"
 	"history-engine/engine/ent/host"
 	"history-engine/engine/ent/icon"
@@ -77,6 +78,7 @@ var (
 func checkColumn(table, column string) error {
 	initCheck.Do(func() {
 		columnCheck = sql.NewColumnCheck(map[string]func(string) bool{
+			alias.Table:    alias.ValidColumn,
 			filetype.Table: filetype.ValidColumn,
 			host.Table:     host.ValidColumn,
 			icon.Table:     icon.ValidColumn,

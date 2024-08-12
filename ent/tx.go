@@ -12,6 +12,8 @@ import (
 // Tx is a transactional client that is created by calling Client.Tx().
 type Tx struct {
 	config
+	// Alias is the client for interacting with the Alias builders.
+	Alias *AliasClient
 	// FileType is the client for interacting with the FileType builders.
 	FileType *FileTypeClient
 	// Host is the client for interacting with the Host builders.
@@ -153,6 +155,7 @@ func (tx *Tx) Client() *Client {
 }
 
 func (tx *Tx) init() {
+	tx.Alias = NewAliasClient(tx.config)
 	tx.FileType = NewFileTypeClient(tx.config)
 	tx.Host = NewHostClient(tx.config)
 	tx.Icon = NewIconClient(tx.config)
@@ -167,7 +170,7 @@ func (tx *Tx) init() {
 // of them in order to commit or rollback the transaction.
 //
 // If a closed transaction is embedded in one of the generated entities, and the entity
-// applies a query, for example: FileType.QueryXXX(), the query will be executed
+// applies a query, for example: Alias.QueryXXX(), the query will be executed
 // through the driver which created this transaction.
 //
 // Note that txDriver is not goroutine safe.

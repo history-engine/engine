@@ -9,6 +9,28 @@ import (
 )
 
 var (
+	// AliasColumns holds the columns for the "alias" table.
+	AliasColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt64, Increment: true},
+		{Name: "user_id", Type: field.TypeInt64},
+		{Name: "domain", Type: field.TypeString, Size: 100},
+		{Name: "alias", Type: field.TypeString, Size: 100},
+		{Name: "created_at", Type: field.TypeTime},
+		{Name: "updated_at", Type: field.TypeTime},
+	}
+	// AliasTable holds the schema information for the "alias" table.
+	AliasTable = &schema.Table{
+		Name:       "alias",
+		Columns:    AliasColumns,
+		PrimaryKey: []*schema.Column{AliasColumns[0]},
+		Indexes: []*schema.Index{
+			{
+				Name:    "alias_user_id_domain_alias",
+				Unique:  true,
+				Columns: []*schema.Column{AliasColumns[1], AliasColumns[2], AliasColumns[3]},
+			},
+		},
+	}
 	// FiletypeColumns holds the columns for the "filetype" table.
 	FiletypeColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt64, Increment: true},
@@ -123,6 +145,7 @@ var (
 	}
 	// Tables holds all the tables in the schema.
 	Tables = []*schema.Table{
+		AliasTable,
 		FiletypeTable,
 		HostTable,
 		IconTable,
@@ -132,6 +155,9 @@ var (
 )
 
 func init() {
+	AliasTable.Annotation = &entsql.Annotation{
+		Table: "alias",
+	}
 	FiletypeTable.Annotation = &entsql.Annotation{
 		Table: "filetype",
 	}
