@@ -41,7 +41,7 @@ func Delete(ctx context.Context, row *ent.Page) error {
 		return errors.New("page empty")
 	}
 
-	if err := os.Remove(setting.SingleFile.HtmlPath + row.Path); err != nil {
+	if err := os.Remove(setting.SingleFile.HtmlPath + row.Path); err != nil && !errors.As(err, &os.ErrNotExist) {
 		return err
 	}
 
