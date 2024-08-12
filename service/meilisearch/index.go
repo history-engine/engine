@@ -15,7 +15,7 @@ func CreateIndex(ctx context.Context, userId int64) error {
 		Uid:        IndexName(userId),
 		PrimaryKey: "id",
 	}
-	content, err := SendRequest(ctx, ApiIndexCreate, http.MethodPost, mi)
+	_, content, err := SendRequest(ctx, ApiIndexCreate, http.MethodPost, mi)
 	if err != nil {
 		return err
 	}

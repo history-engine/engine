@@ -7,5 +7,11 @@ type MeiliDocument struct {
 	Title   string `json:"title,omitempty"`
 	Excerpt string `json:"excerpt,omitempty"`
 	Content string `json:"content,omitempty"`
+}
+
+type MeiliError struct {
+	Message string `json:"message"`
 	Code    string `json:"code"`
+	Type    string `json:"type"`
+	Link    string `json:"link"`
 }

@@ -29,19 +29,19 @@ func SetClient(c *http.Client) {
 	client = c
 }
 
-func SendRequest(ctx context.Context, api, method string, data any) ([]byte, error) {
+func SendRequest(ctx context.Context, api, method string, data any) (int, []byte, error) {
 	var err error
 	var content []byte
 	if data != nil {
 		content, err = json.Marshal(data)
 		if err != nil {
-			return nil, err
+			return 0, nil, err
 		}
 	}
 
 	req, err := http.NewRequestWithContext(ctx, method, setting.MeiliSearch.Host+api, bytes.NewReader(content))
 	if err != nil {
-		return nil, err
+		return 0, nil, err
 	}
 
 	req.Header.Set("Content-Type", "application/json")
@@ -49,9 +49,11 @@ func SendRequest(ctx context.Context, api, method string, data any) ([]byte, err
 
 	res, err := client.Do(req)
 	if err != nil {
-		return nil, err
+		return 0, nil, err
 	}
 	defer res.Body.Close()
 
-	return io.ReadAll(res.Body)
+	content, err = io.ReadAll(res.Body)
+
+	return res.StatusCode, content, err
 }

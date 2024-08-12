@@ -11,23 +11,29 @@ import (
 
 func GetDocument(ctx context.Context, userId int64, docId string) (*model.MeiliDocument, error) {
 	api := fmt.Sprintf(ApiDocGetWithId, IndexName(userId), docId)
-	content, err := SendRequest(ctx, api, http.MethodGet, nil)
+	code, content, err := SendRequest(ctx, api, http.MethodGet, nil)
 	if err != nil {
 		return nil, err
 	}
 
+	me := &model.MeiliError{}
 	md := &model.MeiliDocument{}
-	err = json.Unmarshal(content, md)
-	if err == nil && md.Code != "" {
-		return nil, errors.New(md.Code)
+	if code != 200 {
+		err = json.Unmarshal(content, me)
+		return nil, errors.New(me.Message)
+	} else {
+		err = json.Unmarshal(content, md)
+		if err != nil {
+			return nil, err
+		}
 	}
 
-	return md, err
+	return md, nil
 }
 
 func PutDocument(ctx context.Context, userId int64, doc model.MeiliDocument) error {
 	api := fmt.Sprintf(ApiDocCreate, IndexName(userId))
-	content, err := SendRequest(ctx, api, http.MethodPut, doc)
+	_, content, err := SendRequest(ctx, api, http.MethodPut, doc)
 	if err != nil {
 		return err
 	}
@@ -43,7 +49,7 @@ func PutDocument(ctx context.Context, userId int64, doc model.MeiliDocument) err
 
 func DelDocument(ctx context.Context, userId int64, docId string) error {
 	api := fmt.Sprintf(ApiDocDelete, IndexName(userId), docId)
-	content, err := SendRequest(ctx, api, http.MethodDelete, nil)
+	_, content, err := SendRequest(ctx, api, http.MethodDelete, nil)
 	if err != nil {
 		return err
 	}

@@ -17,7 +17,7 @@ func Search(ctx context.Context, userId int64, search model.SearchRequest) (resp
 		Page:        search.Page,
 	}
 	api := fmt.Sprintf(ApiSearch, IndexName(userId))
-	body, err := SendRequest(ctx, api, http.MethodPost, query)
+	_, body, err := SendRequest(ctx, api, http.MethodPost, query)
 	if err != nil {
 		return
 	}
