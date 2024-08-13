@@ -35,7 +35,7 @@ parser = "mozilla" # 解析器，目前只支持mozilla
 exec_path = "/usr/lib/readability.js" # readability-parse脚本路径，为空会从系统环境变量PATH下查找
 
 [search]
-engine = "meili" # zinc、meili、es
+engine = "meili" # zinc、meili、es # es 暂未实现
 prefix = "history_engine_index"
 
 [zincsearch]
@@ -47,6 +47,14 @@ password = "admin"
 [meilisearch]
 host = "http://localhost:7070"
 master_key = "" # https://www.meilisearch.com/docs/learn/configuration/instance_options#master-key
+
+[elasticsearch]
+host = ["http://localhost:9200"]
+user = "elastic"
+password = ""  # http basic auth
+cloud_id = ""  # http basic auth
+api_key = ""      # Base64-encoded token for authorization; if set, overrides username/password and service token.
+server_token = "" # Service token for authorization; if set, overrides username/password.
 
 [database]
 drive = "mysql" #取值范围：mysql(tidb、mariadb)、sqlite3、postgres

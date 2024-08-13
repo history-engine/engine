@@ -15,6 +15,8 @@ func Engine() EngineInterface {
 			engine = ZincSearchEngine
 		case "meili":
 			engine = MeiliSearchEngine
+		case "es":
+			engine = ElasticSearchEngine
 		default:
 			panic("wrong search engine")
 		}
