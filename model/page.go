@@ -30,7 +30,7 @@ type SearchResultPage struct {
 	Title    string `json:"title"`
 	Excerpt  string `json:"excerpt"`
 	Content  string `json:"content"`
-	Size     int    `json:"size"`
+	Size     string `json:"size"`
 	Url      string `json:"url"`
 	Preview  string `json:"preview"`
 	Time     string `json:"time"`

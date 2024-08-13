@@ -18,7 +18,7 @@ func EntPage2SearchResultPage(ctx context.Context, entPage *ent.Page) model.Sear
 		Title:    utils.Ternary(entPage.Title != "", entPage.Title, "无标题"),
 		Excerpt:  entPage.Excerpt,
 		Content:  entPage.Content,
-		Size:     entPage.Size,
+		Size:     utils.SizeFormat(entPage.Size),
 		Preview:  setting.Web.Domain + "/page/view" + fmt.Sprintf("/%s.%d.html", entPage.UniqueID, entPage.Version),
 		DocId:    fmt.Sprintf("%s%d", entPage.UniqueID, entPage.Version),
 		UniqueId: entPage.UniqueID,
