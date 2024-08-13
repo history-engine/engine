@@ -7,12 +7,12 @@ import (
 	"strconv"
 )
 
-var _ EngineInterface = MeiliSearch{}
+var MeiliSearchEngine EngineInterface
 
 type MeiliSearch struct{}
 
-func NewMeiliSearch() MeiliSearch {
-	return MeiliSearch{}
+func init() {
+	MeiliSearchEngine = MeiliSearch{}
 }
 
 // GetDocument 获取文档  todo 或许可以减少一次转换

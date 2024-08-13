@@ -10,16 +10,17 @@ import (
 )
 
 var (
-	regex           *regexp.Regexp
-	_               Readability = Mozilla{}
-	ErrContentEmpty             = errors.New("parse html empty")
+	ErrContentEmpty = errors.New("parse html empty")
+
+	regex         *regexp.Regexp
+	MozillaParser Readability
 )
 
 type Mozilla struct{}
 
-func NewMozilla() Readability {
+func init() {
 	regex, _ = regexp.Compile(`(?s)<!--.*?(htt.+://\S+).*?saved\sdate.*?-->`)
-	return Mozilla{}
+	MozillaParser = Mozilla{}
 }
 
 func (m Mozilla) Parse(path string) (*Article, error) {

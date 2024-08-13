@@ -7,12 +7,12 @@ import (
 	"strconv"
 )
 
-var _ EngineInterface = ZincSearch{}
+var ZincSearchEngine EngineInterface
 
 type ZincSearch struct{}
 
-func NewZincSearch() ZincSearch {
-	return ZincSearch{}
+func init() {
+	ZincSearchEngine = ZincSearch{}
 }
 
 func (z ZincSearch) GetDocument(ctx context.Context, userId int64, docId string) (*model.SearchEngineDocument, error) {

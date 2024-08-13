@@ -5,8 +5,8 @@ import "history-engine/engine/setting"
 func Parser() Readability {
 	switch setting.Readability.Parser {
 	case "mozilla":
-		return NewMozilla()
+		return MozillaParser
 	default:
-		return NewMozilla()
+		return MozillaParser
 	}
 }

@@ -12,9 +12,9 @@ func Engine() EngineInterface {
 	once.Do(func() {
 		switch setting.Search.Engine {
 		case "zinc":
-			engine = NewZincSearch()
+			engine = ZincSearchEngine
 		case "meili":
-			engine = NewMeiliSearch()
+			engine = MeiliSearchEngine
 		default:
 			panic("wrong search engine")
 		}

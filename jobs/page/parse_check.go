@@ -68,9 +68,9 @@ func runParseCheck(ctx *cli.Context) error {
 			}
 			if ok, err := page.Filter(hi); !ok {
 				logger.Zap().Info(err.Error())
-				x.DeleteOneID(item.ID).Exec(ctx.Context)
+				_ = x.DeleteOneID(item.ID).Exec(ctx.Context)
 				docId := fmt.Sprintf("%s%d", item.UniqueID, item.Version)
-				search.Engine().DelDocument(ctx.Context, item.UserID, docId)
+				_ = search.Engine().DelDocument(ctx.Context, item.UserID, docId)
 				continue
 			}
 
