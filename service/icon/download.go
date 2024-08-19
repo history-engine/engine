@@ -159,6 +159,12 @@ func headerIcon(host, htmlPath string) (string, bool) {
 // data:image/x-icon;base64,AAA...
 // data:image/svg xml,<svg...</svg>
 func SaveBase64Image(host, base64Data string) string {
+	defer func() {
+		if err := recover(); err != nil {
+			logger.Zap().Error("base64 image err", zap.String("host", host), zap.String("base64Data", base64Data))
+		}
+	}()
+
 	commaIndex := strings.Index(base64Data, ",")
 	if commaIndex == -1 {
 		return ""
