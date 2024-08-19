@@ -1,45 +1,18 @@
-# engine
-history engine
+# 这是什么
+History Engine 一个将浏览器访问过的网页离线保存、离线查看、全文搜索的管理系统。
 
-## 其他零碎记录
-用户注册提供开关
-可能需要验证码功能
-jwt需要客户端保存token, 有可能需要cookie, 如果没有cookie, 需要在每个请求中带上token
-多语言支持, 其他语言的翻译文件放在哪里, 如何加载
-不实现用户角色组等功能, id=1的是管理员, 其他都是普通用户
+# 功能和代办
+- [x] 浏览器扩展SingleFile通过WebDAV、REST-API方式保存HTML文件到服务器
+- [x] 提取HTML文件的ICON图标、标题、摘要、主要内容以提供全文搜索和预览
+- [x] 多版本支持，同一个网页可配置保存近期的几个版本
+- [x] 多种过滤策略：上次保存时间、域名过滤、文件大小过滤、后缀过滤
+- [x] 多用户隔离
+- [x] 多种搜索引擎支持：ZincSearch、MeiliSearch、ElasticSearch
+- [ ] 用户中心：个人信息维护、过滤规则维护、已保存HTML文件管理
+- [ ] 管理中心：用户管理、各类系统维护
+- [ ] 界面多语言支持
 
-## 功能代办:
-- [x] webdav 保存到文件
-- [ ] 用户注册登录
-- [ ] webdav提交html时保存相关信息到数据库
-- [ ] webdav提交html时保存相关信息到ZincSearch
-- [ ] webdav文件保存多版本支持
-- [ ] 安装流程, 管理员生成, 数据库表创建
-- [ ] 升级流程, 数据库表升级
-- [ ] 备份脚本
+# 安装
 
-## 目录结构
+参考：[Wiki：安装](https://github.com/history-engine/engine/wiki/install%E2%80%90history%E2%80%90engine)
 
-### TODO 
-http路由注册, 命令行子命令注册挪到routes目录, app只保留handle代码
-
-### service
-业务逻辑
-
-### library
-第三方库封装: db, redis, webdav, zincsearch等
-
-### main.go
-程序入口, 负责初始化各个模块, 启动服务, 加载配置
-
-### setting.toml
-toml格式的配置文件, 用于配置各个模块的参数, 每个配置项都有默认值, 可以不配置
-
-### setting 目录
-配置相关, 每个子模块一个文件, 文件内设置对应的变量和初始值, 可以全局直接引用, 加载配置时会覆盖初始值
-
-### utils 目录
-工具函数, 每个子模块一个文件, 文件内设置对应的函数, 可以全局直接引用
-
-### model 目录
-数据库模型
