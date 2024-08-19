@@ -6,10 +6,6 @@ import (
 	"github.com/spf13/viper"
 )
 
-var (
-	CustomFile = "setting.toml"
-)
-
 func Load(file string) error {
 	if err := initViper(file); err != nil {
 		return err

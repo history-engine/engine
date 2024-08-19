@@ -5,9 +5,11 @@ import (
 	"github.com/urfave/cli/v2"
 	"history-engine/engine/jobs"
 	"history-engine/engine/setting"
+	"history-engine/engine/utils"
 	"history-engine/engine/web"
 	"log"
 	"os"
+	"path/filepath"
 	"runtime"
 	"time"
 )
@@ -26,9 +28,9 @@ func main() {
 
 	app.Flags = append(app.Flags, []cli.Flag{
 		&cli.StringFlag{
-			Name:  "config, c",
-			Value: setting.CustomFile,
-			Usage: "Custom configuration file path",
+			Name:    "config, c",
+			Aliases: []string{"c"},
+			Usage:   "Custom configuration file path",
 		},
 	}...)
 
@@ -40,8 +42,12 @@ func main() {
 func loadSetting(c *cli.Context) error {
 	file := c.String("config")
 	if file == "" {
-		pwd, _ := os.Getwd()
-		file = pwd + "/" + setting.CustomFile
+		pwd, _ := os.Executable()
+		file = filepath.Dir(pwd) + "/" + "setting.toml"
+	}
+
+	if !utils.FileExist(file) {
+		log.Fatalln("setting file not exist")
 	}
 
 	return setting.Load(file)

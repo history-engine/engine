@@ -55,6 +55,7 @@ func loadSingleFile() {
 	}
 
 	checkStoragePath()
+	log.Printf("SingleFile name template: host-{url-host}_suffix-{url-pathname}_sha1-{url-href-digest-sha-1}")
 }
 
 func checkStoragePath() {

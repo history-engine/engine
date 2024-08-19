@@ -43,6 +43,6 @@ func loadWeb() {
 
 func checkWebUiPath() {
 	if !utils.FileExist(Web.UiPath + "/index.html") {
-		log.Fatalf("webui path may empty")
+		log.Println("webui path may empty")
 	}
 }
