@@ -73,14 +73,23 @@ func (z ZincSearch) Search(ctx context.Context, userId int64, request model.Sear
 	}
 
 	for _, item := range zs.Hits.Hits {
-		version, err := strconv.Atoi(item.ID[32:])
+		uniqueId := ""
+		version := 0
+		if len(item.ID) > 40 {
+			uniqueId = item.ID[0:40]
+			version, err = strconv.Atoi(item.ID[40:])
+		} else {
+			uniqueId = item.ID[0:32]
+			version, err = strconv.Atoi(item.ID[32:])
+		}
+
 		if err != nil {
 			return nil, err
 		}
 
 		row := model.SearchResultPage{
 			DocId:    item.ID,
-			UniqueId: item.ID[0:32],
+			UniqueId: uniqueId,
 			Version:  version,
 		}
 		sr.Pages = append(sr.Pages, row)

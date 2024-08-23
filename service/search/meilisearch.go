@@ -66,11 +66,14 @@ func (m MeiliSearch) Search(ctx context.Context, userId int64, request model.Sea
 		Pages: make([]model.SearchResultPage, 0),
 	}
 
-	var version int
 	for _, item := range ms.Hits {
+		uniqueId := ""
+		version := 0
 		if len(item.Id) > 40 {
+			uniqueId = item.Id[0:40]
 			version, err = strconv.Atoi(item.Id[40:])
 		} else {
+			uniqueId = item.Id[0:32]
 			version, err = strconv.Atoi(item.Id[32:])
 		}
 		if err != nil {
@@ -78,7 +81,7 @@ func (m MeiliSearch) Search(ctx context.Context, userId int64, request model.Sea
 		}
 		row := model.SearchResultPage{
 			DocId:    item.Id,
-			UniqueId: item.Id[0:32],
+			UniqueId: uniqueId,
 			Version:  version,
 		}
 		sr.Pages = append(sr.Pages, row)
