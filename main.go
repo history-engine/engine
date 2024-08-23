@@ -40,10 +40,16 @@ func main() {
 }
 
 func loadSetting(c *cli.Context) error {
+	name := "setting.toml"
 	file := c.String("config")
+
 	if file == "" {
 		pwd, _ := os.Executable()
-		file = filepath.Dir(pwd) + "/" + "setting.toml"
+		file = filepath.Dir(pwd) + "/" + name
+		if !utils.FileExist(file) {
+			pwd, _ := os.Getwd()
+			file = pwd + "/" + name
+		}
 	}
 
 	if !utils.FileExist(file) {
