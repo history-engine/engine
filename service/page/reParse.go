@@ -39,7 +39,7 @@ func ReParse(ctx context.Context, ident model.PageIdent) error {
 		return errors.New("HTML file not exist")
 	}
 
-	go func() {
+	go func() { //  TODO ICON强制重新下载，可能之前下载的有问题
 		if err := ParserPageWithId(context.Background(), row.ID); err != nil {
 			logger.Zap().Warn("parse page err", zap.Error(err), zap.Any("page", row))
 			return
