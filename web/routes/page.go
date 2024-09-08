@@ -20,4 +20,6 @@ func pageRouteRegister(r *echo.Group) {
 
 	r.DELETE("/delete", page.Delete, middleware.JwtAuth)
 	r.POST("/exclude", page.Exclude, middleware.JwtAuth)
+
+	r.POST("/re-parse", page.ReParse, middleware.JwtAuth)
 }
