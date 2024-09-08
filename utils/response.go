@@ -8,7 +8,7 @@ import (
 func ApiResponse(ctx echo.Context, code int, msg string, data any) error {
 	return ctx.JSON(200, model.ApiResponse{
 		Code:    0,
-		Message: "ok",
+		Message: msg,
 		Data:    data,
 	})
 }

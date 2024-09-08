@@ -27,7 +27,7 @@ func Exclude(ctx context.Context, ident model.PageIdent) error {
 	}
 
 	if err != nil {
-		return nil
+		return err
 	}
 
 	parsed, err := url.Parse(row.URL)
