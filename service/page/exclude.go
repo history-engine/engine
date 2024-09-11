@@ -3,26 +3,23 @@ package page
 import (
 	"context"
 	"errors"
-	"history-engine/engine/ent"
 	"history-engine/engine/ent/page"
 	"history-engine/engine/library/db"
 	"history-engine/engine/model"
 	"history-engine/engine/service/host"
-	"net/url"
 )
 
-func Exclude(ctx context.Context, ident model.PageIdent) error {
+func Exclude(ctx context.Context, params model.ExcludeRequest) error {
 	x := db.GetEngine()
 
-	var err error
-	var row *ent.Page
-	if ident.Id > 0 {
-		row, err = x.Page.Query().Where(page.ID(ident.Id)).First(ctx)
-	} else {
-		row, err = x.Page.Query().Where(page.UniqueID(ident.UniqueId), page.Version(ident.Version)).First(ctx)
-	}
-
-	if row == nil {
+	exist, err := x.Page.Query().
+		Where(
+			page.UserID(params.UserId),
+			page.UniqueID(params.UniqueId),
+			page.Version(params.Version),
+		).
+		Exist(ctx)
+	if !exist {
 		return errors.New("page not found")
 	}
 
@@ -30,10 +27,5 @@ func Exclude(ctx context.Context, ident model.PageIdent) error {
 		return err
 	}
 
-	parsed, err := url.Parse(row.URL)
-	if err != nil {
-		return err
-	}
-
-	return host.Add(ctx, row.UserID, parsed.Host, 2)
+	return host.Add(ctx, params.UserId, params.Domains, 2)
 }

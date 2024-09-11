@@ -1,23 +1,24 @@
 package page
 
 import (
-	"github.com/labstack/echo/v4"
 	"history-engine/engine/model"
 	"history-engine/engine/service/page"
 	"history-engine/engine/utils"
+
+	"github.com/labstack/echo/v4"
 )
 
 func Exclude(c echo.Context) error {
-	ident := model.PageIdent{UserId: c.Get("uid").(int64)}
-	if err := c.Bind(&ident); err != nil {
-		return utils.ApiResponse(c, 500, err.Error(), ident)
+	req := model.ExcludeRequest{UserId: c.Get("uid").(int64)}
+	if err := c.Bind(&req); err != nil {
+		return utils.ApiResponse(c, 500, err.Error(), req)
 	}
 
-	if ident.Id == 0 && ident.UserId == 0 && ident.UniqueId == "" && ident.Version == 0 {
-		return utils.ApiResponse(c, 500, "args empty", ident)
+	if req.UserId == 0 || req.UniqueId == "" || req.Version == 0 || len(req.Domains) == 0 {
+		return utils.ApiResponse(c, 500, "args empty", req)
 	}
 
-	if err := page.Exclude(c.Request().Context(), ident); err != nil {
+	if err := page.Exclude(c.Request().Context(), req); err != nil {
 		return utils.ApiResponse(c, 500, err.Error(), nil)
 	}
 

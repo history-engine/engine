@@ -53,3 +53,10 @@ type HtmlInfo struct {
 	Path     string
 	IoReader io.ReadCloser
 }
+
+type ExcludeRequest struct {
+	UserId   int64    `json:"-"`
+	UniqueId string   `json:"unique_id"`
+	Version  int      `json:"version"`
+	Domains  []string `json:"domains"`
+}
