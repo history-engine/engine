@@ -17,6 +17,7 @@ func RegisterRoute(e *echo.Echo) {
 	userRouteRegister(e.Group("/user"))
 	pageRouteRegister(e.Group("/page"))
 	adminRouteRegister(e.Group("/admin"))
+	settingRouteRegister(e.Group("/setting"))
 	miscRegister(e.Group("/misc"))
 }
 
