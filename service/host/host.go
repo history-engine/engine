@@ -2,6 +2,7 @@ package host
 
 import (
 	"context"
+	"entgo.io/ent/dialect/sql"
 	"fmt"
 	"github.com/tidwall/match"
 	"go.uber.org/zap"
@@ -69,7 +70,7 @@ func All(ctx context.Context, userId int64, Type int) ([]string, error) {
 	}
 
 	x := db.GetEngine()
-	list, err := x.Host.Query().Select(host.FieldHost).Where(host.Type(Type)).All(ctx)
+	list, err := x.Host.Query().Select(host.FieldHost).Where(host.UserID(userId), host.Type(Type)).All(ctx)
 	if err != nil && ent.IsNotFound(err) {
 		return nil, err
 	}
@@ -83,4 +84,21 @@ func All(ctx context.Context, userId int64, Type int) ([]string, error) {
 	}
 
 	return hosts, nil
+}
+
+func Page(ctx context.Context, userId int64, page int, limit int, keyword string) (int, []*ent.Host, error) {
+	x := db.GetEngine()
+
+	total, err := x.Host.Query().Where(host.UserID(userId), host.HostContains(keyword)).Count(ctx)
+	if err != nil || total == 0 {
+		return total, nil, err
+	}
+
+	list, err := x.Host.Query().
+		Where(host.UserID(userId), host.HostContains(keyword)).
+		Order(host.ByID(sql.OrderDesc())).
+		Offset((page - 1) * limit).
+		Limit(limit).
+		All(ctx)
+	return total, list, err
 }
