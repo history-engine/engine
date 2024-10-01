@@ -100,5 +100,29 @@ func Page(ctx context.Context, userId int64, page int, limit int, keyword string
 		Offset((page - 1) * limit).
 		Limit(limit).
 		All(ctx)
+
 	return total, list, err
+}
+
+func Delete(ctx context.Context, userId, id int64) error {
+	x := db.GetEngine()
+
+	_, err := x.Host.Delete().
+		Where(host.UserID(userId), host.ID(id)).
+		Exec(ctx)
+
+	return err
+}
+
+func Edit(ctx context.Context, userId int64, row ent.Host) error {
+	x := db.GetEngine().Host
+
+	// todo 判断已存在
+	err := x.Update().
+		Where(host.UserID(userId), host.ID(row.ID)).
+		SetHost(row.Host).
+		SetType(row.Type).
+		Exec(ctx)
+
+	return err
 }

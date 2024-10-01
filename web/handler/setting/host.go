@@ -31,5 +31,30 @@ func GetHost(ctx echo.Context) error {
 }
 
 func SaveHost(ctx echo.Context) error {
-	return nil
+	var userId = ctx.Get("uid").(int64)
+	row := ent.Host{}
+	err := ctx.Bind(&row)
+	if err != nil {
+		panic(err)
+	}
+
+	err = host.Edit(ctx.Request().Context(), userId, row)
+	if err != nil {
+		panic(err)
+	}
+
+	return utils.ApiSuccess(ctx, nil)
+}
+
+func DeleteHost(ctx echo.Context) error {
+	var userId = ctx.Get("uid").(int64)
+	var id int64 = 0
+	err := echo.QueryParamsBinder(ctx).Int64("id", &id).BindError()
+	if err != nil {
+		panic(err)
+	}
+
+	host.Delete(ctx.Request().Context(), userId, id)
+
+	return utils.ApiSuccess(ctx, nil)
 }
