@@ -11,6 +11,7 @@ func settingRouteRegister(r *echo.Group) {
 	r.POST("/profile", setting.SaveProfile, middleware.JwtAuth)
 
 	r.GET("/host", setting.GetHost, middleware.JwtAuth)
+	r.PUT("/host", setting.AddHost, middleware.JwtAuth)
 	r.POST("/host", setting.SaveHost, middleware.JwtAuth)
 	r.DELETE("/host", setting.DeleteHost, middleware.JwtAuth)
 

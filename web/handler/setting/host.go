@@ -30,6 +30,23 @@ func GetHost(ctx echo.Context) error {
 	return utils.ApiSuccess(ctx, resp)
 }
 
+func AddHost(ctx echo.Context) error {
+	var userId = ctx.Get("uid").(int64)
+
+	row := ent.Host{}
+	err := ctx.Bind(&row)
+	if err != nil {
+		panic(err)
+	}
+
+	err = host.Add(ctx.Request().Context(), userId, []string{row.Host}, row.Type)
+	if err != nil {
+		panic(err)
+	}
+
+	return utils.ApiSuccess(ctx, nil)
+}
+
 func SaveHost(ctx echo.Context) error {
 	var userId = ctx.Get("uid").(int64)
 	row := ent.Host{}
