@@ -2,6 +2,7 @@ package filetype
 
 import (
 	"context"
+	"entgo.io/ent/dialect/sql"
 	"fmt"
 	"history-engine/engine/ent"
 	"history-engine/engine/ent/filetype"
@@ -57,4 +58,22 @@ func All(ctx context.Context, userId int64, Type int) (map[string]struct{}, erro
 	}
 
 	return filetypes, nil
+}
+
+func Page(ctx context.Context, userId int64, page int, limit int, keyword string) (int, []*ent.FileType, error) {
+	x := db.GetEngine()
+
+	total, err := x.FileType.Query().Where(filetype.UserID(userId), filetype.SuffixContains(keyword)).Count(ctx)
+	if err != nil || total == 0 {
+		return total, nil, err
+	}
+
+	list, err := x.FileType.Query().
+		Where(filetype.UserID(userId), filetype.SuffixContains(keyword)).
+		Order(filetype.ByID(sql.OrderDesc())).
+		Offset((page - 1) * limit).
+		Limit(limit).
+		All(ctx)
+
+	return total, list, err
 }
