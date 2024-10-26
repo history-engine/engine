@@ -23,4 +23,7 @@ func settingRouteRegister(r *echo.Group) {
 
 	r.GET("/filetype", setting.GetFiletype, middleware.JwtAuth)
 	r.POST("/filetype", setting.SaveFiletype, middleware.JwtAuth)
+
+	r.GET("/page", setting.GetPage, middleware.JwtAuth)
+	r.DELETE("/page", setting.DeletePage, middleware.JwtAuth)
 }

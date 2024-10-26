@@ -17,9 +17,9 @@ func DeleteByIdent(ctx context.Context, ident model.PageIdent) error {
 	var err error
 	var row *ent.Page
 	x := db.GetEngine()
-	if ident.Id > 0 {
-		row, err = x.Page.Query().Where(page.ID(ident.Id)).First(ctx)
-	} else {
+	if ident.Id > 0 && ident.UserId > 0 {
+		row, err = x.Page.Query().Where(page.ID(ident.Id), page.UserID(ident.UserId)).First(ctx)
+	} else if ident.UserId > 0 && ident.UniqueId != "" && ident.Version > 0 {
 		row, err = x.Page.Query().
 			Where(
 				page.UserID(ident.UserId),
@@ -27,6 +27,8 @@ func DeleteByIdent(ctx context.Context, ident model.PageIdent) error {
 				page.Version(ident.Version),
 			).
 			First(ctx)
+	} else {
+		return errors.New("ident invalid")
 	}
 
 	if err != nil {
