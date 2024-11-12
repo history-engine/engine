@@ -12,6 +12,7 @@ import (
 	"history-engine/engine/library/logger"
 	"history-engine/engine/model"
 	"history-engine/engine/service/search"
+	serviceSetting "history-engine/engine/service/setting"
 	"history-engine/engine/setting"
 	"os"
 	"time"
@@ -64,7 +65,12 @@ func NextVersion(ctx context.Context, uniqueId string) (int, time.Time) {
 
 // CleanHistory 清除历史版本、HTML文件、ZincSearch索引
 func CleanHistory(ctx context.Context, userId int64, uniqueId string, version int) error {
-	diff := version - setting.SingleFile.MaxVersion
+	storageSetting, err := serviceSetting.GetSetting(ctx, userId)
+	if err != nil {
+		panic(err)
+	}
+
+	diff := version - storageSetting.MaxVersion
 	if diff <= 0 {
 		return nil
 	}
@@ -82,7 +88,6 @@ func CleanHistory(ctx context.Context, userId int64, uniqueId string, version in
 		return err
 	}
 
-	var err error
 	for _, v := range vs {
 		docId := fmt.Sprintf("%s%d", uniqueId, version)
 		if err := search.Engine().DelDocument(ctx, userId, docId); err != nil {
@@ -90,7 +95,7 @@ func CleanHistory(ctx context.Context, userId int64, uniqueId string, version in
 			continue
 		}
 
-		if err := os.Remove(setting.SingleFile.HtmlPath + v.Path); err != nil {
+		if err := os.Remove(setting.Common.HtmlPath + v.Path); err != nil {
 			err = errors.Join(err)
 			continue
 		}

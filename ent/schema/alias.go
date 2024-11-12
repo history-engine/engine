@@ -33,6 +33,7 @@ func (Alias) Edges() []ent.Edge {
 
 func (Alias) Annotations() []schema.Annotation {
 	return []schema.Annotation{
+		entsql.WithComments(true),
 		entsql.Annotation{Table: "alias"},
 	}
 }

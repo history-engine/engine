@@ -20,7 +20,7 @@ func View(c echo.Context) error {
 	uid := c.Get("uid")
 	file := fmt.Sprintf("/%d/%s/%s/%s", uid, path[:2], path[2:4], path)
 
-	file = setting.SingleFile.HtmlPath + file
+	file = setting.Common.HtmlPath + file
 	if !utils.FileExist(file) {
 		return c.String(404, "file not found")
 	}

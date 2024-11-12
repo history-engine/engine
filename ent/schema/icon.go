@@ -38,6 +38,7 @@ func (Icon) Indexes() []ent.Index {
 
 func (Icon) Annotations() []schema.Annotation {
 	return []schema.Annotation{
+		entsql.WithComments(true),
 		entsql.Annotation{Table: "icon"},
 	}
 }

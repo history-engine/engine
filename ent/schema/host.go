@@ -33,6 +33,7 @@ func (Host) Edges() []ent.Edge {
 
 func (Host) Annotations() []schema.Annotation {
 	return []schema.Annotation{
+		entsql.WithComments(true),
 		entsql.Annotation{Table: "host"},
 	}
 }

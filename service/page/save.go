@@ -21,11 +21,11 @@ func SavePage(ctx context.Context, hi *model.HtmlInfo) error {
 
 	// 检查并创建目录
 	storagePath := fmt.Sprintf("/%d/%s/%s", hi.UserId, hi.Sha1[:2], hi.Sha1[2:4])
-	if _, err := os.Stat(setting.SingleFile.HtmlPath + storagePath); err != nil {
+	if _, err := os.Stat(setting.Common.HtmlPath + storagePath); err != nil {
 		if !os.IsNotExist(err) { // TODO 未知错误,记录日志
 			return err
 		}
-		if err := os.MkdirAll(setting.SingleFile.HtmlPath+storagePath, 0775); err != nil {
+		if err := os.MkdirAll(setting.Common.HtmlPath+storagePath, 0775); err != nil {
 			// todo 这里可能有多种情况
 			return err
 		}
@@ -33,7 +33,7 @@ func SavePage(ctx context.Context, hi *model.HtmlInfo) error {
 
 	// 文件写入
 	storageFile := fmt.Sprintf("%s/%s.%d.html", storagePath, hi.Sha1, version)
-	f, err := os.OpenFile(setting.SingleFile.HtmlPath+storageFile, os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0644)
+	f, err := os.OpenFile(setting.Common.HtmlPath+storageFile, os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0644)
 	if err != nil {
 		return err
 	}
@@ -56,7 +56,7 @@ func SavePage(ctx context.Context, hi *model.HtmlInfo) error {
 
 	logger.Zap().Info("rest receive singleFile",
 		zap.String("url", utils.Ternary[string](hi.Url == "", hi.Host, hi.Url)),
-		zap.String("path", setting.SingleFile.HtmlPath+storageFile),
+		zap.String("path", setting.Common.HtmlPath+storageFile),
 		zap.String("uniqueId", hi.Sha1),
 		zap.Int("version", version))
 

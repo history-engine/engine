@@ -48,6 +48,7 @@ func (Page) Indexes() []ent.Index {
 
 func (Page) Annotations() []schema.Annotation {
 	return []schema.Annotation{
+		entsql.WithComments(true),
 		entsql.Annotation{Table: "page"},
 	}
 }

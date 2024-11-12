@@ -6,6 +6,7 @@ import (
 	"history-engine/engine/model"
 	"history-engine/engine/service/filetype"
 	"history-engine/engine/service/host"
+	serviceSetting "history-engine/engine/service/setting"
 	"history-engine/engine/setting"
 	"history-engine/engine/utils"
 	"strconv"
@@ -13,11 +14,16 @@ import (
 )
 
 func Filter(hi *model.HtmlInfo) (bool, error) {
-	if hi.Size > 0 && (hi.Size < 2048 || hi.Size > setting.SingleFile.MaxSize) {
+	storageSetting, err := serviceSetting.GetSetting(context.Background(), hi.UserId)
+	if err != nil {
+		panic(err)
+	}
+
+	if hi.Size > 0 && (hi.Size < 2048 || hi.Size > storageSetting.MaxSize) {
 		return false, errors.New("ignore by size: " + strconv.Itoa(hi.Size))
 	}
 
-	if hi.Path != "" && !utils.FileExist(setting.SingleFile.HtmlPath+hi.Path) {
+	if hi.Path != "" && !utils.FileExist(setting.Common.HtmlPath+hi.Path) {
 		return false, errors.New("ignore by file not exist： " + hi.Path)
 	}
 
@@ -35,7 +41,7 @@ func Filter(hi *model.HtmlInfo) (bool, error) {
 
 	if hi.Sha1 != "" {
 		_, created := NextVersion(context.Background(), hi.Sha1)
-		if utils.CheckVersionInterval(setting.SingleFile.MinVersionInterval, created) {
+		if utils.CheckVersionInterval(storageSetting.MinVersionInterval, created) {
 			return false, errors.New("ignore by interval: " + hi.Sha1)
 		}
 	}

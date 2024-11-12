@@ -9,6 +9,7 @@ import (
 	"history-engine/engine/ent/icon"
 	"history-engine/engine/ent/page"
 	"history-engine/engine/ent/schema"
+	"history-engine/engine/ent/setting"
 	"history-engine/engine/ent/user"
 	"time"
 )
@@ -197,6 +198,18 @@ func init() {
 	page.DefaultUpdatedAt = pageDescUpdatedAt.Default.(func() time.Time)
 	// page.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
 	page.UpdateDefaultUpdatedAt = pageDescUpdatedAt.UpdateDefault.(func() time.Time)
+	settingFields := schema.Setting{}.Fields()
+	_ = settingFields
+	// settingDescCreatedAt is the schema descriptor for created_at field.
+	settingDescCreatedAt := settingFields[6].Descriptor()
+	// setting.DefaultCreatedAt holds the default value on creation for the created_at field.
+	setting.DefaultCreatedAt = settingDescCreatedAt.Default.(func() time.Time)
+	// settingDescUpdatedAt is the schema descriptor for updated_at field.
+	settingDescUpdatedAt := settingFields[7].Descriptor()
+	// setting.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	setting.DefaultUpdatedAt = settingDescUpdatedAt.Default.(func() time.Time)
+	// setting.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	setting.UpdateDefaultUpdatedAt = settingDescUpdatedAt.UpdateDefault.(func() time.Time)
 	userFields := schema.User{}.Fields()
 	_ = userFields
 	// userDescUsername is the schema descriptor for username field.

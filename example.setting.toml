@@ -5,6 +5,7 @@ lang="zh-CN"
 data_path = "data"
 time_zone = "Asia/Shanghai"
 icon_path = "data/icon"
+html_path = "data/html" # 为空默认在当前目录下创建html文件夹
 
 [log]
 file = "data/runtime.log"
@@ -20,15 +21,6 @@ ui_path = "data/webui"
 [jwt]
 jwt_key = "he-jwt-key"
 jwt_secret = "123456abcdef"
-
-[singlefile]
-html_path = "data/html" # 为空默认在当前目录下创建html文件夹
-max_version = 5
-min_version_interval =  86400 # 两个版本之间的最小间隔时间
-version_check_interval = 3600 # 检查版本间隔时间
-version_check_limit = 100 # 检查版本数量限制
-min_size = 2048
-max_size = 20971520 # 20MB
 
 [readability]
 parser = "mozilla" # 解析器，目前只支持mozilla

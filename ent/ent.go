@@ -11,6 +11,7 @@ import (
 	"history-engine/engine/ent/host"
 	"history-engine/engine/ent/icon"
 	"history-engine/engine/ent/page"
+	"history-engine/engine/ent/setting"
 	"history-engine/engine/ent/user"
 	"reflect"
 	"sync"
@@ -83,6 +84,7 @@ func checkColumn(table, column string) error {
 			host.Table:     host.ValidColumn,
 			icon.Table:     icon.ValidColumn,
 			page.Table:     page.ValidColumn,
+			setting.Table:  setting.ValidColumn,
 			user.Table:     user.ValidColumn,
 		})
 	})

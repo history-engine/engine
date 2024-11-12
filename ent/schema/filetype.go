@@ -33,6 +33,7 @@ func (FileType) Edges() []ent.Edge {
 
 func (FileType) Annotations() []schema.Annotation {
 	return []schema.Annotation{
+		entsql.WithComments(true),
 		entsql.Annotation{Table: "filetype"},
 	}
 }

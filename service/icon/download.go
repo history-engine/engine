@@ -56,7 +56,7 @@ func DownloadIcon(ctx context.Context, pageUrl, pagePath string) error {
 	}
 
 	if iconPath == "" {
-		if newIcon, ok := headerIcon(parsed.Host, setting.SingleFile.HtmlPath+pagePath); ok {
+		if newIcon, ok := headerIcon(parsed.Host, setting.Common.HtmlPath+pagePath); ok {
 			iconPath = newIcon
 		}
 	}

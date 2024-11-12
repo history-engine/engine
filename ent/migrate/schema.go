@@ -12,11 +12,11 @@ var (
 	// AliasColumns holds the columns for the "alias" table.
 	AliasColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt64, Increment: true},
-		{Name: "user_id", Type: field.TypeInt64},
-		{Name: "domain", Type: field.TypeString, Size: 100},
-		{Name: "alias", Type: field.TypeString, Size: 100},
-		{Name: "created_at", Type: field.TypeTime},
-		{Name: "updated_at", Type: field.TypeTime},
+		{Name: "user_id", Type: field.TypeInt64, Comment: "用户id"},
+		{Name: "domain", Type: field.TypeString, Size: 100, Comment: "域名"},
+		{Name: "alias", Type: field.TypeString, Size: 100, Comment: "别名"},
+		{Name: "created_at", Type: field.TypeTime, Comment: "入库时间"},
+		{Name: "updated_at", Type: field.TypeTime, Comment: "最后更新时间"},
 	}
 	// AliasTable holds the schema information for the "alias" table.
 	AliasTable = &schema.Table{
@@ -34,11 +34,11 @@ var (
 	// FiletypeColumns holds the columns for the "filetype" table.
 	FiletypeColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt64, Increment: true},
-		{Name: "user_id", Type: field.TypeInt64},
-		{Name: "suffix", Type: field.TypeString, Size: 100},
-		{Name: "type", Type: field.TypeInt, Default: 0},
-		{Name: "created_at", Type: field.TypeTime},
-		{Name: "updated_at", Type: field.TypeTime},
+		{Name: "user_id", Type: field.TypeInt64, Comment: "用户id"},
+		{Name: "suffix", Type: field.TypeString, Size: 100, Comment: "后缀"},
+		{Name: "type", Type: field.TypeInt, Comment: "规则：1-include、2-exclude", Default: 0},
+		{Name: "created_at", Type: field.TypeTime, Comment: "入库时间"},
+		{Name: "updated_at", Type: field.TypeTime, Comment: "最后更新时间"},
 	}
 	// FiletypeTable holds the schema information for the "filetype" table.
 	FiletypeTable = &schema.Table{
@@ -56,11 +56,11 @@ var (
 	// HostColumns holds the columns for the "host" table.
 	HostColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt64, Increment: true},
-		{Name: "user_id", Type: field.TypeInt64},
-		{Name: "host", Type: field.TypeString, Size: 100},
-		{Name: "type", Type: field.TypeInt, Default: 0},
-		{Name: "created_at", Type: field.TypeTime},
-		{Name: "updated_at", Type: field.TypeTime},
+		{Name: "user_id", Type: field.TypeInt64, Comment: "用户id"},
+		{Name: "host", Type: field.TypeString, Size: 100, Comment: "域名"},
+		{Name: "type", Type: field.TypeInt, Comment: "规则：1-include、2-exclude", Default: 0},
+		{Name: "created_at", Type: field.TypeTime, Comment: "入库时间"},
+		{Name: "updated_at", Type: field.TypeTime, Comment: "最后更新时间"},
 	}
 	// HostTable holds the schema information for the "host" table.
 	HostTable = &schema.Table{
@@ -78,10 +78,10 @@ var (
 	// IconColumns holds the columns for the "icon" table.
 	IconColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt64, Increment: true},
-		{Name: "host", Type: field.TypeString, Size: 100},
-		{Name: "path", Type: field.TypeString, Size: 500},
-		{Name: "created_at", Type: field.TypeTime},
-		{Name: "updated_at", Type: field.TypeTime},
+		{Name: "host", Type: field.TypeString, Size: 100, Comment: "域名"},
+		{Name: "path", Type: field.TypeString, Size: 500, Comment: "完整本地文件地址"},
+		{Name: "created_at", Type: field.TypeTime, Comment: "入库时间"},
+		{Name: "updated_at", Type: field.TypeTime, Comment: "最后更新时间"},
 	}
 	// IconTable holds the schema information for the "icon" table.
 	IconTable = &schema.Table{
@@ -99,19 +99,19 @@ var (
 	// PageColumns holds the columns for the "page" table.
 	PageColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt64, Increment: true},
-		{Name: "user_id", Type: field.TypeInt64},
-		{Name: "unique_id", Type: field.TypeString, Size: 40},
-		{Name: "version", Type: field.TypeInt, Default: 1},
-		{Name: "title", Type: field.TypeString, Size: 500, Default: ""},
-		{Name: "excerpt", Type: field.TypeString, Size: 2147483647, Default: ""},
-		{Name: "content", Type: field.TypeString, Size: 2147483647, Default: ""},
-		{Name: "url", Type: field.TypeString, Size: 2048},
-		{Name: "path", Type: field.TypeString, Size: 500},
-		{Name: "size", Type: field.TypeInt, Default: 0},
-		{Name: "parsed_at", Type: field.TypeTime},
-		{Name: "indexed_at", Type: field.TypeTime},
-		{Name: "created_at", Type: field.TypeTime},
-		{Name: "updated_at", Type: field.TypeTime},
+		{Name: "user_id", Type: field.TypeInt64, Comment: "用户id"},
+		{Name: "unique_id", Type: field.TypeString, Size: 40, Comment: "页面唯一id"},
+		{Name: "version", Type: field.TypeInt, Comment: "版本", Default: 1},
+		{Name: "title", Type: field.TypeString, Size: 500, Comment: "页面标题", Default: ""},
+		{Name: "excerpt", Type: field.TypeString, Size: 2147483647, Comment: "摘要", Default: ""},
+		{Name: "content", Type: field.TypeString, Size: 2147483647, Comment: "提取后的内容", Default: ""},
+		{Name: "url", Type: field.TypeString, Size: 2048, Comment: "原始地址"},
+		{Name: "path", Type: field.TypeString, Size: 500, Comment: "完整本地文件地址"},
+		{Name: "size", Type: field.TypeInt, Comment: "文件大小", Default: 0},
+		{Name: "parsed_at", Type: field.TypeTime, Comment: "最后解析时间"},
+		{Name: "indexed_at", Type: field.TypeTime, Comment: "最后索引时间"},
+		{Name: "created_at", Type: field.TypeTime, Comment: "入库时间"},
+		{Name: "updated_at", Type: field.TypeTime, Comment: "最后更新时间"},
 	}
 	// PageTable holds the schema information for the "page" table.
 	PageTable = &schema.Table{
@@ -126,16 +126,40 @@ var (
 			},
 		},
 	}
+	// SettingColumns holds the columns for the "setting" table.
+	SettingColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt64, Increment: true},
+		{Name: "user_id", Type: field.TypeInt64, Comment: "用户id"},
+		{Name: "max_version", Type: field.TypeInt, Comment: "最大版本数"},
+		{Name: "min_version_interval", Type: field.TypeInt, Comment: "最小保存间隔（秒）"},
+		{Name: "min_size", Type: field.TypeInt, Comment: "最小HTML文件大小"},
+		{Name: "max_size", Type: field.TypeInt, Comment: "设置项"},
+		{Name: "created_at", Type: field.TypeTime, Comment: "入库时间"},
+		{Name: "updated_at", Type: field.TypeTime, Comment: "最后更新时间"},
+	}
+	// SettingTable holds the schema information for the "setting" table.
+	SettingTable = &schema.Table{
+		Name:       "setting",
+		Columns:    SettingColumns,
+		PrimaryKey: []*schema.Column{SettingColumns[0]},
+		Indexes: []*schema.Index{
+			{
+				Name:    "setting_user_id",
+				Unique:  false,
+				Columns: []*schema.Column{SettingColumns[1]},
+			},
+		},
+	}
 	// UserColumns holds the columns for the "user" table.
 	UserColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt64, Increment: true},
-		{Name: "username", Type: field.TypeString, Unique: true, Size: 50},
-		{Name: "email", Type: field.TypeString, Unique: true, Size: 100},
-		{Name: "password", Type: field.TypeString, Size: 32},
-		{Name: "admin", Type: field.TypeInt, Default: 0},
-		{Name: "avatar", Type: field.TypeString, Size: 2048, Default: ""},
-		{Name: "created_at", Type: field.TypeTime},
-		{Name: "updated_at", Type: field.TypeTime},
+		{Name: "username", Type: field.TypeString, Unique: true, Size: 50, Comment: "用户名"},
+		{Name: "email", Type: field.TypeString, Unique: true, Size: 100, Comment: "邮箱地址"},
+		{Name: "password", Type: field.TypeString, Size: 32, Comment: "版本"},
+		{Name: "admin", Type: field.TypeInt, Comment: "是否是管理员", Default: 0},
+		{Name: "avatar", Type: field.TypeString, Size: 2048, Comment: "头像", Default: ""},
+		{Name: "created_at", Type: field.TypeTime, Comment: "入库时间"},
+		{Name: "updated_at", Type: field.TypeTime, Comment: "最后更新时间"},
 	}
 	// UserTable holds the schema information for the "user" table.
 	UserTable = &schema.Table{
@@ -150,6 +174,7 @@ var (
 		HostTable,
 		IconTable,
 		PageTable,
+		SettingTable,
 		UserTable,
 	}
 )
@@ -169,6 +194,9 @@ func init() {
 	}
 	PageTable.Annotation = &entsql.Annotation{
 		Table: "page",
+	}
+	SettingTable.Annotation = &entsql.Annotation{
+		Table: "setting",
 	}
 	UserTable.Annotation = &entsql.Annotation{
 		Table: "user",

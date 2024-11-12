@@ -16,6 +16,7 @@ var Common = struct {
 	DataPath       string
 	TimeZone       string
 	IconPath       string
+	HtmlPath       string
 }{
 	Env:            "dev",
 	EnableRegister: false,
@@ -23,6 +24,7 @@ var Common = struct {
 	DataPath:       "data",
 	TimeZone:       "Asia/Shanghai",
 	IconPath:       "data/icon",
+	HtmlPath:       "data/html",
 }
 
 func loadCommon() {
@@ -45,6 +47,9 @@ func loadCommon() {
 		}
 		if v.IsSet("icon_path") {
 			Common.IconPath = v.GetString("icon_path")
+		}
+		if v.IsSet("html_path") {
+			Common.HtmlPath = v.GetString("html_path")
 		}
 	}
 

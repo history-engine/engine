@@ -34,7 +34,7 @@ func runLostCheck(ctx *cli.Context) error {
 	for _, user := range users {
 		logger.Zap().Info("scan user html", zap.Int64("user_id", user.ID))
 
-		root := fmt.Sprintf("%s/%d", setting.SingleFile.HtmlPath, user.ID)
+		root := fmt.Sprintf("%s/%d", setting.Common.HtmlPath, user.ID)
 		if !utils.PathExist(root) {
 			logger.Zap().Info("user html root not exist：" + root)
 			continue
@@ -86,7 +86,7 @@ func runLostCheck(ctx *cli.Context) error {
 				continue
 			}
 
-			htmlPath := strings.Replace(file, setting.SingleFile.HtmlPath, "", 1)
+			htmlPath := strings.Replace(file, setting.Common.HtmlPath, "", 1)
 			_, err = x.Page.Create().
 				SetUserID(user.ID).
 				SetUniqueID(uniqueId).

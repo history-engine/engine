@@ -34,7 +34,7 @@ func ReParse(ctx context.Context, ident model.PageIdent) error {
 		return err
 	}
 
-	if !utils.FileExist(setting.SingleFile.HtmlPath + row.Path) {
+	if !utils.FileExist(setting.Common.HtmlPath + row.Path) {
 		go Delete(context.Background(), row)
 		return errors.New("HTML file not exist")
 	}

@@ -21,7 +21,6 @@ func Load(file string) error {
 	loadMeiliSearch()
 	loadZincSearch()
 	loadReadability()
-	loadSingleFile()
 
 	return nil
 }

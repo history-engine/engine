@@ -22,6 +22,8 @@ type Tx struct {
 	Icon *IconClient
 	// Page is the client for interacting with the Page builders.
 	Page *PageClient
+	// Setting is the client for interacting with the Setting builders.
+	Setting *SettingClient
 	// User is the client for interacting with the User builders.
 	User *UserClient
 
@@ -160,6 +162,7 @@ func (tx *Tx) init() {
 	tx.Host = NewHostClient(tx.config)
 	tx.Icon = NewIconClient(tx.config)
 	tx.Page = NewPageClient(tx.config)
+	tx.Setting = NewSettingClient(tx.config)
 	tx.User = NewUserClient(tx.config)
 }
 

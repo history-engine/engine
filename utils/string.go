@@ -23,10 +23,3 @@ func Str2Int(s string) int {
 	}
 	return i
 }
-
-func Ternary[T any](cond bool, true, false T) T {
-	if cond {
-		return true
-	}
-	return false
-}

@@ -42,7 +42,7 @@ func parserPage(ctx context.Context, row model.PageIdent) error {
 		return err
 	}
 
-	fullPath := setting.SingleFile.HtmlPath + item.Path
+	fullPath := setting.Common.HtmlPath + item.Path
 	article, err := readability.Parser().Parse(fullPath)
 	if err != nil && errors.Is(err, readability.ErrContentEmpty) {
 		_, err2 := x.Page.Update().SetParsedAt(time.Now()).Where(page.ID(item.ID)).Save(ctx)

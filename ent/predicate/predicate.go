@@ -21,5 +21,8 @@ type Icon func(*sql.Selector)
 // Page is the predicate function for page builders.
 type Page func(*sql.Selector)
 
+// Setting is the predicate function for setting builders.
+type Setting func(*sql.Selector)
+
 // User is the predicate function for user builders.
 type User func(*sql.Selector)
