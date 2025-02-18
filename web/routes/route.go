@@ -14,11 +14,11 @@ func RegisterRoute(e *echo.Echo) {
 	e.OnAddRouteHandler = onAddRouteHandler
 
 	uiRouteRegister(e.Group(""))
-	userRouteRegister(e.Group("/user"))
-	pageRouteRegister(e.Group("/page"))
-	adminRouteRegister(e.Group("/admin"))
-	settingRouteRegister(e.Group("/setting"))
-	miscRegister(e.Group("/misc"))
+	userRouteRegister(e.Group("/api/user"))
+	pageRouteRegister(e.Group("/api/page"))
+	adminRouteRegister(e.Group("/api/admin"))
+	settingRouteRegister(e.Group("/api/setting"))
+	miscRegister(e.Group("/api/misc"))
 }
 
 func onAddRouteHandler(host string, route echo.Route, handler echo.HandlerFunc, middleware []echo.MiddlewareFunc) {
