@@ -21,8 +21,6 @@ func RegisterStopper(name string, stopper Stopper) {
 
 // ShutdownComponent 关闭组件
 func ShutdownComponent(ch chan error) {
-	log.Println("shutdown component")
-
 	timeout := make(chan struct{})
 	go func() {
 		time.Sleep(5 * time.Second)
@@ -32,6 +30,7 @@ func ShutdownComponent(ch chan error) {
 	wg := &sync.WaitGroup{}
 	wg.Add(len(stopMap))
 	for name, stopper := range stopMap {
+		log.Printf("shutdown %s\n", name)
 		go func(wg *sync.WaitGroup, name string, stopper Stopper) {
 			if err := stopper.Stop(); err != nil {
 				ch <- fmt.Errorf("stop %s err: %v", name, err)

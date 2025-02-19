@@ -9,7 +9,7 @@ var _ shutdown.Stopper = stopper{}
 type stopper struct{}
 
 func initSignal() {
-	shutdown.RegisterStopper("db", stopper{})
+	shutdown.RegisterStopper("logger", stopper{})
 }
 
 func (m stopper) Stop() error {
