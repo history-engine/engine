@@ -1,7 +1,11 @@
 NAME=history-engine
 VERSION=$(shell git describe --tags || git rev-parse --short HEAD)
+TIME=$(shell date +"%Y-%m-%dT%H:%M:%S%:z")
 RELEASE_DIR=release
-GOBUILD=CGO_ENABLED=0 go build -trimpath -ldflags '-w -s -X "main.buildVersion=$(VERSION)"'
+GOBUILD=CGO_ENABLED=0 go build -trimpath \
+	-ldflags '-w -s \
+	-X "main.buildVersion=$(VERSION)" \
+	-X "main.buildTime=${TIME}"'
 
 PLATFORM_LIST = \
 	darwin-amd64 \

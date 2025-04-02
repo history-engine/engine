@@ -11,10 +11,10 @@ import (
 	"os"
 	"path/filepath"
 	"runtime"
-	"time"
 )
 
 var buildVersion = "dev-master"
+var buildTime = "unknown"
 
 func main() {
 	app := cli.NewApp()
@@ -23,7 +23,7 @@ func main() {
 	app.Description = "history engine"
 	app.Before = loadSetting
 	app.Commands = []*cli.Command{web.Web, jobs.Jobs}
-	app.Version = fmt.Sprintf("%s, build with: %s, time: %s", buildVersion, runtime.Version(), time.Now().Format(time.RFC3339))
+	app.Version = fmt.Sprintf("%s, build with: %s, time: %s", buildVersion, runtime.Version(), buildTime)
 	app.DefaultCommand = web.Web.Name
 
 	app.Flags = append(app.Flags, []cli.Flag{
