@@ -10,7 +10,6 @@ import (
 func userRouteRegister(r *echo.Group) {
 	r.GET("/info", user.Info, middleware.JwtAuth)
 	r.GET("/logout", user.Logout, middleware.JwtAuth)
-	r.GET("/avatar/:path", user.Avatar, middleware.JwtAuth)
 	r.POST("/login", user.PasswordLogin)
 	r.POST("/register", user.Register)
 }
