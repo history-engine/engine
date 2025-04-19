@@ -23,7 +23,7 @@ func Info(ctx context.Context, uid int64) *ent.User {
 		return nil
 	}
 
-	user.Avatar = setting.Web.Domain + "/user/avatar" + user.Avatar
+	user.Avatar = setting.Web.Domain + "/avatar" + user.Avatar
 
 	return user
 }
