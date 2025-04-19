@@ -104,8 +104,14 @@ func init() {
 	icon.UpdateDefaultUpdatedAt = iconDescUpdatedAt.UpdateDefault.(func() time.Time)
 	pageFields := schema.Page{}.Fields()
 	_ = pageFields
+	// pageDescUserID is the schema descriptor for user_id field.
+	pageDescUserID := pageFields[1].Descriptor()
+	// page.DefaultUserID holds the default value on creation for the user_id field.
+	page.DefaultUserID = pageDescUserID.Default.(int64)
 	// pageDescUniqueID is the schema descriptor for unique_id field.
 	pageDescUniqueID := pageFields[2].Descriptor()
+	// page.DefaultUniqueID holds the default value on creation for the unique_id field.
+	page.DefaultUniqueID = pageDescUniqueID.Default.(string)
 	// page.UniqueIDValidator is a validator for the "unique_id" field. It is called by the builders before save.
 	page.UniqueIDValidator = func() func(string) error {
 		validators := pageDescUniqueID.Validators
@@ -142,6 +148,8 @@ func init() {
 	page.DefaultContent = pageDescContent.Default.(string)
 	// pageDescURL is the schema descriptor for url field.
 	pageDescURL := pageFields[7].Descriptor()
+	// page.DefaultURL holds the default value on creation for the url field.
+	page.DefaultURL = pageDescURL.Default.(string)
 	// page.URLValidator is a validator for the "url" field. It is called by the builders before save.
 	page.URLValidator = func() func(string) error {
 		validators := pageDescURL.Validators
@@ -160,6 +168,8 @@ func init() {
 	}()
 	// pageDescPath is the schema descriptor for path field.
 	pageDescPath := pageFields[8].Descriptor()
+	// page.DefaultPath holds the default value on creation for the path field.
+	page.DefaultPath = pageDescPath.Default.(string)
 	// page.PathValidator is a validator for the "path" field. It is called by the builders before save.
 	page.PathValidator = func() func(string) error {
 		validators := pageDescPath.Validators
@@ -180,20 +190,28 @@ func init() {
 	pageDescSize := pageFields[9].Descriptor()
 	// page.DefaultSize holds the default value on creation for the size field.
 	page.DefaultSize = pageDescSize.Default.(int)
+	// pageDescDomains is the schema descriptor for domains field.
+	pageDescDomains := pageFields[10].Descriptor()
+	// page.DefaultDomains holds the default value on creation for the domains field.
+	page.DefaultDomains = pageDescDomains.Default.([]string)
+	// pageDescStatus is the schema descriptor for status field.
+	pageDescStatus := pageFields[11].Descriptor()
+	// page.DefaultStatus holds the default value on creation for the status field.
+	page.DefaultStatus = pageDescStatus.Default.(int)
 	// pageDescParsedAt is the schema descriptor for parsed_at field.
-	pageDescParsedAt := pageFields[10].Descriptor()
+	pageDescParsedAt := pageFields[12].Descriptor()
 	// page.DefaultParsedAt holds the default value on creation for the parsed_at field.
 	page.DefaultParsedAt = pageDescParsedAt.Default.(time.Time)
 	// pageDescIndexedAt is the schema descriptor for indexed_at field.
-	pageDescIndexedAt := pageFields[11].Descriptor()
+	pageDescIndexedAt := pageFields[13].Descriptor()
 	// page.DefaultIndexedAt holds the default value on creation for the indexed_at field.
 	page.DefaultIndexedAt = pageDescIndexedAt.Default.(time.Time)
 	// pageDescCreatedAt is the schema descriptor for created_at field.
-	pageDescCreatedAt := pageFields[12].Descriptor()
+	pageDescCreatedAt := pageFields[14].Descriptor()
 	// page.DefaultCreatedAt holds the default value on creation for the created_at field.
 	page.DefaultCreatedAt = pageDescCreatedAt.Default.(func() time.Time)
 	// pageDescUpdatedAt is the schema descriptor for updated_at field.
-	pageDescUpdatedAt := pageFields[13].Descriptor()
+	pageDescUpdatedAt := pageFields[15].Descriptor()
 	// page.DefaultUpdatedAt holds the default value on creation for the updated_at field.
 	page.DefaultUpdatedAt = pageDescUpdatedAt.Default.(func() time.Time)
 	// page.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.

@@ -3,6 +3,7 @@
 package ent
 
 import (
+	"encoding/json"
 	"fmt"
 	"history-engine/engine/ent/page"
 	"strings"
@@ -35,6 +36,10 @@ type Page struct {
 	Path string `json:"path,omitempty"`
 	// 文件大小
 	Size int `json:"size,omitempty"`
+	// 匹配的域名
+	Domains []string `json:"domains,omitempty"`
+	// 标记状态：0新收录1保留2不保留
+	Status int `json:"status,omitempty"`
 	// 最后解析时间
 	ParsedAt time.Time `json:"parsed_at,omitempty"`
 	// 最后索引时间
@@ -51,7 +56,9 @@ func (*Page) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case page.FieldID, page.FieldUserID, page.FieldVersion, page.FieldSize:
+		case page.FieldDomains:
+			values[i] = new([]byte)
+		case page.FieldID, page.FieldUserID, page.FieldVersion, page.FieldSize, page.FieldStatus:
 			values[i] = new(sql.NullInt64)
 		case page.FieldUniqueID, page.FieldTitle, page.FieldExcerpt, page.FieldContent, page.FieldURL, page.FieldPath:
 			values[i] = new(sql.NullString)
@@ -131,6 +138,20 @@ func (pa *Page) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field size", values[i])
 			} else if value.Valid {
 				pa.Size = int(value.Int64)
+			}
+		case page.FieldDomains:
+			if value, ok := values[i].(*[]byte); !ok {
+				return fmt.Errorf("unexpected type %T for field domains", values[i])
+			} else if value != nil && len(*value) > 0 {
+				if err := json.Unmarshal(*value, &pa.Domains); err != nil {
+					return fmt.Errorf("unmarshal field domains: %w", err)
+				}
+			}
+		case page.FieldStatus:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field status", values[i])
+			} else if value.Valid {
+				pa.Status = int(value.Int64)
 			}
 		case page.FieldParsedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
@@ -218,6 +239,12 @@ func (pa *Page) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("size=")
 	builder.WriteString(fmt.Sprintf("%v", pa.Size))
+	builder.WriteString(", ")
+	builder.WriteString("domains=")
+	builder.WriteString(fmt.Sprintf("%v", pa.Domains))
+	builder.WriteString(", ")
+	builder.WriteString("status=")
+	builder.WriteString(fmt.Sprintf("%v", pa.Status))
 	builder.WriteString(", ")
 	builder.WriteString("parsed_at=")
 	builder.WriteString(pa.ParsedAt.Format(time.ANSIC))

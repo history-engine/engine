@@ -26,9 +26,25 @@ func (pc *PageCreate) SetUserID(i int64) *PageCreate {
 	return pc
 }
 
+// SetNillableUserID sets the "user_id" field if the given value is not nil.
+func (pc *PageCreate) SetNillableUserID(i *int64) *PageCreate {
+	if i != nil {
+		pc.SetUserID(*i)
+	}
+	return pc
+}
+
 // SetUniqueID sets the "unique_id" field.
 func (pc *PageCreate) SetUniqueID(s string) *PageCreate {
 	pc.mutation.SetUniqueID(s)
+	return pc
+}
+
+// SetNillableUniqueID sets the "unique_id" field if the given value is not nil.
+func (pc *PageCreate) SetNillableUniqueID(s *string) *PageCreate {
+	if s != nil {
+		pc.SetUniqueID(*s)
+	}
 	return pc
 }
 
@@ -94,9 +110,25 @@ func (pc *PageCreate) SetURL(s string) *PageCreate {
 	return pc
 }
 
+// SetNillableURL sets the "url" field if the given value is not nil.
+func (pc *PageCreate) SetNillableURL(s *string) *PageCreate {
+	if s != nil {
+		pc.SetURL(*s)
+	}
+	return pc
+}
+
 // SetPath sets the "path" field.
 func (pc *PageCreate) SetPath(s string) *PageCreate {
 	pc.mutation.SetPath(s)
+	return pc
+}
+
+// SetNillablePath sets the "path" field if the given value is not nil.
+func (pc *PageCreate) SetNillablePath(s *string) *PageCreate {
+	if s != nil {
+		pc.SetPath(*s)
+	}
 	return pc
 }
 
@@ -110,6 +142,26 @@ func (pc *PageCreate) SetSize(i int) *PageCreate {
 func (pc *PageCreate) SetNillableSize(i *int) *PageCreate {
 	if i != nil {
 		pc.SetSize(*i)
+	}
+	return pc
+}
+
+// SetDomains sets the "domains" field.
+func (pc *PageCreate) SetDomains(s []string) *PageCreate {
+	pc.mutation.SetDomains(s)
+	return pc
+}
+
+// SetStatus sets the "status" field.
+func (pc *PageCreate) SetStatus(i int) *PageCreate {
+	pc.mutation.SetStatus(i)
+	return pc
+}
+
+// SetNillableStatus sets the "status" field if the given value is not nil.
+func (pc *PageCreate) SetNillableStatus(i *int) *PageCreate {
+	if i != nil {
+		pc.SetStatus(*i)
 	}
 	return pc
 }
@@ -211,6 +263,14 @@ func (pc *PageCreate) ExecX(ctx context.Context) {
 
 // defaults sets the default values of the builder before save.
 func (pc *PageCreate) defaults() {
+	if _, ok := pc.mutation.UserID(); !ok {
+		v := page.DefaultUserID
+		pc.mutation.SetUserID(v)
+	}
+	if _, ok := pc.mutation.UniqueID(); !ok {
+		v := page.DefaultUniqueID
+		pc.mutation.SetUniqueID(v)
+	}
 	if _, ok := pc.mutation.Version(); !ok {
 		v := page.DefaultVersion
 		pc.mutation.SetVersion(v)
@@ -227,9 +287,25 @@ func (pc *PageCreate) defaults() {
 		v := page.DefaultContent
 		pc.mutation.SetContent(v)
 	}
+	if _, ok := pc.mutation.URL(); !ok {
+		v := page.DefaultURL
+		pc.mutation.SetURL(v)
+	}
+	if _, ok := pc.mutation.Path(); !ok {
+		v := page.DefaultPath
+		pc.mutation.SetPath(v)
+	}
 	if _, ok := pc.mutation.Size(); !ok {
 		v := page.DefaultSize
 		pc.mutation.SetSize(v)
+	}
+	if _, ok := pc.mutation.Domains(); !ok {
+		v := page.DefaultDomains
+		pc.mutation.SetDomains(v)
+	}
+	if _, ok := pc.mutation.Status(); !ok {
+		v := page.DefaultStatus
+		pc.mutation.SetStatus(v)
 	}
 	if _, ok := pc.mutation.ParsedAt(); !ok {
 		v := page.DefaultParsedAt
@@ -297,6 +373,12 @@ func (pc *PageCreate) check() error {
 	}
 	if _, ok := pc.mutation.Size(); !ok {
 		return &ValidationError{Name: "size", err: errors.New(`ent: missing required field "Page.size"`)}
+	}
+	if _, ok := pc.mutation.Domains(); !ok {
+		return &ValidationError{Name: "domains", err: errors.New(`ent: missing required field "Page.domains"`)}
+	}
+	if _, ok := pc.mutation.Status(); !ok {
+		return &ValidationError{Name: "status", err: errors.New(`ent: missing required field "Page.status"`)}
 	}
 	if _, ok := pc.mutation.ParsedAt(); !ok {
 		return &ValidationError{Name: "parsed_at", err: errors.New(`ent: missing required field "Page.parsed_at"`)}
@@ -377,6 +459,14 @@ func (pc *PageCreate) createSpec() (*Page, *sqlgraph.CreateSpec) {
 	if value, ok := pc.mutation.Size(); ok {
 		_spec.SetField(page.FieldSize, field.TypeInt, value)
 		_node.Size = value
+	}
+	if value, ok := pc.mutation.Domains(); ok {
+		_spec.SetField(page.FieldDomains, field.TypeJSON, value)
+		_node.Domains = value
+	}
+	if value, ok := pc.mutation.Status(); ok {
+		_spec.SetField(page.FieldStatus, field.TypeInt, value)
+		_node.Status = value
 	}
 	if value, ok := pc.mutation.ParsedAt(); ok {
 		_spec.SetField(page.FieldParsedAt, field.TypeTime, value)

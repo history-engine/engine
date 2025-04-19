@@ -99,6 +99,11 @@ func Size(v int) predicate.Page {
 	return predicate.Page(sql.FieldEQ(FieldSize, v))
 }
 
+// Status applies equality check predicate on the "status" field. It's identical to StatusEQ.
+func Status(v int) predicate.Page {
+	return predicate.Page(sql.FieldEQ(FieldStatus, v))
+}
+
 // ParsedAt applies equality check predicate on the "parsed_at" field. It's identical to ParsedAtEQ.
 func ParsedAt(v time.Time) predicate.Page {
 	return predicate.Page(sql.FieldEQ(FieldParsedAt, v))
@@ -627,6 +632,46 @@ func SizeLT(v int) predicate.Page {
 // SizeLTE applies the LTE predicate on the "size" field.
 func SizeLTE(v int) predicate.Page {
 	return predicate.Page(sql.FieldLTE(FieldSize, v))
+}
+
+// StatusEQ applies the EQ predicate on the "status" field.
+func StatusEQ(v int) predicate.Page {
+	return predicate.Page(sql.FieldEQ(FieldStatus, v))
+}
+
+// StatusNEQ applies the NEQ predicate on the "status" field.
+func StatusNEQ(v int) predicate.Page {
+	return predicate.Page(sql.FieldNEQ(FieldStatus, v))
+}
+
+// StatusIn applies the In predicate on the "status" field.
+func StatusIn(vs ...int) predicate.Page {
+	return predicate.Page(sql.FieldIn(FieldStatus, vs...))
+}
+
+// StatusNotIn applies the NotIn predicate on the "status" field.
+func StatusNotIn(vs ...int) predicate.Page {
+	return predicate.Page(sql.FieldNotIn(FieldStatus, vs...))
+}
+
+// StatusGT applies the GT predicate on the "status" field.
+func StatusGT(v int) predicate.Page {
+	return predicate.Page(sql.FieldGT(FieldStatus, v))
+}
+
+// StatusGTE applies the GTE predicate on the "status" field.
+func StatusGTE(v int) predicate.Page {
+	return predicate.Page(sql.FieldGTE(FieldStatus, v))
+}
+
+// StatusLT applies the LT predicate on the "status" field.
+func StatusLT(v int) predicate.Page {
+	return predicate.Page(sql.FieldLT(FieldStatus, v))
+}
+
+// StatusLTE applies the LTE predicate on the "status" field.
+func StatusLTE(v int) predicate.Page {
+	return predicate.Page(sql.FieldLTE(FieldStatus, v))
 }
 
 // ParsedAtEQ applies the EQ predicate on the "parsed_at" field.

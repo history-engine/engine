@@ -2369,6 +2369,10 @@ type PageMutation struct {
 	_path         *string
 	size          *int
 	addsize       *int
+	domains       *[]string
+	appenddomains []string
+	status        *int
+	addstatus     *int
 	parsed_at     *time.Time
 	indexed_at    *time.Time
 	created_at    *time.Time
@@ -2867,6 +2871,113 @@ func (m *PageMutation) ResetSize() {
 	m.addsize = nil
 }
 
+// SetDomains sets the "domains" field.
+func (m *PageMutation) SetDomains(s []string) {
+	m.domains = &s
+	m.appenddomains = nil
+}
+
+// Domains returns the value of the "domains" field in the mutation.
+func (m *PageMutation) Domains() (r []string, exists bool) {
+	v := m.domains
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldDomains returns the old "domains" field's value of the Page entity.
+// If the Page object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *PageMutation) OldDomains(ctx context.Context) (v []string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldDomains is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldDomains requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldDomains: %w", err)
+	}
+	return oldValue.Domains, nil
+}
+
+// AppendDomains adds s to the "domains" field.
+func (m *PageMutation) AppendDomains(s []string) {
+	m.appenddomains = append(m.appenddomains, s...)
+}
+
+// AppendedDomains returns the list of values that were appended to the "domains" field in this mutation.
+func (m *PageMutation) AppendedDomains() ([]string, bool) {
+	if len(m.appenddomains) == 0 {
+		return nil, false
+	}
+	return m.appenddomains, true
+}
+
+// ResetDomains resets all changes to the "domains" field.
+func (m *PageMutation) ResetDomains() {
+	m.domains = nil
+	m.appenddomains = nil
+}
+
+// SetStatus sets the "status" field.
+func (m *PageMutation) SetStatus(i int) {
+	m.status = &i
+	m.addstatus = nil
+}
+
+// Status returns the value of the "status" field in the mutation.
+func (m *PageMutation) Status() (r int, exists bool) {
+	v := m.status
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldStatus returns the old "status" field's value of the Page entity.
+// If the Page object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *PageMutation) OldStatus(ctx context.Context) (v int, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldStatus is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldStatus requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldStatus: %w", err)
+	}
+	return oldValue.Status, nil
+}
+
+// AddStatus adds i to the "status" field.
+func (m *PageMutation) AddStatus(i int) {
+	if m.addstatus != nil {
+		*m.addstatus += i
+	} else {
+		m.addstatus = &i
+	}
+}
+
+// AddedStatus returns the value that was added to the "status" field in this mutation.
+func (m *PageMutation) AddedStatus() (r int, exists bool) {
+	v := m.addstatus
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetStatus resets all changes to the "status" field.
+func (m *PageMutation) ResetStatus() {
+	m.status = nil
+	m.addstatus = nil
+}
+
 // SetParsedAt sets the "parsed_at" field.
 func (m *PageMutation) SetParsedAt(t time.Time) {
 	m.parsed_at = &t
@@ -3045,7 +3156,7 @@ func (m *PageMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *PageMutation) Fields() []string {
-	fields := make([]string, 0, 13)
+	fields := make([]string, 0, 15)
 	if m.user_id != nil {
 		fields = append(fields, page.FieldUserID)
 	}
@@ -3072,6 +3183,12 @@ func (m *PageMutation) Fields() []string {
 	}
 	if m.size != nil {
 		fields = append(fields, page.FieldSize)
+	}
+	if m.domains != nil {
+		fields = append(fields, page.FieldDomains)
+	}
+	if m.status != nil {
+		fields = append(fields, page.FieldStatus)
 	}
 	if m.parsed_at != nil {
 		fields = append(fields, page.FieldParsedAt)
@@ -3111,6 +3228,10 @@ func (m *PageMutation) Field(name string) (ent.Value, bool) {
 		return m.Path()
 	case page.FieldSize:
 		return m.Size()
+	case page.FieldDomains:
+		return m.Domains()
+	case page.FieldStatus:
+		return m.Status()
 	case page.FieldParsedAt:
 		return m.ParsedAt()
 	case page.FieldIndexedAt:
@@ -3146,6 +3267,10 @@ func (m *PageMutation) OldField(ctx context.Context, name string) (ent.Value, er
 		return m.OldPath(ctx)
 	case page.FieldSize:
 		return m.OldSize(ctx)
+	case page.FieldDomains:
+		return m.OldDomains(ctx)
+	case page.FieldStatus:
+		return m.OldStatus(ctx)
 	case page.FieldParsedAt:
 		return m.OldParsedAt(ctx)
 	case page.FieldIndexedAt:
@@ -3226,6 +3351,20 @@ func (m *PageMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetSize(v)
 		return nil
+	case page.FieldDomains:
+		v, ok := value.([]string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetDomains(v)
+		return nil
+	case page.FieldStatus:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetStatus(v)
+		return nil
 	case page.FieldParsedAt:
 		v, ok := value.(time.Time)
 		if !ok {
@@ -3271,6 +3410,9 @@ func (m *PageMutation) AddedFields() []string {
 	if m.addsize != nil {
 		fields = append(fields, page.FieldSize)
 	}
+	if m.addstatus != nil {
+		fields = append(fields, page.FieldStatus)
+	}
 	return fields
 }
 
@@ -3285,6 +3427,8 @@ func (m *PageMutation) AddedField(name string) (ent.Value, bool) {
 		return m.AddedVersion()
 	case page.FieldSize:
 		return m.AddedSize()
+	case page.FieldStatus:
+		return m.AddedStatus()
 	}
 	return nil, false
 }
@@ -3314,6 +3458,13 @@ func (m *PageMutation) AddField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.AddSize(v)
+		return nil
+	case page.FieldStatus:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddStatus(v)
 		return nil
 	}
 	return fmt.Errorf("unknown Page numeric field %s", name)
@@ -3368,6 +3519,12 @@ func (m *PageMutation) ResetField(name string) error {
 		return nil
 	case page.FieldSize:
 		m.ResetSize()
+		return nil
+	case page.FieldDomains:
+		m.ResetDomains()
+		return nil
+	case page.FieldStatus:
+		m.ResetStatus()
 		return nil
 	case page.FieldParsedAt:
 		m.ResetParsedAt()

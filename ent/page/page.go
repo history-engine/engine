@@ -31,6 +31,10 @@ const (
 	FieldPath = "path"
 	// FieldSize holds the string denoting the size field in the database.
 	FieldSize = "size"
+	// FieldDomains holds the string denoting the domains field in the database.
+	FieldDomains = "domains"
+	// FieldStatus holds the string denoting the status field in the database.
+	FieldStatus = "status"
 	// FieldParsedAt holds the string denoting the parsed_at field in the database.
 	FieldParsedAt = "parsed_at"
 	// FieldIndexedAt holds the string denoting the indexed_at field in the database.
@@ -55,6 +59,8 @@ var Columns = []string{
 	FieldURL,
 	FieldPath,
 	FieldSize,
+	FieldDomains,
+	FieldStatus,
 	FieldParsedAt,
 	FieldIndexedAt,
 	FieldCreatedAt,
@@ -72,6 +78,10 @@ func ValidColumn(column string) bool {
 }
 
 var (
+	// DefaultUserID holds the default value on creation for the "user_id" field.
+	DefaultUserID int64
+	// DefaultUniqueID holds the default value on creation for the "unique_id" field.
+	DefaultUniqueID string
 	// UniqueIDValidator is a validator for the "unique_id" field. It is called by the builders before save.
 	UniqueIDValidator func(string) error
 	// DefaultVersion holds the default value on creation for the "version" field.
@@ -84,12 +94,20 @@ var (
 	DefaultExcerpt string
 	// DefaultContent holds the default value on creation for the "content" field.
 	DefaultContent string
+	// DefaultURL holds the default value on creation for the "url" field.
+	DefaultURL string
 	// URLValidator is a validator for the "url" field. It is called by the builders before save.
 	URLValidator func(string) error
+	// DefaultPath holds the default value on creation for the "path" field.
+	DefaultPath string
 	// PathValidator is a validator for the "path" field. It is called by the builders before save.
 	PathValidator func(string) error
 	// DefaultSize holds the default value on creation for the "size" field.
 	DefaultSize int
+	// DefaultDomains holds the default value on creation for the "domains" field.
+	DefaultDomains []string
+	// DefaultStatus holds the default value on creation for the "status" field.
+	DefaultStatus int
 	// DefaultParsedAt holds the default value on creation for the "parsed_at" field.
 	DefaultParsedAt time.Time
 	// DefaultIndexedAt holds the default value on creation for the "indexed_at" field.
@@ -153,6 +171,11 @@ func ByPath(opts ...sql.OrderTermOption) OrderOption {
 // BySize orders the results by the size field.
 func BySize(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldSize, opts...).ToFunc()
+}
+
+// ByStatus orders the results by the status field.
+func ByStatus(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldStatus, opts...).ToFunc()
 }
 
 // ByParsedAt orders the results by the parsed_at field.

@@ -12,6 +12,7 @@ import (
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
+	"entgo.io/ent/dialect/sql/sqljson"
 	"entgo.io/ent/schema/field"
 )
 
@@ -161,6 +162,39 @@ func (pu *PageUpdate) AddSize(i int) *PageUpdate {
 	return pu
 }
 
+// SetDomains sets the "domains" field.
+func (pu *PageUpdate) SetDomains(s []string) *PageUpdate {
+	pu.mutation.SetDomains(s)
+	return pu
+}
+
+// AppendDomains appends s to the "domains" field.
+func (pu *PageUpdate) AppendDomains(s []string) *PageUpdate {
+	pu.mutation.AppendDomains(s)
+	return pu
+}
+
+// SetStatus sets the "status" field.
+func (pu *PageUpdate) SetStatus(i int) *PageUpdate {
+	pu.mutation.ResetStatus()
+	pu.mutation.SetStatus(i)
+	return pu
+}
+
+// SetNillableStatus sets the "status" field if the given value is not nil.
+func (pu *PageUpdate) SetNillableStatus(i *int) *PageUpdate {
+	if i != nil {
+		pu.SetStatus(*i)
+	}
+	return pu
+}
+
+// AddStatus adds i to the "status" field.
+func (pu *PageUpdate) AddStatus(i int) *PageUpdate {
+	pu.mutation.AddStatus(i)
+	return pu
+}
+
 // SetParsedAt sets the "parsed_at" field.
 func (pu *PageUpdate) SetParsedAt(t time.Time) *PageUpdate {
 	pu.mutation.SetParsedAt(t)
@@ -300,6 +334,20 @@ func (pu *PageUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if value, ok := pu.mutation.AddedSize(); ok {
 		_spec.AddField(page.FieldSize, field.TypeInt, value)
+	}
+	if value, ok := pu.mutation.Domains(); ok {
+		_spec.SetField(page.FieldDomains, field.TypeJSON, value)
+	}
+	if value, ok := pu.mutation.AppendedDomains(); ok {
+		_spec.AddModifier(func(u *sql.UpdateBuilder) {
+			sqljson.Append(u, page.FieldDomains, value)
+		})
+	}
+	if value, ok := pu.mutation.Status(); ok {
+		_spec.SetField(page.FieldStatus, field.TypeInt, value)
+	}
+	if value, ok := pu.mutation.AddedStatus(); ok {
+		_spec.AddField(page.FieldStatus, field.TypeInt, value)
 	}
 	if value, ok := pu.mutation.ParsedAt(); ok {
 		_spec.SetField(page.FieldParsedAt, field.TypeTime, value)
@@ -460,6 +508,39 @@ func (puo *PageUpdateOne) SetNillableSize(i *int) *PageUpdateOne {
 // AddSize adds i to the "size" field.
 func (puo *PageUpdateOne) AddSize(i int) *PageUpdateOne {
 	puo.mutation.AddSize(i)
+	return puo
+}
+
+// SetDomains sets the "domains" field.
+func (puo *PageUpdateOne) SetDomains(s []string) *PageUpdateOne {
+	puo.mutation.SetDomains(s)
+	return puo
+}
+
+// AppendDomains appends s to the "domains" field.
+func (puo *PageUpdateOne) AppendDomains(s []string) *PageUpdateOne {
+	puo.mutation.AppendDomains(s)
+	return puo
+}
+
+// SetStatus sets the "status" field.
+func (puo *PageUpdateOne) SetStatus(i int) *PageUpdateOne {
+	puo.mutation.ResetStatus()
+	puo.mutation.SetStatus(i)
+	return puo
+}
+
+// SetNillableStatus sets the "status" field if the given value is not nil.
+func (puo *PageUpdateOne) SetNillableStatus(i *int) *PageUpdateOne {
+	if i != nil {
+		puo.SetStatus(*i)
+	}
+	return puo
+}
+
+// AddStatus adds i to the "status" field.
+func (puo *PageUpdateOne) AddStatus(i int) *PageUpdateOne {
+	puo.mutation.AddStatus(i)
 	return puo
 }
 
@@ -632,6 +713,20 @@ func (puo *PageUpdateOne) sqlSave(ctx context.Context) (_node *Page, err error) 
 	}
 	if value, ok := puo.mutation.AddedSize(); ok {
 		_spec.AddField(page.FieldSize, field.TypeInt, value)
+	}
+	if value, ok := puo.mutation.Domains(); ok {
+		_spec.SetField(page.FieldDomains, field.TypeJSON, value)
+	}
+	if value, ok := puo.mutation.AppendedDomains(); ok {
+		_spec.AddModifier(func(u *sql.UpdateBuilder) {
+			sqljson.Append(u, page.FieldDomains, value)
+		})
+	}
+	if value, ok := puo.mutation.Status(); ok {
+		_spec.SetField(page.FieldStatus, field.TypeInt, value)
+	}
+	if value, ok := puo.mutation.AddedStatus(); ok {
+		_spec.AddField(page.FieldStatus, field.TypeInt, value)
 	}
 	if value, ok := puo.mutation.ParsedAt(); ok {
 		_spec.SetField(page.FieldParsedAt, field.TypeTime, value)

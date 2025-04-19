@@ -99,15 +99,17 @@ var (
 	// PageColumns holds the columns for the "page" table.
 	PageColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt64, Increment: true},
-		{Name: "user_id", Type: field.TypeInt64, Comment: "用户id"},
-		{Name: "unique_id", Type: field.TypeString, Size: 40, Comment: "页面唯一id"},
+		{Name: "user_id", Type: field.TypeInt64, Comment: "用户id", Default: 0},
+		{Name: "unique_id", Type: field.TypeString, Size: 40, Comment: "页面唯一id", Default: ""},
 		{Name: "version", Type: field.TypeInt, Comment: "版本", Default: 1},
 		{Name: "title", Type: field.TypeString, Size: 500, Comment: "页面标题", Default: ""},
 		{Name: "excerpt", Type: field.TypeString, Size: 2147483647, Comment: "摘要", Default: ""},
 		{Name: "content", Type: field.TypeString, Size: 2147483647, Comment: "提取后的内容", Default: ""},
-		{Name: "url", Type: field.TypeString, Size: 2048, Comment: "原始地址"},
-		{Name: "path", Type: field.TypeString, Size: 500, Comment: "完整本地文件地址"},
+		{Name: "url", Type: field.TypeString, Size: 2048, Comment: "原始地址", Default: ""},
+		{Name: "path", Type: field.TypeString, Size: 512, Comment: "完整本地文件地址", Default: ""},
 		{Name: "size", Type: field.TypeInt, Comment: "文件大小", Default: 0},
+		{Name: "domains", Type: field.TypeJSON, Comment: "匹配的域名"},
+		{Name: "status", Type: field.TypeInt, Comment: "标记状态：0新收录1保留2不保留", Default: 0},
 		{Name: "parsed_at", Type: field.TypeTime, Comment: "最后解析时间"},
 		{Name: "indexed_at", Type: field.TypeTime, Comment: "最后索引时间"},
 		{Name: "created_at", Type: field.TypeTime, Comment: "入库时间"},
@@ -123,6 +125,11 @@ var (
 				Name:    "page_user_id_unique_id_version",
 				Unique:  true,
 				Columns: []*schema.Column{PageColumns[1], PageColumns[2], PageColumns[3]},
+			},
+			{
+				Name:    "page_status",
+				Unique:  false,
+				Columns: []*schema.Column{PageColumns[11]},
 			},
 		},
 	}
