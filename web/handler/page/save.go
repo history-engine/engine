@@ -13,18 +13,18 @@ import (
 func RestSave(c echo.Context) error {
 	err := c.Request().ParseMultipartForm(10 << 20)
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, nil)
+		return c.JSON(http.StatusInternalServerError, err)
 	}
 
 	url := c.FormValue("url")
 	html, err := c.FormFile("file")
 	if err != nil {
-		return c.JSON(http.StatusBadRequest, nil)
+		return c.JSON(http.StatusBadRequest, err)
 	}
 
 	src, err := html.Open()
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, nil)
+		return c.JSON(http.StatusInternalServerError, err)
 	}
 
 	hi := &model.HtmlInfo{
@@ -42,7 +42,7 @@ func RestSave(c echo.Context) error {
 	}
 
 	if err := page.SavePage(c.Request().Context(), hi); err != nil {
-		return c.JSON(http.StatusInternalServerError, nil)
+		return c.JSON(http.StatusInternalServerError, err)
 	}
 
 	return c.JSON(http.StatusCreated, nil)

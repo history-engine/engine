@@ -70,6 +70,8 @@ func SavePage(ctx context.Context, hi *model.HtmlInfo) error {
 		SetURL(hi.Url).
 		SetPath(storageFile).
 		SetSize(hi.Size).
+		SetDomains(utils.ExtractDomains(hi.Url)).
+		SetStatus(0).
 		Save(ctx)
 	if err != nil {
 		return err
