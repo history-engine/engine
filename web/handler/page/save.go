@@ -7,6 +7,7 @@ import (
 	"history-engine/engine/service/page"
 	"history-engine/engine/utils"
 	"net/http"
+	"net/url"
 )
 
 // RestSave rest api 方式保存HTML
@@ -16,8 +17,13 @@ func RestSave(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, err)
 	}
 
-	url := c.FormValue("url")
+	link := c.FormValue("url")
 	html, err := c.FormFile("file")
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, err)
+	}
+
+	u, err := url.Parse(link)
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, err)
 	}
@@ -28,10 +34,11 @@ func RestSave(c echo.Context) error {
 	}
 
 	hi := &model.HtmlInfo{
-		Url:      url,
-		Suffix:   utils.FileSuffix(url),
+		Host:     u.Host,
+		Url:      link,
+		Suffix:   utils.FileSuffix(link),
 		Size:     int(html.Size),
-		Sha1:     utils.Sha1Str(url),
+		Sha1:     utils.Sha1Str(link),
 		UserId:   c.Get("uid").(int64),
 		IoReader: src,
 	}
