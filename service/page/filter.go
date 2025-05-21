@@ -20,29 +20,29 @@ func Filter(hi *model.HtmlInfo) (bool, error) {
 	}
 
 	if hi.Size > 0 && (hi.Size < 2048 || hi.Size > storageSetting.MaxSize) {
-		return false, errors.New("ignore by size: " + strconv.Itoa(hi.Size))
+		return false, errors.New("ignore " + hi.Url + " by size: " + strconv.Itoa(hi.Size))
 	}
 
 	if hi.Path != "" && !utils.FileExist(setting.Common.HtmlPath+hi.Path) {
-		return false, errors.New("ignore by file not exist： " + hi.Path)
+		return false, errors.New("ignore " + hi.Url + " by file not exist： " + hi.Path)
 	}
 
 	if hi.Host != "" && !host.Include(hi.UserId, hi.Host) && host.Exclude(hi.UserId, hi.Host) {
-		return false, errors.New("ignore by rule: " + hi.Host)
+		return false, errors.New("ignore " + hi.Url + " by host rule: " + hi.Host)
 	}
 
 	if hi.Url != "" && !host.Include(hi.UserId, hi.Url) && host.Exclude(hi.UserId, hi.Url) {
-		return false, errors.New("ignore by rule: " + hi.Url)
+		return false, errors.New("ignore " + hi.Url + " by url rule: " + hi.Url)
 	}
 
 	if hi.Suffix != "" && !filetype.Include(hi.UserId, hi.Suffix) && filetype.Exclude(hi.UserId, hi.Suffix) {
-		return false, errors.New("ignore by suffix: " + hi.Suffix)
+		return false, errors.New("ignore " + hi.Url + " by suffix: " + hi.Suffix)
 	}
 
 	if hi.Sha1 != "" {
 		_, created := NextVersion(context.Background(), hi.Sha1)
 		if utils.CheckVersionInterval(storageSetting.MinVersionInterval, created) {
-			return false, errors.New("ignore by interval: " + hi.Sha1)
+			return false, errors.New("ignore " + hi.Url + " by interval: " + hi.Sha1)
 		}
 	}
 
