@@ -1,3 +1,3 @@
 #!/bin/bash
 
-ent generate --target ./ent ./ent/schema
+go run -mod=mod entgo.io/ent/cmd/ent generate ./ent/schema
