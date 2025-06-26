@@ -5,7 +5,8 @@ import (
 	"strings"
 )
 
-// ExtractDomains 提取网址中的域名，移植自前端逻辑
+// ExtractDomains 提取网址中的域名
+// 跟前端逻辑不一样的地方是不包括跟域名
 func ExtractDomains(inputURL string) []string {
 	parsedURL, err := url.Parse(inputURL)
 	if err != nil {
@@ -20,7 +21,7 @@ func ExtractDomains(inputURL string) []string {
 	parts := strings.Split(hostname, ".")
 	if len(parts) >= 2 {
 		rootDomain := strings.Join(parts[len(parts)-2:], ".")
-		domains[rootDomain] = struct{}{}
+		//domains[rootDomain] = struct{}{}
 		domains["*."+rootDomain] = struct{}{}
 	}
 
