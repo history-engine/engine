@@ -16,7 +16,7 @@ import (
 func Filter(hi *model.HtmlInfo) (bool, error) {
 	storageSetting, err := serviceSetting.GetSetting(context.Background(), hi.UserId)
 	if err != nil {
-		panic(err)
+		return false, err
 	}
 
 	if hi.Size > 0 && (hi.Size < 2048 || hi.Size > storageSetting.MaxSize) {
