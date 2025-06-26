@@ -21,6 +21,7 @@ var Jobs = &cli.Command{
 		page.IndexCheck,
 		page.ExcludeCheck,
 		icon.DownloadIcon,
+		page.DomainsCheck,
 	},
 }
 
