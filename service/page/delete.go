@@ -2,16 +2,46 @@ package page
 
 import (
 	"context"
+	"entgo.io/ent/dialect/sql"
+	"entgo.io/ent/dialect/sql/sqljson"
 	"errors"
 	"fmt"
 	"history-engine/engine/ent"
 	"history-engine/engine/ent/page"
+	"history-engine/engine/ent/predicate"
 	"history-engine/engine/library/db"
 	"history-engine/engine/model"
 	"history-engine/engine/service/search"
 	"history-engine/engine/setting"
 	"os"
 )
+
+func DeleteByHost(ctx context.Context, host ...string) (int, error) {
+	if len(host) == 0 {
+		return 0, nil
+	}
+
+	ps := make([]predicate.Page, 0)
+	for _, item := range host {
+		ps = append(ps, func(selector *sql.Selector) {
+			selector.Where(sqljson.ValueContains("domains", item))
+		})
+	}
+
+	pages, err := db.GetEngine().Page.Query().Where(page.Or(ps...)).All(ctx)
+	if err != nil {
+		return 0, err
+	}
+
+	rows := 0
+	for _, item := range pages {
+		if err := Delete(ctx, item); err != nil {
+			return rows, err
+		}
+	}
+
+	return rows, err
+}
 
 func DeleteByIdent(ctx context.Context, ident model.PageIdent) error {
 	var err error
