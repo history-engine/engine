@@ -24,7 +24,7 @@ func Search(ctx context.Context, userId int64, search model.SearchRequest) (resp
 
 	err = json.Unmarshal(body, &resp)
 	if err != nil {
-		logger.Zap().Error("search zinc err", zap.ByteString("resp", body))
+		logger.Zap().Error("search meilisearch err", zap.ByteString("resp", body))
 		return
 	}
 

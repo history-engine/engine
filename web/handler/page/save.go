@@ -45,7 +45,7 @@ func RestSave(c echo.Context) error {
 
 	if ok, err := page.Filter(hi); !ok {
 		logger.Zap().Info(err.Error())
-		return c.String(http.StatusBadRequest, err.Error())
+		return c.JSON(http.StatusBadRequest, err)
 	}
 
 	if err := page.SavePage(c.Request().Context(), hi); err != nil {
