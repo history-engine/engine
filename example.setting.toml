@@ -16,7 +16,6 @@ format = "console" # json、console
 port = 8080
 addr = "0.0.0.0"
 domain = "http://localhost:8080"
-ui_path = "data/webui"
 
 [jwt]
 jwt_key = "he-jwt-key"
