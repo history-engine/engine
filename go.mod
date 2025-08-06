@@ -1,6 +1,6 @@
 module history-engine/engine
 
-go 1.24.0
+go 1.24
 
 require (
 	entgo.io/ent v0.14.4

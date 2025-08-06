@@ -1,13 +1,12 @@
 package web
 
 import (
+	"github.com/urfave/cli/v2"
 	"history-engine/engine/library/db"
 	"history-engine/engine/library/localcache"
 	"history-engine/engine/library/logger"
 	"history-engine/engine/library/server"
 	"history-engine/engine/web/routes"
-
-	"github.com/urfave/cli/v2"
 )
 
 var Web = &cli.Command{

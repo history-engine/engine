@@ -16,7 +16,7 @@ PLATFORM_LIST = \
 
 WINDOWS_ARCH_LIST = windows-amd64
 
-all: linux-amd64 linux-arm64 linux-arm darwin-amd64 darwin-arm64 windows-amd64
+all: linux-amd64 linux-arm64 linux-arm darwin-amd64 darwin-arm64 windows-amd64 webui
 
 darwin-amd64:
 	GOARCH=amd64 GOOS=darwin $(GOBUILD) -o $(RELEASE_DIR)/$(NAME)-$@
@@ -48,6 +48,9 @@ windows-amd64:
 	mkdir -p $(RELEASE_DIR)/data
 	cp example.setting.toml $(RELEASE_DIR)/setting.toml
 
+webui-dist:
+	cd webui && yarn build
+
 gz_releases=$(addsuffix .gz, $(PLATFORM_LIST))
 zip_releases=$(addsuffix .zip, $(WINDOWS_ARCH_LIST))
 
@@ -62,3 +65,4 @@ release: $(gz_releases) $(zip_releases)
 
 clean:
 	rm -rf $(RELEASE_DIR)/*
+	rm -rf webui/dist

@@ -1,6 +1,7 @@
 package routes
 
 import (
+	"history-engine/engine/web/middleware"
 	"log"
 	"strings"
 
@@ -10,12 +11,12 @@ import (
 )
 
 func RegisterRoute(e *echo.Echo) {
-	e.Use(em.Recover())
 	e.OnAddRouteHandler = onAddRouteHandler
+	e.Use(em.Recover())
+	e.Use(em.RequestID())
+	e.Use(middleware.Assets())
 
-	uiRouteRegister(e.Group(""))
 	pageViewRegister(e.Group("/page"))
-	
 	userRouteRegister(e.Group("/api/user"))
 	pageRouteRegister(e.Group("/api/page"))
 	adminRouteRegister(e.Group("/api/admin"))
