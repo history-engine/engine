@@ -1,11 +1,12 @@
 package middleware
 
 import (
+	"history-engine/engine/webui"
+	"strings"
+
 	"github.com/fengqi/lrace"
 	"github.com/labstack/echo/v4"
 	em "github.com/labstack/echo/v4/middleware"
-	"history-engine/engine/webui"
-	"strings"
 )
 
 var spec = []string{
@@ -22,7 +23,11 @@ func Assets() echo.MiddlewareFunc {
 		HTML5:      true,
 		Skipper: func(c echo.Context) bool {
 			path := c.Request().URL.Path
-			return !(lrace.InArray(spec, path) || strings.HasPrefix(path, "/assets/"))
+			if lrace.InArray(spec, path) || strings.HasPrefix(path, "/assets/") {
+				c.Response().Header().Set(echo.HeaderCacheControl, "public, max-age=604800")
+				return false
+			}
+			return true
 		},
 	})
 }
