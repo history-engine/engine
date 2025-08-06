@@ -10,9 +10,9 @@ import (
 var f embed.FS
 
 func Dist(path string) http.FileSystem {
-	fs, err := fs.Sub(f, path)
+	fsSub, err := fs.Sub(f, path)
 	if err != nil {
 		panic(err)
 	}
-	return http.FS(fs)
+	return http.FS(fsSub)
 }
