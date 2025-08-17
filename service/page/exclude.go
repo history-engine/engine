@@ -3,12 +3,13 @@ package page
 import (
 	"context"
 	"errors"
-	"go.uber.org/zap"
 	"history-engine/engine/ent/page"
 	"history-engine/engine/library/db"
 	"history-engine/engine/library/logger"
 	"history-engine/engine/model"
 	"history-engine/engine/service/host"
+
+	"go.uber.org/zap"
 )
 
 func Exclude(ctx context.Context, params model.ExcludeRequest) error {
@@ -32,9 +33,9 @@ func Exclude(ctx context.Context, params model.ExcludeRequest) error {
 	go func() {
 		n, err := DeleteByHost(context.Background(), params.Domains...)
 		if err != nil {
-			logger.Zap().Error("delete ignore page err", zap.Error(err), zap.Any("domains", params.Domains))
+			logger.Zap().Error("delete ignore page err", zap.Error(err), zap.Strings("domains", params.Domains))
 		} else {
-			logger.Zap().Info("delete ignore page", zap.Int("rows", n))
+			logger.Zap().Info("delete ignore page", zap.Strings("domain", params.Domains), zap.Int("rows", n))
 		}
 	}()
 

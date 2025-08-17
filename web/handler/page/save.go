@@ -1,13 +1,15 @@
 package page
 
 import (
-	"github.com/labstack/echo/v4"
 	"history-engine/engine/library/logger"
 	"history-engine/engine/model"
 	"history-engine/engine/service/page"
 	"history-engine/engine/utils"
 	"net/http"
 	"net/url"
+
+	"github.com/labstack/echo/v4"
+	"go.uber.org/zap"
 )
 
 // RestSave rest api 方式保存HTML
@@ -44,11 +46,12 @@ func RestSave(c echo.Context) error {
 	}
 
 	if ok, err := page.Filter(hi); !ok {
-		logger.Zap().Info(err.Error())
+		logger.Zap().Error("page filter err", zap.Error(err), zap.Any("html_info", hi))
 		return c.JSON(http.StatusBadRequest, err)
 	}
 
 	if err := page.SavePage(c.Request().Context(), hi); err != nil {
+		logger.Zap().Error("save page err", zap.Error(err), zap.Any("html_info", hi))
 		return c.JSON(http.StatusInternalServerError, err)
 	}
 
