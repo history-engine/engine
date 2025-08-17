@@ -7,6 +7,7 @@ import (
 	entHost "history-engine/engine/ent/host"
 	"history-engine/engine/library/db"
 	"history-engine/engine/library/localcache"
+	"history-engine/engine/utils"
 )
 
 func Add(ctx context.Context, userId int64, host []string, Type int) error {
@@ -18,6 +19,7 @@ func Add(ctx context.Context, userId int64, host []string, Type int) error {
 
 	x := db.GetEngine()
 
+	host = utils.FilterDuplicateDomains(host)
 	create := make([]*ent.HostCreate, 0)
 	for _, item := range host {
 		exist, _ := x.Host.Query().Where(entHost.UserID(userId), entHost.Host(item), entHost.Type(Type)).Exist(ctx)
