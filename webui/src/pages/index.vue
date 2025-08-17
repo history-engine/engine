@@ -374,6 +374,11 @@ export default {
       }).catch(err => {
         this.alert('搜索失败：' + err)
       });
+
+      window.scrollTo({
+        top: 0,
+        behavior: 'smooth'
+      });
     },
 
     handlePopState(event) {
