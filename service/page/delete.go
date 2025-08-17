@@ -2,8 +2,6 @@ package page
 
 import (
 	"context"
-	"entgo.io/ent/dialect/sql"
-	"entgo.io/ent/dialect/sql/sqljson"
 	"errors"
 	"fmt"
 	"history-engine/engine/ent"
@@ -14,6 +12,9 @@ import (
 	"history-engine/engine/service/search"
 	"history-engine/engine/setting"
 	"os"
+
+	"entgo.io/ent/dialect/sql"
+	"entgo.io/ent/dialect/sql/sqljson"
 )
 
 func DeleteByHost(ctx context.Context, host ...string) (int, error) {
@@ -38,6 +39,7 @@ func DeleteByHost(ctx context.Context, host ...string) (int, error) {
 		if err := Delete(ctx, item); err != nil {
 			return rows, err
 		}
+		rows += 1
 	}
 
 	return rows, err
