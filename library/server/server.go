@@ -35,6 +35,7 @@ func New(routeRegister func(r *echo.Echo)) *Server {
 	s.http.HideBanner = true
 	s.http.HidePort = true
 	s.http.Debug = setting.Common.Env == "dev"
+	s.http.Validator = NewCustomValidator()
 	routeRegister(s.http)
 
 	return s

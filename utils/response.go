@@ -1,10 +1,28 @@
 package utils
 
 import (
-	"github.com/labstack/echo/v4"
 	"history-engine/engine/model"
 	"net/http"
+
+	"github.com/labstack/echo/v4"
 )
+
+// todo 抽象成response包，方便调用
+
+func ApiCustom(ctx echo.Context, code model.MsgCode, msg string) error {
+	if msg == "" {
+		if val, ok := model.MsgTable[code]; !ok {
+			msg = val
+		}
+	}
+
+	return ctx.JSON(http.StatusOK, model.ApiResponse{
+		Code:    code,
+		Message: msg,
+		Data:    nil,
+	})
+
+}
 
 func ApiResponse(ctx echo.Context, code int, msg string, data any) error {
 	return ctx.JSON(http.StatusOK, model.ApiResponse{
