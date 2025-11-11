@@ -49,7 +49,7 @@ windows-amd64:
 	cp example.setting.toml $(RELEASE_DIR)/setting.toml
 
 webui-dist:
-	cd webui && yarn build
+	cd webui && yarn install && yarn build
 
 gz_releases=$(addsuffix .gz, $(PLATFORM_LIST))
 zip_releases=$(addsuffix .zip, $(WINDOWS_ARCH_LIST))

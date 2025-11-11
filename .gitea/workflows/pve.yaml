@@ -1,0 +1,76 @@
+name: Auto deployment to PVE
+run-name: Auto deployment to PVE
+on: [push]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: Setup Go
+        uses: actions/setup-go@v6
+        with:
+          go-version-file: 'go.mod'
+          cache-dependency-path: "go.sum"
+
+      - name: Cache Go Modules、Binaries、Build Cache
+        uses: actions/cache@v4
+        id: go-modules-cache
+        with:
+            path: |
+              ~/go/pkg/mod
+              ~/go/bin
+              ~/.cache/go-build
+            key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+            restore-keys: |
+              ${{ runner.os }}-go-
+
+      - name: Setup pve-pct command
+        run: |
+          go install github.com/fengqi/pve-pct@f386a6d
+
+      - name: Setup Node
+        uses: actions/setup-node@v6
+        with:
+          node-version: '24'
+
+      - name: Cache Node Modules
+        uses: actions/cache@v4
+        id: node-modules-cache
+        with:
+          path: ./webui/node_modules
+          key: ${{ runner.os }}-yarn-${{ hashFiles('./webui/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-yarn-
+
+      - name: Install Yarn
+        run: npm install -g yarn
+
+      - name: Build Webui
+        run: |
+          cd webui
+          yarn install
+          yarn build
+
+      - name: Build Server
+        run: make linux-amd64
+
+      - name: Deploy to PVE
+        run: |
+          pve-pct push ${{ secrets.PVE_LXC_ID }} ./release/history-engine-linux-amd64 /data/history-engine/history-engine-linux-amd64
+          pve-pct push ${{ secrets.PVE_LXC_ID }} ./release/setting.toml /data/history-engine/example.setting.toml
+          pve-pct exec ${{ secrets.PVE_LXC_ID }} chmod +x /data/history-engine/history-engine-linux-amd64
+          pve-pct exec ${{ secrets.PVE_LXC_ID }} systemctl restart history-engine
+          echo "Deploy to PVE done"
+        env:
+          PVE_ADDR: ${{ secrets.PVE_HOST }}
+          PVE_PORT: ${{ secrets.PVE_PORT }}
+          PVE_USER: ${{ secrets.PVE_USER }}
+          PVE_PRIVATE_KEY: ${{ secrets.PVE_PRIVATE_KEY }}
+          PVE_PRIVATE_KEY_PASSWORD: ${{ secrets.PVE_PRIVATE_KEY_PASSWORD }}
+
+      - run: echo "🍏 This job's status is ${{ job.status }}"
